@@ -49,8 +49,6 @@ select {
   font: inherit;
 }
 
-/* Layout */
-
 .stack {
   display: flex;
   flex-direction: column;
@@ -91,8 +89,6 @@ select {
   background-repeat: no-repeat;
   filter: opacity(0.04) grayscale(100%);
 }
-
-/* Filters */
 
 .filters {
   display: flex;
@@ -135,8 +131,6 @@ select {
   color: inherit;
   cursor: pointer;
 }
-
-/* Tables */
 
 .table-container {
   width: 100%;
@@ -237,8 +231,6 @@ tbody tr:nth-of-type(even) {
   }
 }
 
-/* Homepage */
-
 .tiles {
   display: grid;
   grid-template-columns: 1fr;
@@ -290,8 +282,6 @@ tbody tr:nth-of-type(even) {
   font-weight: 400;
   line-height: 1.43;
 }
-
-/* Details dialog */
 
 .detail-dialog {
   width: calc(100% - 64px);
@@ -385,8 +375,6 @@ tbody tr:nth-of-type(even) {
   width: 100%;
 }
 
-/* Verify */
-
 .verify {
   position: relative;
   gap: 32px;
@@ -425,8 +413,6 @@ tbody tr:nth-of-type(even) {
   font-style: italic;
   color: var(--text-secondary);
 }
-
-/* Toast and error fallback */
 
 .toast {
   position: fixed;

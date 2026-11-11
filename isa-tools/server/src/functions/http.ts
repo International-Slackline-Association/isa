@@ -13,7 +13,7 @@ export type Request = {
 
 export type Route = (request: Request) => Promise<APIGatewayProxyResult>;
 
-const corsHeaders = { 'Access-Control-Allow-Origin': '*' };
+export const corsHeaders = { 'Access-Control-Allow-Origin': '*' };
 
 export const json = (data: unknown, statusCode = 200): APIGatewayProxyResult => ({
   statusCode,
@@ -46,13 +46,15 @@ const parseBody = (event: APIGatewayProxyEvent) => {
   return body;
 };
 
-// Routes are keyed "METHOD /path" in lower case; the path comes from the {proxy+} parameter.
 export const createHandler = (
   lambdaName: string,
   routes: Record<string, Route>,
   notFoundMessage: (path: string) => string,
 ) => {
   logger.setLambdaName(lambdaName);
+  const routesByKey = Object.fromEntries(
+    Object.entries(routes).map(([key, route]) => [key.toLowerCase(), route]),
+  );
 
   return async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const method = event.httpMethod.toUpperCase();
@@ -64,8 +66,13 @@ export const createHandler = (
       const headers = Object.fromEntries(
         Object.entries(event.headers ?? {}).map(([name, value]) => [name.toLowerCase(), value]),
       );
-      const route = routes[`${method} ${path.replace(/\/+$/, '').toLowerCase()}`];
-      if (!route) return json({ message: notFoundMessage(path) }, 404);
+      // Express answered HEAD from GET routes.
+      const routeMethod = method === 'HEAD' ? 'GET' : method;
+      const route = routesByKey[`${routeMethod} ${path.replace(/\/+$/, '')}`.toLowerCase()];
+      if (!route) {
+        logger.info('Not found', { method, path });
+        return json({ message: notFoundMessage(path) }, 404);
+      }
       return await route({ method, path, headers, query, body });
     } catch (error) {
       const message = (error as Error).message || 'Error occurred';

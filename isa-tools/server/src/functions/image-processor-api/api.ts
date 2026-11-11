@@ -2,7 +2,7 @@ import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { s3 } from '../../core/aws/clients';
 import sharp, { Sharp } from 'sharp';
 
-import { type Request, json, validate } from '../http';
+import { type Request, corsHeaders, json, validate } from '../http';
 import { ProcessImageBody, processImageSchema } from './schema';
 
 export const processImage = async (request: Request) => {
@@ -45,7 +45,7 @@ export const processImage = async (request: Request) => {
     return {
       statusCode: 200,
       headers: {
-        'Access-Control-Allow-Origin': '*',
+        ...corsHeaders,
         'Content-Type': contentType,
         'Content-Encoding': 'base64',
       },

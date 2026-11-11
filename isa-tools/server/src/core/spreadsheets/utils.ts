@@ -90,10 +90,14 @@ const authorize = () => {
 
 const batchGet = async (spreadsheetId: string, range: string) => {
   const { token } = await (await authorize()).getAccessToken();
-  const response = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchGet?ranges=${encodeURIComponent(range)}`,
-    { headers: { Authorization: `Bearer ${token}` } },
-  );
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchGet?ranges=${encodeURIComponent(range)}`;
+  let response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  // Same retries the googleapis client did: 408, 429 and 5xx, with backoff.
+  const retryable = (status: number) => status === 408 || status === 429 || status >= 500;
+  for (let attempt = 1; attempt <= 3 && retryable(response.status); attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, 100 * 2 ** attempt));
+    response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  }
   if (!response.ok) {
     throw new Error(`Google Sheets request failed with status ${response.status}`);
   }

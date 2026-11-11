@@ -1,7 +1,5 @@
-// Calls a built handler's `main` with an API Gateway proxy event and prints status and body.
 // pnpm run build && pnpm run invoke api GET /sheets/list/riggers -H origin:http://localhost
 // pnpm run invoke api POST /sign -H x-api-key:KEY -d '{"subject":"s","expiresInSeconds":60,"content":"0123456789"}'
-// The handlers need AWS credentials (AWS_PROFILE, AWS_REGION) and the environment variables set in the CDK stack.
 import { createRequire } from 'node:module';
 import { parseArgs } from 'node:util';
 

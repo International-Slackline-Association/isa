@@ -4,7 +4,6 @@ import { showError } from './components/Toast';
 
 const API_URL = 'https://tools-api.slacklineinternational.org';
 
-/** GET `path` from the tools API. A null path does not fetch. Failures show the error toast. */
 export function useFetch<T>(path: string | null) {
   const [state, setState] = useState<{ data?: T; isFetching: boolean }>({
     isFetching: path !== null,
