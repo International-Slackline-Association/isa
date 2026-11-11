@@ -1,0 +1,3 @@
+# The docs folder holds prose plus one script: `scripts/find-in-docs.mjs`, the
+# docs-index CLI. Its two dependencies are all that is installed here.
+saveExact: true

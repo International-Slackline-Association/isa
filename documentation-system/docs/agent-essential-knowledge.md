@@ -28,7 +28,7 @@ Quick look for you:
 
 ## Finding docs
 
-The docs are spread across the repo next to the code they describe, in `docs/` folders. Before you guess where knowledge is, when you enter a scope, or meet a term you don't know: start at the scope's `docs/README.md` and search the `description` lines of the docs' frontmatter.
+The docs are spread across the repo next to the code they describe, in `docs/` folders. Before you guess where knowledge is, when you enter a scope, or meet a term you don't know: start at the scope's `docs/README.md` and run the `find-in-docs` skill, which lists every doc with its type and description.
 
 ## Never
 

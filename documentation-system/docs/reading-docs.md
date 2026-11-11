@@ -24,14 +24,14 @@ Why: [progressive disclosure](the-theory.md#progressive-disclosure). If a situat
 
 | Situation | Do |
 |---|---|
-| Asked to work in folder `X/` | Read `X/docs/README.md` if it exists. List `X/docs/` with each file's description. Decide from the README and the descriptions together what to open; open it. Follow upward links the README gives. |
+| Asked to work in folder `X/` | Read `X/docs/README.md` if it exists. Run `find-in-docs --dir X`. Decide from the README and the descriptions together what to open; open it. Follow upward links the README gives. |
 | `X/docs/` does not exist | Proceed. Do not look in parent folders' docs unless a task or a README sends you there. |
-| `X/docs/` exists but has no `README.md`, or its files have no frontmatter | The scope is unconverted. Those files are legacy docs: read the ones whose filename fits the task, and treat what they say as facts to check against the code. |
+| `X/docs/` exists but has no `README.md`, or `find-in-docs --dir` lists files as not in the catalog | The scope is unconverted. Those files are legacy docs: read the ones whose filename fits the task, and treat what they say as facts to check against the code. |
 | The task spans several folders | Read each folder's README. |
 | A doc's first lines say it is behind its author's thinking | Read it, but ask the human before relying on it. |
 | A doc's `description` suggests it's irrelevant | Skip it. |
 | The README is long or contains theory | Read it anyway; then tell the human it has grown past one screen. |
-| You need business or company context, or don't know which scope owns a topic | Search the `description` lines across all `docs/` folders. |
+| You need business or company context, or don't know which scope owns a topic | `find-in-docs <keywords>`. |
 
 ## When the docs fail you
 

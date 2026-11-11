@@ -9,6 +9,7 @@
     "commit": "",
     "pr": ""
   },
+  "outputStyle": "Concise",
   "permissions": {
     "deny": [
       "mcp__ide__*",

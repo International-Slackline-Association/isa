@@ -34,7 +34,7 @@ Runs at the end of every change, before the pull request; nothing waits for the 
 
 ## Before any doc
 
-1. Search the docs' `description` lines for the topic. If a doc owns the topic, change it.
+1. `find-in-docs <topic>`. If a doc owns the topic, change it.
 2. Pick the scope: the lowest folder that contains everything the doc is about.
 3. Pick one type by the filing test in the frontmatter spec.
 4. Frontmatter: `type`, `description`, optionally `title`. Spend the effort on the description.
