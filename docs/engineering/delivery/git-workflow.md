@@ -1,13 +1,13 @@
 ---
 type: policy
 title: Git workflow
-description: "Committing directly to main for now, and the branching, PR, review and squash-merge rules for when PRs are used again."
+description: "Working on a branch and squash-merging into main when done, for now without PRs, and the PR, review and squash-merge rules for when PRs are used again."
 nav: { order: 40 }
 ---
 
 # Git workflow
 
-- For now there are no PRs: commits go directly to `main`.
+- For now there are no PRs. Work happens on a branch off `main`; when the human says it is done, the branch is squash-merged into `main` with a descriptive message.
 
 ### Pull Request Rules
 

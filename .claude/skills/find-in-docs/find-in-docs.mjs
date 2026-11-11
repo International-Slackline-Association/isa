@@ -2,7 +2,7 @@
 // find-in-docs — browse/search the repo's docs catalog.
 //
 // The catalog is opt-in: any tracked .md file whose frontmatter has a non-empty
-// `type` and `description` (see documentation-system/docs/frontmatter-spec.md).
+// `type` and `description` (see docs/documentation-system/frontmatter-spec.md).
 // `status: deprecated` docs are hidden. This tool only points — it never prints
 // doc bodies; read the files it points at.
 //

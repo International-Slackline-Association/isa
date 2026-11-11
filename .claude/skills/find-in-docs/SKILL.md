@@ -6,14 +6,14 @@ description: Map and search the monorepo docs before starting work in an area or
 From the repo root:
 
 ```bash
-node documentation-system/scripts/find-in-docs.mjs <keywords…>          # search title, description, path
-node documentation-system/scripts/find-in-docs.mjs --dir <path>         # list a subtree's docs, plus its markdown not in the catalog
-node documentation-system/scripts/find-in-docs.mjs --map                # catalog overview
+node .claude/skills/find-in-docs/find-in-docs.mjs <keywords…>          # search title, description, path
+node .claude/skills/find-in-docs/find-in-docs.mjs --dir <path>         # list a subtree's docs, plus its markdown not in the catalog
+node .claude/skills/find-in-docs/find-in-docs.mjs --map                # catalog overview
 ```
 
 Keywords combine with OR and a doc matching several ranks first, so give two or three specific terms, not one generic word and not a sentence. Terms of three letters or fewer must match exactly.
 
-On a fresh checkout it fails with a missing-module error once: `pnpm install --dir documentation-system`, then retry.
+On a fresh checkout it fails with a missing-module error once: `pnpm install --dir .claude/skills/find-in-docs`, then retry.
 
 Reading the output:
 

@@ -2,7 +2,7 @@
 type: explanation
 title: How we build
 description: "The human's theory of how software is built here: what humans decide, what agents do, and what simplicity means in this architecture."
-related: [coding/coding-rules.md, code-review/the-review.md, /documentation-system/docs/the-theory.md]
+related: [coding/coding-rules.md, code-review/the-review.md, /docs/documentation-system/the-theory.md]
 nav: { order: 10 }
 ---
 
@@ -24,7 +24,7 @@ Patterns are reused, not code: a new scope does a thing the way an existing scop
 
 ## Modularity
 
-Code follows the same modularity ideas the [docs system](/documentation-system/docs/the-theory.md#scopes-not-levels) holds for knowledge: colocation, encapsulation, one dependency direction. One idea for both, not one for code and another for docs. The rules: [modularity](coding/coding-rules.md#modularity) and [the boundary](coding/coding-rules.md#the-boundary).
+Code follows the same modularity ideas the [docs system](/docs/documentation-system/the-theory.md#scopes-not-levels) holds for knowledge: colocation, encapsulation, one dependency direction. One idea for both, not one for code and another for docs. The rules: [modularity](coding/coding-rules.md#modularity) and [the boundary](coding/coding-rules.md#the-boundary).
 
 ## Debuggable, traceable, runnable here
 

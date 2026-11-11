@@ -2,13 +2,13 @@
 type: policy
 title: Code comments
 description: What a code comment may say (only what the code around it cannot show), and where a wider why goes instead.
-related: [/documentation-system/docs/content-rules.md]
+related: [/docs/documentation-system/content-rules.md]
 nav: { order: 22 }
 ---
 
 # Code comments
 
-Why: [the content rules](/documentation-system/docs/content-rules.md), with the surrounding code as the scope.
+Why: [the content rules](/docs/documentation-system/content-rules.md), with the surrounding code as the scope.
 
 1. A comment says only what a competent reader cannot reconstruct from the code around it: the why of this line, an external quirk, a contract this code participates in, a non-obvious constraint.
 2. A comment that narrates the code (what the next lines do, what a function handles, what a type is) fails the test. Delete it.

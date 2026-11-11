@@ -11,7 +11,7 @@ nav:
 
 This system is IMPORTANT beyond we can express. Everything relies on this foundation. Our documentation in this repo and the system around is the essential layer for everything. You must work with it fully!
 
-You can read it all details starting at `documentation-system/docs` but here is the compact information you need to know for everything you work on. 
+You can read it all details starting at [the system's README](README.md) but here is the compact information you need to know for everything you work on. 
 
 ## Understanding documentation system
 

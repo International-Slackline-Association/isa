@@ -2,13 +2,13 @@
 type: explanation
 title: Code review
 description: "Why finished code is reviewed by an adversarial agent, when it runs, what humans no longer review and what comes back as questions instead of findings."
-related: [reviewing.md, ../how-we-build.md, /documentation-system/docs/the-theory.md]
+related: [reviewing.md, ../how-we-build.md, /docs/documentation-system/the-theory.md]
 nav: { order: 30 }
 ---
 
 # Code review
 
-Humans stop checking code for bugs and stop testing it; [how we build](../how-we-build.md) draws that line. Code review is how the line is held: an agent with a fresh context, that did not write the change and does not know how it was made, reads the finished implementation against the docs along its paths. It is the [adversarial reader](/documentation-system/docs/the-theory.md#the-adversarial-reader) of the docs system applied to code. The reviewer owes the change nothing and is honest about it, so every report carries its opinion of the change, marked as its own. How a review runs is [reviewing](reviewing.md); the triggers only point there with the scope and the intent.
+Humans stop checking code for bugs and stop testing it; [how we build](../how-we-build.md) draws that line. Code review is how the line is held: an agent with a fresh context, that did not write the change and does not know how it was made, reads the finished implementation against the docs along its paths. It is the [adversarial reader](/docs/documentation-system/the-theory.md#the-adversarial-reader) of the docs system applied to code. The reviewer owes the change nothing and is honest about it, so every report carries its opinion of the change, marked as its own. How a review runs is [reviewing](reviewing.md); the triggers only point there with the scope and the intent.
 
 ## When it runs
 

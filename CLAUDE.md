@@ -4,7 +4,7 @@ Pointer only. Knowledge lives in `docs/`; this file carries what every session m
 
 ## Our Documentation System
 
-@documentation-system/docs/agent-essential-knowledge.md
+@docs/documentation-system/agent-essential-knowledge.md
 
 ## Must never
 
