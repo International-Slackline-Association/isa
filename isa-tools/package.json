@@ -1,33 +1,13 @@
 {
   "name": "isa-tools",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "dev": "pnpm --filter isa-tools-web run start",
     "build": "pnpm --filter isa-tools-web run build",
     "checkTs": "pnpm -r run checkTs",
-    "lint": "eslint .",
-    "prettify": "prettier --write '**/*.{js,ts,tsx}'",
     "synth": "pnpm run build && pnpm --filter isa-tools-infra exec cdk synth --profile isa-admin",
     "diff": "pnpm run build && pnpm --filter isa-tools-infra exec cdk diff --profile isa-admin",
     "deploy": "pnpm run build && pnpm --filter isa-tools-infra exec cdk deploy --profile isa-admin"
-  },
-  "devDependencies": {
-    "@eslint/js": "8.57.0",
-    "@types/eslint__js": "8.42.3",
-    "eslint": "8.57.0",
-    "typescript-eslint": "7.13.0",
-    "@trivago/prettier-plugin-sort-imports": "4.3.0",
-    "globals": "15.4.0",
-    "prettier": "3.3.2",
-    "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-prettier": "5.1.3",
-    "eslint-plugin-react": "7.34.2",
-    "eslint-plugin-react-hooks": "4.6.2",
-    "eslint-plugin-unused-imports": "3.2.0"
-  },
-  "author": {
-    "name": "Can Sahin"
   },
   "private": true,
   "license": "GPL-3.0",

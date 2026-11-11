@@ -30,7 +30,7 @@ Why: [upgrades as we go](/docs/the-monorepo.md#upgrades-as-we-go).
 
 ## Scripts
 
-Every project's root `package.json` carries the same building blocks: `dev`, `build`, `checkTs`, `lint`, `synth`, `diff`, `deploy`. Anything run more than once becomes one of them, not a command in a doc.
+Every project's root `package.json` carries the same building blocks: `dev`, `build`, `checkTs`, `synth`, `diff`, `deploy`. Anything run more than once becomes one of them, not a command in a doc.
 
 ## Deploying
 

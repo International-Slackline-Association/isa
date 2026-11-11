@@ -8,7 +8,7 @@ nav: { order: 10 }
 
 # How we build
 
-Humans stop checking code for bugs and stop testing it. We abstract ourselves to system design, alignment with the future architecture, decision making and the robustness of architectural flows: anything high level. Functions, code and coding style are not ours anymore. Everything below that line is the agents', at the best quality possible, and the [coding rules](coding/coding-rules.md) are what that quality is held against. How that line is checked is [code review](code-review/the-review.md).
+Humans stop checking code for bugs and stop testing it. We abstract ourselves to system design, alignment with the future architecture, decision making and the robustness of architectural flows: anything high level. Functions, code and coding style are not ours anymore. Everything below that line is the agents', at the best quality possible, and the [coding rules](coding/coding-rules.md) are what that quality is held against. Code is fully agent-maintained and nobody reads it anymore, so there is no linter or formatter; the type check is the gate. How that line is checked is [code review](code-review/the-review.md).
 
 ## Simplicity, in every axis
 
