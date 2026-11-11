@@ -216,11 +216,5 @@ export class AppStack extends Stack {
         treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       }).addAlarmAction(alarmAction);
     }
-    new cloudwatch.Alarm(this, 'Api5xxAlarm', {
-      metric: api.metricServerError({ period: Duration.minutes(5) }),
-      threshold: 3,
-      evaluationPeriods: 1,
-      treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
-    }).addAlarmAction(alarmAction);
   }
 }

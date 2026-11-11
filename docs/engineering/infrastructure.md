@@ -25,7 +25,7 @@ Why: [upgrades as we go](/docs/the-monorepo.md#upgrades-as-we-go).
 - No native binaries in git. A native module is installed for the Lambda's platform at bundling time.
 - Secrets live in SSM Parameter Store, created by hand. CDK references them and never creates them.
 - Web apps are an S3 bucket behind CloudFront with origin access control, deployed by `BucketDeployment`.
-- Lambda errors and API 5xx raise a CloudWatch alarm to the role address `aws@slacklineinternational.org`.
+- Lambda errors raise a CloudWatch alarm to the role address `aws@slacklineinternational.org`.
 - Exact-pinned dependencies, pnpm through corepack, one lockfile per project.
 
 ## Scripts
