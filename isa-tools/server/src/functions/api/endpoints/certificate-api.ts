@@ -3,11 +3,11 @@ import { generateCertificatePDF } from '../../../core/certificates/generators/ce
 import { certificateSpreadsheet } from '../../../core/spreadsheets/certificates';
 import { CertificateType } from '../../../core/spreadsheets/types';
 import { type Request, json, validate } from '../../http';
-import { verifyTrustedDomainRequest, verifyTrustedServiceRequest } from '../auth';
+import { verifyTrustedServiceRequest } from '../auth';
 import { generateCertificatePostBodySchema, listCertificatesQueryParamsSchema } from './schema';
 
 const listCertificates = async (request: Request) => {
-  verifyTrustedDomainRequest(request);
+  verifyTrustedServiceRequest(request);
 
   const query = validate(request.query, listCertificatesQueryParamsSchema);
 
