@@ -4,7 +4,7 @@ import { SnackbarNotification } from 'store/state/types';
 
 interface Props {
   snackbarNotification: SnackbarNotification;
-  onClose: (event) => void;
+  onClose: (event: unknown) => void;
 }
 const NotificationSnackbar = ({ snackbarNotification, onClose }: Props) => {
   const isOpen = Boolean(snackbarNotification);

@@ -1,6 +1,6 @@
-import { verifySignedDocument } from '@server/functions/api/endpoints/sign-api';
 import { baseApi } from 'store/rtk-query';
-import { AsyncReturnType } from 'type-fest';
+
+import { VerifyResult } from './types';
 
 export const signApi = baseApi
   .enhanceEndpoints({
@@ -8,7 +8,7 @@ export const signApi = baseApi
   })
   .injectEndpoints({
     endpoints: (builder) => ({
-      verify: builder.query<AsyncReturnType<typeof verifySignedDocument>, string>({
+      verify: builder.query<VerifyResult, string>({
         query: (token: string) => ({
           url: `sign/verify?token=${token}`,
         }),

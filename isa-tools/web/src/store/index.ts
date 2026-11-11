@@ -24,7 +24,7 @@ export function configureAppStore() {
 
 const createReducer = (staticReducers: StaticReducersType) => {
   if (Object.keys(staticReducers).length === 0) {
-    return (state) => state;
+    return (state: unknown) => state;
   } else {
     return combineReducers({
       ...staticReducers,
