@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
+    "AWS_REGION": "eu-central-1"
+  },
+  "attribution": {
+    "sessionUrl": false,
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "deny": [
+      "mcp__ide__*",
+      "mcp__claude_ai_*",
+      "NotebookEdit",
+      "Read(~/.aws/credentials)",
+      "Read(**/.env.local)"
+    ]
+  },
+
+  "plansDirectory": "./.claude/.plans",
+  "autoMemoryDirectory": "./.claude/.memory",
+  "autoMemoryEnabled": false
+}

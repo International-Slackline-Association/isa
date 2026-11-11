@@ -1,24 +1,21 @@
+# CLAUDE.md
+
+Pointer only. Knowledge lives in `docs/`; this file carries what every session must hold and where to read next. Repo entry: [the repo's docs](docs/README.md). Why this monorepo, its scope and the critical data: [why one monorepo](docs/the-monorepo.md).
+
+## Our Documentation System
+
 @documentation-system/docs/agent-essential-knowledge.md
-
-# ISA monorepo
-
-Monorepo of the International Slackline Association (ISA). Public. Each
-project is a self-contained folder with its own docs, dependencies and
-deploys. Start at [docs/README.md](docs/README.md).
 
 ## Must never
 
-- Secrets, tokens, personal emails or private data in code, docs or commits.
-- Changes outside the project folder the task is about, unless the user
-  approved the cross-project change.
-- AWS writes without the user approving the specific change.
-- Commits the user did not ask for; pushes ever. The user pushes.
+- Secrets, tokens or private data in code, docs or commits: the repo is public.
+- Commit unasked, or push. The user pushes.
 
 ## Conventions
 
-- Concise everywhere: docs, comments, commits, answers. Tables and bullets
-  over prose.
-- Simplest solution that works. Suggest, don't over-engineer; the user
-  decides.
-- Plan critical, impactful actions before executing. The user leads.
-- pnpm, one lockfile per project.
+Repo-wide; read the policy when you touch that kind of code. A scope's own conventions arrive with its `docs/README.md`.
+
+- **Engineering**: humans keep architecture and decisions, agents code and never add a new shape on their own; [how we build](docs/engineering/how-we-build.md), the rules in [coding rules](docs/engineering/coding/coding-rules.md). A change is held against the [architecture rules](docs/engineering/architecture-rules.md). Plan critical, impactful actions first; the user decides. When the work is finished, `/review-code` reads them back.
+- **Code comments** say only what the code around them cannot show. [Code comments](docs/engineering/coding/code-comments.md)
+- **Testing**: a new unit test exists only where a rule in the policy allows it. [Unit tests](docs/engineering/coding/testing/unit-tests.md)
+- **Communication**: concise everywhere, docs, comments, commits, answers; tables and bullets over prose.
