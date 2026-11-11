@@ -30,5 +30,8 @@ ddb.middlewareStack.add(
   },
 );
 
-export const s3 = new S3Client();
+export const s3 = new S3Client({
+  requestChecksumCalculation: 'WHEN_REQUIRED',
+  responseChecksumValidation: 'WHEN_REQUIRED',
+});
 export const ssm = new SSMClient();
