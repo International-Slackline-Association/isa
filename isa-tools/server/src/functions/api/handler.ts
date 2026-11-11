@@ -1,13 +1,10 @@
-import serverlessExpress from '@vendia/serverless-express';
-import type { APIGatewayProxyEvent, Context } from 'aws-lambda';
-import { logger } from '../../core/utils/logger';
+import { createHandler } from '../http';
+import { certificateRoutes } from './endpoints/certificate-api';
+import { listingsRoutes } from './endpoints/listings-api';
+import { signRoutes } from './endpoints/sign-api';
 
-import app from './app';
-
-logger.updateMeta({ lambdaName: 'api' });
-
-const handler = serverlessExpress({ app });
-
-// Node.js 24 Lambda rejects handlers that take a callback; serverless-express resolves a promise instead.
-export const main = (event: APIGatewayProxyEvent, context: Context) =>
-  handler(event, context, () => {});
+export const main = createHandler(
+  'api',
+  { ...certificateRoutes, ...listingsRoutes, ...signRoutes },
+  (path) => `${path} Not Found`,
+);

@@ -28,4 +28,4 @@ export const processImageSchema = z
     cacheControl: z.string().optional(),
   })
   .strip();
-export type ProcessImagePostBody = z.infer<typeof processImageSchema>;
+export type ProcessImageBody = z.input<typeof processImageSchema>;

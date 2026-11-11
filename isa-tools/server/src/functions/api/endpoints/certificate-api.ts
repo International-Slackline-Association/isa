@@ -2,25 +2,14 @@ import { uploadPDFToS3 } from '../../../core/aws/s3';
 import { generateCertificatePDF } from '../../../core/certificates/generators/certificateGenerator';
 import { certificateSpreadsheet } from '../../../core/spreadsheets/certificates';
 import { CertificateType } from '../../../core/spreadsheets/types';
-import express, { Request, Response } from 'express';
+import { type Request, json, validate } from '../../http';
+import { verifyTrustedDomainRequest, verifyTrustedServiceRequest } from '../auth';
+import { generateCertificatePostBodySchema, listCertificatesQueryParamsSchema } from './schema';
 
-import {
-  expressRoute,
-  validateApiPayload,
-  verifyTrustedDomainRequest,
-  verifyTrustedServiceRequest,
-} from '../utils';
-import {
-  GenerateCertificatePostBody,
-  ListCertificatesQueryParams,
-  generateCertificatePostBodySchema,
-  listCertificatesQueryParamsSchema,
-} from './schema';
+const listCertificates = async (request: Request) => {
+  verifyTrustedDomainRequest(request);
 
-const listCertificates = async (req: Request<any, any, any, ListCertificatesQueryParams>) => {
-  verifyTrustedDomainRequest(req);
-
-  const query = validateApiPayload(req.query, listCertificatesQueryParamsSchema);
+  const query = validate(request.query, listCertificatesQueryParamsSchema);
 
   const certs = await certificateSpreadsheet.getAllItems({
     isaId: query.isaId,
@@ -42,16 +31,13 @@ const listCertificates = async (req: Request<any, any, any, ListCertificatesQuer
     'world-first': ['en'],
   };
 
-  return { certificates: certs, certificateLanguages };
+  return json({ certificates: certs, certificateLanguages });
 };
 
-const generateCertificate = async (
-  req: Request<any, any, GenerateCertificatePostBody>,
-  _res: Response,
-) => {
-  verifyTrustedServiceRequest(req);
+const generateCertificate = async (request: Request) => {
+  verifyTrustedServiceRequest(request);
 
-  const body = validateApiPayload(req.body, generateCertificatePostBodySchema);
+  const body = validate(request.body, generateCertificatePostBodySchema);
 
   const { pdfBytes } = await generateCertificatePDF({
     certificateType: body.certificateType as CertificateType,
@@ -66,9 +52,10 @@ const generateCertificate = async (
     buffer,
   );
 
-  return { pdfUrl: presignedUrl, certificateId: body.certificateId };
+  return json({ pdfUrl: presignedUrl, certificateId: body.certificateId });
 };
 
-export const certificateApi = express.Router();
-certificateApi.get('/', expressRoute(listCertificates));
-certificateApi.post('/generate', expressRoute(generateCertificate));
+export const certificateRoutes = {
+  'GET /sheets/certificate': listCertificates,
+  'POST /sheets/certificate/generate': generateCertificate,
+};

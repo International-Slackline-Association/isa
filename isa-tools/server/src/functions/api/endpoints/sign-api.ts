@@ -1,14 +1,13 @@
 import * as dateFns from 'date-fns';
 import { createSignedDocument, getSignedDocument } from '../../../core/documentVerification';
-import express, { Request } from 'express';
+import { type Request, json, validate } from '../../http';
+import { verifyTrustedServiceRequest } from '../auth';
+import { signDocumentPostBodySchema } from './schema';
 
-import { expressRoute, validateApiPayload, verifyTrustedServiceRequest } from '../utils';
-import { SignDocumentePostBody, signDocumentPostBodySchema } from './schema';
+const sign = async (request: Request) => {
+  verifyTrustedServiceRequest(request);
 
-const sign = async (req: Request<any, any, SignDocumentePostBody>) => {
-  verifyTrustedServiceRequest(req);
-
-  const body = validateApiPayload(req.body, signDocumentPostBodySchema);
+  const body = validate(request.body, signDocumentPostBodySchema);
 
   const { token, verificationUrl, expiresAt } = await createSignedDocument({
     subject: body.subject,
@@ -17,26 +16,22 @@ const sign = async (req: Request<any, any, SignDocumentePostBody>) => {
     content: body.content,
   });
 
-  return {
-    token,
-    verificationUrl,
-    expiresAt,
-  };
+  return json({ token, verificationUrl, expiresAt });
 };
 
-export const verifySignedDocument = async (req: Request) => {
-  const code = req.query.token as string;
+const verifySignedDocument = async (request: Request) => {
+  const code = request.query.token;
   if (!code) throw new Error('No token provided');
 
   try {
     const document = await getSignedDocument(code);
-    return {
+    return json({
       isVerified: true,
       subject: document.subject,
       issuedAt: dateFns.format(document.issuedAt, 'PPP'),
       expiresAt: dateFns.format(document.expiresAt, 'PPP'),
       content: document.payload.content,
-    };
+    });
   } catch (error) {
     let errorMessage = "This document couldn't be verified.";
     if (error instanceof Error) {
@@ -52,13 +47,11 @@ export const verifySignedDocument = async (req: Request) => {
           break;
       }
     }
-    return {
-      isVerified: false,
-      content: errorMessage,
-    };
+    return json({ isVerified: false, content: errorMessage });
   }
 };
 
-export const signApi = express.Router();
-signApi.post('/', expressRoute(sign));
-signApi.get('/verify', expressRoute(verifySignedDocument));
+export const signRoutes = {
+  'POST /sign': sign,
+  'GET /sign/verify': verifySignedDocument,
+};

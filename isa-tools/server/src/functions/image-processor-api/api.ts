@@ -1,14 +1,14 @@
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { s3 } from '../../core/aws/clients';
-import express, { Request, Response } from 'express';
 import sharp, { Sharp } from 'sharp';
 
-import { ProcessImagePostBody, processImageSchema } from './schema';
-import { catchExpressJsErrorWrapper, validateApiPayload } from './utils';
+import { type Request, json, validate } from '../http';
+import { ProcessImageBody, processImageSchema } from './schema';
 
-export const processImage = async (req: Request<any, any, ProcessImagePostBody>, res: Response) => {
-  const body = req.body;
-  validateApiPayload(body, processImageSchema);
+export const processImage = async (request: Request) => {
+  const body: ProcessImageBody = request.body;
+  // The parsed result is discarded on purpose: the schema's quality default has never been applied.
+  validate(body, processImageSchema);
 
   const s3Image = await s3.send(
     new GetObjectCommand({
@@ -16,8 +16,7 @@ export const processImage = async (req: Request<any, any, ProcessImagePostBody>,
       Key: body.input.s3?.key,
     }),
   );
-  const streamToString = await s3Image.Body!.transformToString('base64');
-  const sharpObject = sharp(Buffer.from(streamToString, 'base64'));
+  const sharpObject = sharp(Buffer.from(await s3Image.Body!.transformToByteArray()));
 
   await resize(sharpObject, body);
 
@@ -41,15 +40,18 @@ export const processImage = async (req: Request<any, any, ProcessImagePostBody>,
   }
 
   const newImageBuffer = await sharpObject.toBuffer();
-  const newImageSize = Buffer.byteLength(newImageBuffer, 'base64');
 
   if (body.output.raw) {
-    res.writeHead(200, {
-      'content-type': contentType,
-      'content-encoding': 'base64',
-      'content-length': newImageSize,
-    });
-    res.end(newImageBuffer);
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': contentType,
+        'Content-Encoding': 'base64',
+      },
+      body: newImageBuffer.toString('base64'),
+      isBase64Encoded: true,
+    };
   } else if (body.output.s3?.bucket || body.output.s3?.key) {
     await s3.send(
       new PutObjectCommand({
@@ -61,13 +63,13 @@ export const processImage = async (req: Request<any, any, ProcessImagePostBody>,
         CacheControl: body.cacheControl || s3Image.CacheControl,
       }),
     );
-    res.status(200).json({});
+    return json({});
   } else {
     throw new Error('Validation: Invalid output parameters');
   }
 };
 
-const resize = async (sharpObject: Sharp, options: ProcessImagePostBody) => {
+const resize = async (sharpObject: Sharp, options: ProcessImageBody) => {
   const opts = options.resize;
   const metadata = await sharpObject.metadata().then((metadata) => {
     return {
@@ -105,5 +107,3 @@ const resize = async (sharpObject: Sharp, options: ProcessImagePostBody) => {
     return;
   }
 };
-export const api = express.Router();
-api.post('/', catchExpressJsErrorWrapper(processImage));

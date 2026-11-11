@@ -2,12 +2,12 @@ import { formatCertificateDate } from '../../../core/certificates/generators/uti
 import { certificateSpreadsheet } from '../../../core/spreadsheets/certificates';
 import { getEquipmentWarnings } from '../../../core/spreadsheets/equipment-warnings';
 import { getSairReports } from '../../../core/spreadsheets/sair-reports';
-import express, { Request } from 'express';
 
-import { expressRoute, verifyTrustedDomainRequest } from '../utils';
+import { type Request, json } from '../../http';
+import { verifyTrustedDomainRequest } from '../auth';
 
-export const listInstructors = async (req: Request) => {
-  verifyTrustedDomainRequest(req);
+const listInstructors = async (request: Request) => {
+  verifyTrustedDomainRequest(request);
 
   const instructors = await certificateSpreadsheet.getInstructors();
 
@@ -23,11 +23,11 @@ export const listInstructors = async (req: Request) => {
     .sort(sortByField('country', 'name'))
     .filter((i) => i.name.length > 2);
 
-  return { items };
+  return json({ items });
 };
 
-export const listRiggers = async (req: Request) => {
-  verifyTrustedDomainRequest(req);
+const listRiggers = async (request: Request) => {
+  verifyTrustedDomainRequest(request);
 
   const riggers = await certificateSpreadsheet.getRiggers();
   const items = riggers
@@ -42,11 +42,11 @@ export const listRiggers = async (req: Request) => {
     .sort(sortByField('country', 'name'))
     .filter((i) => i.name.length > 2);
 
-  return { items };
+  return json({ items });
 };
 
-export const listCertifiedGears = async (req: Request) => {
-  verifyTrustedDomainRequest(req);
+const listCertifiedGears = async (request: Request) => {
+  verifyTrustedDomainRequest(request);
 
   const gears = await certificateSpreadsheet.getApprovedGears();
   const items = gears
@@ -56,11 +56,11 @@ export const listCertifiedGears = async (req: Request) => {
     })
     .sort(sortByField('brand'));
 
-  return { items };
+  return json({ items });
 };
 
-export const listEquipmentWarnings = async (req: Request) => {
-  verifyTrustedDomainRequest(req);
+const listEquipmentWarnings = async (request: Request) => {
+  verifyTrustedDomainRequest(request);
 
   const warnings = await getEquipmentWarnings();
   const items = warnings.sort((a, b) => {
@@ -73,20 +73,20 @@ export const listEquipmentWarnings = async (req: Request) => {
     return 0;
   });
 
-  return { items };
+  return json({ items });
 };
 
-export const listSairReports = async (req: Request) => {
-  verifyTrustedDomainRequest(req);
+const listSairReports = async (request: Request) => {
+  verifyTrustedDomainRequest(request);
 
   const reports = await getSairReports();
   const items = reports.sort(sortByField('incidentDateParsed')).reverse();
 
-  return { items };
+  return json({ items });
 };
 
-export const listWorldRecords = async (req: Request) => {
-  verifyTrustedDomainRequest(req);
+const listWorldRecords = async (request: Request) => {
+  verifyTrustedDomainRequest(request);
 
   const worldRecords = await certificateSpreadsheet.getWorldRecords();
 
@@ -99,11 +99,11 @@ export const listWorldRecords = async (req: Request) => {
     .sort(sortByField('dateParsed'))
     .reverse();
 
-  return { items };
+  return json({ items });
 };
 
-export const listWorldFirsts = async (req: Request) => {
-  verifyTrustedDomainRequest(req);
+const listWorldFirsts = async (request: Request) => {
+  verifyTrustedDomainRequest(request);
 
   const worldFirsts = await certificateSpreadsheet.getWorldFirsts();
 
@@ -116,7 +116,7 @@ export const listWorldFirsts = async (req: Request) => {
     .sort(sortByField('dateParsed'))
     .reverse();
 
-  return { items };
+  return json({ items });
 };
 
 const sortByField = (...fields: string[]) => {
@@ -129,11 +129,12 @@ const sortByField = (...fields: string[]) => {
   };
 };
 
-export const listingsApi = express.Router();
-listingsApi.get('/instructors', expressRoute(listInstructors));
-listingsApi.get('/riggers', expressRoute(listRiggers));
-listingsApi.get('/approved-gears', expressRoute(listCertifiedGears));
-listingsApi.get('/equipment-warnings', expressRoute(listEquipmentWarnings));
-listingsApi.get('/sair-reports', expressRoute(listSairReports));
-listingsApi.get('/world-records', expressRoute(listWorldRecords));
-listingsApi.get('/world-firsts', expressRoute(listWorldFirsts));
+export const listingsRoutes = {
+  'GET /sheets/list/instructors': listInstructors,
+  'GET /sheets/list/riggers': listRiggers,
+  'GET /sheets/list/approved-gears': listCertifiedGears,
+  'GET /sheets/list/equipment-warnings': listEquipmentWarnings,
+  'GET /sheets/list/sair-reports': listSairReports,
+  'GET /sheets/list/world-records': listWorldRecords,
+  'GET /sheets/list/world-firsts': listWorldFirsts,
+};
