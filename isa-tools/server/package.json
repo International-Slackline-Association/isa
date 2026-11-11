@@ -23,7 +23,7 @@
     "jsonwebtoken": "9.0.2",
     "pdf-lib": "1.17.1",
     "qrcode": "1.5.4",
-    "zod": "3.22.4"
+    "zod": "3.25.76"
   },
   "devDependencies": {
     "@types/aws-lambda": "8.10.130",
