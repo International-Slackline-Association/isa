@@ -6,7 +6,7 @@ nav: { order: 30 }
 ---
 # Manual operations
 
-Not managed by CDK. Update this page when something here changes.
+Not managed by CDK.
 
 ## Accounts
 
@@ -43,7 +43,7 @@ Cloudflare records AWS depends on (slacklineinternational.org):
 ## Email
 
 - `aws@slacklineinternational.org`: Google Workspace alias, forwarding set in Google.
-- SES: production access; bounce/complaint → isa-tools SNS topic (not in CloudFormation).
+- SES: production access. Bounce and complaint notifications of the domain identity point at `IsaShared`'s SES notifications topic, set by hand (not in CloudFormation).
 
 ## CDK caveats
 

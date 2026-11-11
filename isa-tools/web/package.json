@@ -1,0 +1,45 @@
+{
+  "name": "isa-tools-web",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "checkTs": "tsc --noEmit",
+    "start": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "11.11.3",
+    "@emotion/styled": "11.11.0",
+    "@mui/icons-material": "5.15.3",
+    "@mui/lab": "5.0.0-alpha.159",
+    "@mui/material": "5.15.3",
+    "@mui/system": "5.15.3",
+    "@reduxjs/toolkit": "2.0.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-error-boundary": "4.0.12",
+    "react-helmet-async": "2.0.4",
+    "react-redux": "9.0.4",
+    "react-router-dom": "6.21.1",
+    "vite-tsconfig-paths": "4.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "20.10.6",
+    "@types/react": "18.2.47",
+    "@types/react-dom": "18.2.18",
+    "@vitejs/plugin-react": "4.2.1",
+    "type-fest": "4.9.0",
+    "typescript": "5.3.3",
+    "vite": "5.0.11"
+  },
+  "author": {
+    "name": "Can Sahin"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "overrides": {
+    "csstype": "3.1.3"
+  }
+}

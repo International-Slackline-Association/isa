@@ -23,9 +23,10 @@ export const organization = {
 export const allowedRegions = ['eu-central-1', 'eu-central-2', 'us-east-1', 'us-east-2'] as const;
 
 // ISA-wide resources in the ISA account (IsaShared, IsaSharedUsEast1).
-// App-specific DNS, certificates and backups live in the app repos.
+// App-specific DNS, certificates and backups live with each app.
 export const shared = {
   domain: 'slacklineinternational.org',
+  notificationEmail: 'aws@slacklineinternational.org',
 };
 
 // Org-wide cost budget in the management account (IsaBilling).

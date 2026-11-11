@@ -15,7 +15,7 @@ CDK for the ISA's AWS organization `o-1voshuzmv4`: guardrails, Identity Center a
 
 ## Read when
 
-- Any change or deploy: [general rules](general-rules.md): diff first, never rename stacks or construct IDs
+- Any change or deploy: [general rules](general-rules.md)
 - Which stack, account and profile: [stacks](stacks.md)
 - Deploying, adding or removing a person: [operating](operating.md)
 - Touching something CDK does not manage: [manual operations](manual-operations.md)
