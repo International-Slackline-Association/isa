@@ -1,6 +1,7 @@
 import { GetParameterCommand } from '@aws-sdk/client-ssm';
+import { JWT } from 'google-auth-library';
+
 import { ssm } from '../aws/clients';
-import { google, sheets_v4 } from 'googleapis';
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 const googleCredsSSMParameter = 'isa-tools-google-credentials-json';
@@ -8,18 +9,15 @@ const certificatesSpreadsheetId = '1WO8RDDn6WKTmZQX4YK9xNwWfh0-eciIX0fdSvsgNRsA'
 const equipmentWarningsSpreadsheetId = '16cp9iRy1Rs8uOU_UZ9ouJGkhQ_0IiySmF5UNCaorJHM';
 const sairReportSpreadsheetId = '1uZiOhAlhAX_u682hhvjkcdos--bzWpBNImff29Hx5aI';
 
-let sheets: sheets_v4.Sheets;
+type ValueRange = { values?: string[][] };
+
+let googleClient: Promise<JWT> | undefined;
 const cache: {
-  googleCreds?: any;
-  ranges: { [key: string]: sheets_v4.Schema$ValueRange[] | undefined };
+  ranges: { [key: string]: ValueRange[] | undefined };
   expiresIn: number;
 } = {
   ranges: {},
   expiresIn: Date.now() + 1000 * 60 * 5,
-};
-
-export const initSpreadsheets = async () => {
-  return authorizeSpreadsheet();
 };
 
 export const getSpreadsheetValues = async <T extends string>(
@@ -29,8 +27,6 @@ export const getSpreadsheetValues = async <T extends string>(
 ) => {
   const cachedValue = cache.ranges[range] || [];
   if (cachedValue.length <= 0 || cache.expiresIn < Date.now()) {
-    await authorizeSpreadsheet();
-
     let spreadsheetId: string;
 
     switch (spreadsheet) {
@@ -47,11 +43,7 @@ export const getSpreadsheetValues = async <T extends string>(
         throw new Error('Invalid spreadsheet');
     }
 
-    const result = await sheets.spreadsheets.values.batchGet({
-      spreadsheetId: spreadsheetId,
-      ranges: [range],
-    });
-    cache.ranges[range] = result.data.valueRanges;
+    cache.ranges[range] = await batchGet(spreadsheetId, range);
     cache.expiresIn = Date.now() + 1000 * 60 * 5;
   }
   const valueRanges = cache.ranges[range] || [];
@@ -86,17 +78,25 @@ export const getSpreadsheetValues = async <T extends string>(
   return data;
 };
 
-const authorizeSpreadsheet = async () => {
-  if (!sheets) {
+const authorize = () => {
+  googleClient ??= (async () => {
     const ssmParam = await ssm.send(new GetParameterCommand({ Name: googleCredsSSMParameter }));
     const googleCreds = JSON.parse(ssmParam.Parameter?.Value || '');
-    const client = new google.auth.JWT(
-      googleCreds.client_email,
-      undefined,
-      googleCreds.private_key,
-      SCOPES,
-    );
-    await client.authorize();
-    sheets = google.sheets({ version: 'v4', auth: client });
+    return new JWT({ email: googleCreds.client_email, key: googleCreds.private_key, scopes: SCOPES });
+  })();
+  googleClient.catch(() => (googleClient = undefined));
+  return googleClient;
+};
+
+const batchGet = async (spreadsheetId: string, range: string) => {
+  const { token } = await (await authorize()).getAccessToken();
+  const response = await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchGet?ranges=${encodeURIComponent(range)}`,
+    { headers: { Authorization: `Bearer ${token}` } },
+  );
+  if (!response.ok) {
+    throw new Error(`Google Sheets request failed with status ${response.status}`);
   }
+  const data = (await response.json()) as { valueRanges?: ValueRange[] };
+  return data.valueRanges;
 };

@@ -1,6 +1,5 @@
 import * as dateFns from 'date-fns';
-import { getHash, putHash } from '../db/genericHash';
-import { DDBGenericHashItem } from '../db/genericHash/types';
+import { type HashItem, getHash, putHash } from '../db';
 import { hashValue, signJWT, verifyJWT } from './crypto';
 import { JwtPayload } from 'jsonwebtoken';
 
@@ -29,7 +28,7 @@ export const createSignedDocument = async (document: {
 
   let hash: string | undefined;
   if (createHash) {
-    const hashItem: DDBGenericHashItem = {
+    const hashItem: HashItem = {
       hash: hashValue(token),
       ddb_ttl: Math.round(Date.now() / 1000) + expiresInSeconds,
       value: token,

@@ -1,5 +1,5 @@
 import { CertificateType } from './types';
-import { getSpreadsheetValues, initSpreadsheets } from './utils';
+import { getSpreadsheetValues } from './utils';
 
 type FilterBy = {
   isaId?: string;
@@ -188,8 +188,6 @@ const getISAPartners = async (filterBy: FilterBy = {}) => {
 };
 
 const getAllItems = async (filterBy: FilterBy = {}) => {
-  await initSpreadsheets();
-
   const certs: {
     certificateType: CertificateType;
     certId?: string;
