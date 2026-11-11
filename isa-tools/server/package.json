@@ -26,14 +26,14 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
-    "@types/aws-lambda": "8.10.130",
+    "@types/aws-lambda": "8.10.164",
     "@types/jsonwebtoken": "9.0.10",
-    "@types/node": "20.10.5",
+    "@types/node": "24.19.2",
     "@types/qrcode": "1.5.6",
     "esbuild": "0.28.2",
     "puppeteer-core": "23.11.1",
     "sharp": "0.33.1",
-    "typescript": "5.3.3"
+    "typescript": "5.9.3"
   },
   "author": "Can Sahin",
   "license": "GPL-3.0"

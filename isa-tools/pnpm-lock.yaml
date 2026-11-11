@@ -271,14 +271,14 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/aws-lambda':
-        specifier: 8.10.130
-        version: 8.10.130
+        specifier: 8.10.164
+        version: 8.10.164
       '@types/jsonwebtoken':
         specifier: 9.0.10
         version: 9.0.10
       '@types/node':
-        specifier: 20.10.5
-        version: 20.10.5
+        specifier: 24.19.2
+        version: 24.19.2
       '@types/qrcode':
         specifier: 1.5.6
         version: 1.5.6
@@ -292,8 +292,8 @@ importers:
         specifier: 0.33.1
         version: 0.33.1
       typescript:
-        specifier: 5.3.3
-        version: 5.3.3
+        specifier: 5.9.3
+        version: 5.9.3
 
   web:
     dependencies:
@@ -1513,8 +1513,8 @@ packages:
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
-  '@types/aws-lambda@8.10.130':
-    resolution: {integrity: sha512-HxTfLeGvD1wTJqIGwcBCpNmHKenja+We1e0cuzeIDFfbEj3ixnlTInyPR/81zAe0Ss/Ip12rFK6XNeMLVucOSg==}
+  '@types/aws-lambda@8.10.164':
+    resolution: {integrity: sha512-XOnrazWcOd6yWPnR7DxqCBPPYciDjHq+NN8LPwwqBCJNXLyPJgKo47fZpJ113+oyAn9Zti0Cf6H4k6yPcE3WFg==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -1545,9 +1545,6 @@ packages:
 
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
-
-  '@types/node@20.10.5':
-    resolution: {integrity: sha512-nNPsNE65wjMxEKI93yOP+NPGGBJz/PoN3kZsVLee0XMiJolxSekEVD8wRwBUBqkwc7UWop0edW50yrCQW4CyRw==}
 
   '@types/node@20.10.6':
     resolution: {integrity: sha512-Vac8H+NlRNNlAmDfGUP7b5h/KA+AtWIzuXy0E6OyP8f1tCLYAtPvKRRDJjAPqhpCb0t6U2j7/xqAuLEebW2kiw==}
@@ -4572,7 +4569,7 @@ snapshots:
 
   '@tsconfig/node16@1.0.4': {}
 
-  '@types/aws-lambda@8.10.130': {}
+  '@types/aws-lambda@8.10.164': {}
 
   '@types/babel__core@7.20.5':
     dependencies:
@@ -4611,13 +4608,9 @@ snapshots:
   '@types/jsonwebtoken@9.0.10':
     dependencies:
       '@types/ms': 2.1.0
-      '@types/node': 20.10.5
+      '@types/node': 24.19.2
 
   '@types/ms@2.1.0': {}
-
-  '@types/node@20.10.5':
-    dependencies:
-      undici-types: 5.26.5
 
   '@types/node@20.10.6':
     dependencies:
@@ -4633,7 +4626,7 @@ snapshots:
 
   '@types/qrcode@1.5.6':
     dependencies:
-      '@types/node': 20.10.5
+      '@types/node': 24.19.2
 
   '@types/react-dom@18.2.18':
     dependencies:
@@ -4655,7 +4648,7 @@ snapshots:
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 20.10.5
+      '@types/node': 24.19.2
     optional: true
 
   '@typescript-eslint/eslint-plugin@7.13.0(@typescript-eslint/parser@7.13.0(eslint@8.57.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@8.57.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3)':
