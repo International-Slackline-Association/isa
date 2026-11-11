@@ -1,7 +1,7 @@
 import { GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
-import { ddb } from 'core/aws/clients';
-import { DDBGenericHashAttrs, DDBGenericHashItem } from 'core/db/genericHash/types';
-import { TABLE_NAME, transformUtils } from 'core/db/utils';
+import { ddb } from '../../aws/clients';
+import { DDBGenericHashAttrs, DDBGenericHashItem } from './types';
+import { TABLE_NAME, transformUtils } from '../utils';
 
 import { ConvertKeysToInterface, TransformerParams } from '../types';
 

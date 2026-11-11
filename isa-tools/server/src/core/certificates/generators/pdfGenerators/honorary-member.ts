@@ -21,14 +21,14 @@ export async function generate(language: string, data: Props): Promise<PDFDocume
       font: berkshireFont,
       color: black,
       x: pageWidth / 2 - berkshireFont.widthOfTextAtSize(data.fullname, 36) / 2,
-      y: convertToYCoordinate(190, pageHeight, berkshireFont, 36),
+      y: convertToYCoordinate(190, pageHeight, 36),
     },
     date: {
       size: 16,
       font: semiboldFont,
       color: black,
       x: 424,
-      y: convertToYCoordinate(355, pageHeight, semiboldFont, 16),
+      y: convertToYCoordinate(355, pageHeight, 16),
     },
   };
   for (const [key, value] of Object.entries(modifications)) {

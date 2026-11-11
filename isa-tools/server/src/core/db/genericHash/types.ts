@@ -1,4 +1,4 @@
-import { DDBTableKeyAttrs } from 'core/db/types';
+import { DDBTableKeyAttrs } from '../types';
 
 interface ParsedKeyAttrs {
   hash: string;

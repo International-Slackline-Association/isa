@@ -1,7 +1,7 @@
-import { formatCertificateDate } from 'core/certificates/generators/utils';
-import { certificateSpreadsheet } from 'core/spreadsheets/certificates';
-import { getEquipmentWarnings } from 'core/spreadsheets/equipment-warnings';
-import { getSairReports } from 'core/spreadsheets/sair-reports';
+import { formatCertificateDate } from '../../../core/certificates/generators/utils';
+import { certificateSpreadsheet } from '../../../core/spreadsheets/certificates';
+import { getEquipmentWarnings } from '../../../core/spreadsheets/equipment-warnings';
+import { getSairReports } from '../../../core/spreadsheets/sair-reports';
 import express, { Request } from 'express';
 
 import { expressRoute, verifyTrustedDomainRequest } from '../utils';

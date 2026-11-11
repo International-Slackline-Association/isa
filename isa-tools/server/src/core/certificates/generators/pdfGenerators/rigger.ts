@@ -27,28 +27,28 @@ export async function generate(
       font: berkshireFont,
       color: black,
       x: pageWidth / 2 - berkshireFont.widthOfTextAtSize(data.fullname, 36) / 2,
-      y: convertToYCoordinate(176, pageHeight, berkshireFont, 36),
+      y: convertToYCoordinate(176, pageHeight, 36),
     },
     level: {
       size: 21,
       font: boldFont,
       color: black,
       x: pageWidth / 2 - boldFont.widthOfTextAtSize(data.level, 21) / 2,
-      y: convertToYCoordinate(290, pageHeight, boldFont, 21),
+      y: convertToYCoordinate(290, pageHeight, 21),
     },
     startDate: {
       size: 11,
       font: semiboldFont,
       color: black,
       x: 401,
-      y: convertToYCoordinate(387, pageHeight, semiboldFont, 11),
+      y: convertToYCoordinate(387, pageHeight, 11),
     },
     endDate: {
       size: 11,
       font: semiboldFont,
       color: black,
       x: 570,
-      y: convertToYCoordinate(387, pageHeight, semiboldFont, 11),
+      y: convertToYCoordinate(387, pageHeight, 11),
     },
   };
 

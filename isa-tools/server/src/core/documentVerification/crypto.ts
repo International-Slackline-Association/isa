@@ -1,5 +1,5 @@
 import { GetParametersCommand } from '@aws-sdk/client-ssm';
-import { ssm } from 'core/aws/clients';
+import { ssm } from '../aws/clients';
 import { createHash } from 'crypto';
 import jwt, { SignOptions } from 'jsonwebtoken';
 

@@ -1,6 +1,6 @@
 import serverlessExpress from '@vendia/serverless-express';
 import type { APIGatewayProxyEvent, Context } from 'aws-lambda';
-import { logger } from 'core/utils/logger';
+import { logger } from '../../core/utils/logger';
 
 import app from './app';
 

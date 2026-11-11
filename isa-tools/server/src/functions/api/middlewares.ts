@@ -1,4 +1,4 @@
-import { logger } from 'core/utils/logger';
+import { logger } from '../../core/utils/logger';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 
 const trustedOrigins = [

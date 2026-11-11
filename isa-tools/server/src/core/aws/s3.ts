@@ -1,6 +1,6 @@
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { s3 } from 'core/aws/clients';
+import { s3 } from './clients';
 
 export const uploadPDFToS3 = async (key: string, body: Buffer) => {
   await s3.send(

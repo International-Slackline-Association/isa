@@ -2,7 +2,7 @@ import {
   errorMiddleware,
   injectCommonlyUsedHeadersMiddleware,
   notFoundMiddleware,
-} from '@functions/image-processor-api/middlewares';
+} from './middlewares';
 import cors from 'cors';
 import { Express, default as express, json, urlencoded } from 'express';
 

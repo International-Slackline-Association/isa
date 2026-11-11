@@ -25,7 +25,7 @@ export async function generate(
 ): Promise<PDFDocument> {
   const blankPDF = blankPDFTemplate('approved-gear', language);
 
-  const { boldFont, berkshireFont, page, pageHeight, pageWidth, pdfDoc, semiboldFont } =
+  const { berkshireFont, page, pageHeight, pageWidth, pdfDoc, semiboldFont } =
     await loadPDFTemplate(blankPDF);
 
   const modifications: PDFModificationsObject<Props> = {
@@ -34,56 +34,56 @@ export async function generate(
       font: berkshireFont,
       color: black,
       x: pageWidth / 2 - berkshireFont.widthOfTextAtSize(data.modelName, 36) / 2,
-      y: convertToYCoordinate(176, pageHeight, berkshireFont, 36),
+      y: convertToYCoordinate(176, pageHeight, 36),
     },
     brand: {
       size: 16,
       font: semiboldFont,
       color: black,
       x: 260,
-      y: convertToYCoordinate(232, pageHeight, semiboldFont, 16),
+      y: convertToYCoordinate(232, pageHeight, 16),
     },
     modelVersion: {
       size: 16,
       font: semiboldFont,
       color: black,
       x: 260,
-      y: convertToYCoordinate(251, pageHeight, semiboldFont, 16),
+      y: convertToYCoordinate(251, pageHeight, 16),
     },
     releaseYear: {
       size: 16,
       font: semiboldFont,
       color: black,
       x: 260,
-      y: convertToYCoordinate(269, pageHeight, semiboldFont, 16),
+      y: convertToYCoordinate(269, pageHeight, 16),
     },
     standard: {
       size: 16,
       font: semiboldFont,
       color: black,
       x: 260,
-      y: convertToYCoordinate(292, pageHeight, boldFont, 16),
+      y: convertToYCoordinate(292, pageHeight, 16),
     },
     productType: {
       size: 16,
       font: semiboldFont,
       color: black,
       x: 260,
-      y: convertToYCoordinate(316, pageHeight, boldFont, 16),
+      y: convertToYCoordinate(316, pageHeight, 16),
     },
     testingLab: {
       size: 16,
       font: semiboldFont,
       color: black,
       x: 260,
-      y: convertToYCoordinate(335, pageHeight, boldFont, 16),
+      y: convertToYCoordinate(335, pageHeight, 16),
     },
     testDate: {
       size: 16,
       font: semiboldFont,
       color: black,
       x: 260,
-      y: convertToYCoordinate(354, pageHeight, boldFont, 16),
+      y: convertToYCoordinate(354, pageHeight, 16),
     },
   };
 

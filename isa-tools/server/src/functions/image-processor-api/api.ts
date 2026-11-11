@@ -1,5 +1,5 @@
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
-import { s3 } from 'core/aws/clients';
+import { s3 } from '../../core/aws/clients';
 import express, { Request, Response } from 'express';
 import sharp, { Sharp } from 'sharp';
 

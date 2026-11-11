@@ -4,7 +4,7 @@ import {
   DDBTableKeyAttrs,
   DDBTableRequiredKeyAttrs,
   TransformerParams,
-} from 'core/db/types';
+} from './types';
 import cloneDeep from 'lodash.clonedeep';
 
 export const TABLE_NAME = process.env.ISA_DOCUMENTS_TABLE_NAME as string;

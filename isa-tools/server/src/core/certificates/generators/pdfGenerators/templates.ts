@@ -1,4 +1,4 @@
-import { CertificateType } from 'core/spreadsheets/types';
+import { CertificateType } from '../../../spreadsheets/types';
 
 import APPROVED_GEAR_EN from './templates/approved-gear-en.pdf';
 import ATHLETE_EXCELLENCE from './templates/athlete-excellence-en.pdf';

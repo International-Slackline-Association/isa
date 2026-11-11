@@ -1,5 +1,5 @@
 import * as dateFns from 'date-fns';
-import { createSignedDocument, getSignedDocument } from 'core/documentVerification';
+import { createSignedDocument, getSignedDocument } from '../../../core/documentVerification';
 import express, { Request } from 'express';
 
 import { expressRoute, validateApiPayload, verifyTrustedServiceRequest } from '../utils';

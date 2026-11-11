@@ -41,7 +41,6 @@
     "@types/qrcode": "1.5.5",
     "puppeteer-core": "23.11.1",
     "sharp": "0.33.1",
-    "type-fest": "4.8.3",
     "typescript": "5.3.3"
   },
   "author": "Can Sahin",

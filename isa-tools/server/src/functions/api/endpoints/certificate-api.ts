@@ -1,7 +1,7 @@
-import { uploadPDFToS3 } from 'core/aws/s3';
-import { generateCertificatePDF } from 'core/certificates/generators/certificateGenerator';
-import { certificateSpreadsheet } from 'core/spreadsheets/certificates';
-import { CertificateType } from 'core/spreadsheets/types';
+import { uploadPDFToS3 } from '../../../core/aws/s3';
+import { generateCertificatePDF } from '../../../core/certificates/generators/certificateGenerator';
+import { certificateSpreadsheet } from '../../../core/spreadsheets/certificates';
+import { CertificateType } from '../../../core/spreadsheets/types';
 import express, { Request, Response } from 'express';
 
 import {

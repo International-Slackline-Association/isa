@@ -1,5 +1,5 @@
 import { GetParameterCommand } from '@aws-sdk/client-ssm';
-import { ssm } from 'core/aws/clients';
+import { ssm } from '../aws/clients';
 import { google, sheets_v4 } from 'googleapis';
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];

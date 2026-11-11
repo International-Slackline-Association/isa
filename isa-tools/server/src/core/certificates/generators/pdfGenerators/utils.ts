@@ -1,5 +1,5 @@
 import fontkit from '@pdf-lib/fontkit';
-import { PDFDocument, PDFFont, rgb } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
 import QRCode from 'qrcode';
 
 import berkshireTTF from './fonts/BerkshireSwash-Regular.ttf';
@@ -34,12 +34,7 @@ export const loadPDFTemplate = async (blankPDF: string) => {
   };
 };
 
-export const convertToYCoordinate = (
-  y: number,
-  height: number,
-  font: PDFFont,
-  fontSize: number,
-) => {
+export const convertToYCoordinate = (y: number, height: number, fontSize: number) => {
   return height - (y + fontSize / 2);
 };
 

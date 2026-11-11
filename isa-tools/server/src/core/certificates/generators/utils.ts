@@ -1,5 +1,5 @@
 import * as dateFns from 'date-fns';
-import { createSignedDocument } from 'core/documentVerification';
+import { createSignedDocument } from '../../documentVerification';
 
 export const formatCertificateDate = (
   date: string | undefined,

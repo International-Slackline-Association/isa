@@ -21,28 +21,28 @@ export async function generate(language: string, data: Props, qrCodeUrl?: string
       font: berkshireFont,
       color: black,
       x: pageWidth / 2 - berkshireFont.widthOfTextAtSize(data.name, 36) / 2,
-      y: convertToYCoordinate(172, pageHeight, berkshireFont, 36),
+      y: convertToYCoordinate(172, pageHeight, 36),
     },
     description: {
       size: 16,
       font: boldFont,
       color: black,
       x: pageWidth / 2 - boldFont.widthOfTextAtSize(data.description, 16) / 2,
-      y: convertToYCoordinate(269, pageHeight, boldFont, 16),
+      y: convertToYCoordinate(269, pageHeight, 16),
     },
     specs: {
       size: 16,
       font: semiboldFont,
       color: black,
       x: 422,
-      y: convertToYCoordinate(312, pageHeight, semiboldFont, 16),
+      y: convertToYCoordinate(312, pageHeight, 16),
     },
     date: {
       size: 16,
       font: semiboldFont,
       color: black,
       x: 422,
-      y: convertToYCoordinate(343, pageHeight, semiboldFont, 16),
+      y: convertToYCoordinate(343, pageHeight, 16),
     },
   };
 
