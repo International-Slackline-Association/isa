@@ -1,0 +1,18 @@
+{
+  "name": "isa-users",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "pnpm --filter isa-users-web run start",
+    "build": "pnpm --filter isa-users-web run build",
+    "checkTs": "pnpm -r run checkTs",
+    "synth": "pnpm run build && pnpm --filter isa-users-infra exec cdk synth --profile isa-admin",
+    "diff": "pnpm run build && pnpm --filter isa-users-infra exec cdk diff --profile isa-admin",
+    "deploy": "pnpm run build && pnpm --filter isa-users-infra exec cdk deploy --profile isa-admin"
+  },
+  "private": true,
+  "license": "GPL-3.0",
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=24"
+  }
+}

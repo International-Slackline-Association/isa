@@ -19,7 +19,7 @@ Everything is public, the org infra included. Keeping the infra private, out of 
 
 None of these apps are critical production workloads. As long as the critical data is kept, anything may change: projects move in bit by bit and are upgraded as they go, towards shared practices (CDK instead of Serverless, one way to deploy). The first two or three projects that move in set those standards for the rest; frequently used building blocks, deploying first of all, become package scripts so things are standardized. A CloudFormation deploy can get stuck for quite a while, so nothing waits on one synchronously. Rules: [infrastructure](engineering/infrastructure.md).
 
-There is no staging: a change is deployed and tested online. Downtime is fine, as long as no data is lost and old URLs keep working.
+There is no staging today: a change is deployed and tested online. That may change, so resource names carry the stage. Downtime is fine, as long as no data is lost and old URLs keep working.
 
 Critical data, never put at risk:
 

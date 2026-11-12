@@ -1,7 +1,7 @@
 ---
 type: policy
 title: Infrastructure rules
-description: "How every project's AWS infrastructure is built and deployed with CDK: the infra package, config, stack split, references between stacks and apps, Lambda bundling, secrets, alarms, the standard package scripts and running deploys."
+description: "How every project's AWS infrastructure is built and deployed with CDK: the infra package, config, naming and tags, stack split, importing what cannot be recreated, references between stacks and apps, Lambda bundling, secrets, alarms, the standard package scripts and running deploys."
 related: [/docs/the-monorepo.md]
 nav: { order: 14 }
 ---
@@ -15,9 +15,11 @@ Why: [upgrades as we go](/docs/the-monorepo.md#upgrades-as-we-go).
 - Infrastructure is CDK in TypeScript. No Serverless Framework, no hand-written CloudFormation.
 - An app's CDK app is the `infra/` package of the project's pnpm workspace, next to `server/` and `web/`.
 - Account, region, domains, certificate ARNs and the names of other apps' resources live in `infra/lib/config.ts`. No context lookups.
-- Stacks split by lifecycle: `<App>Data` holds what keeps data, with `RemovalPolicy.RETAIN`, deletion protection where the service has it, and termination protection; `<App>App` holds everything that can be destroyed and recreated.
+- Names: the namespace is `{project}-{stage}`. Stacks are `{namespace}-{stack}`; a resource that keeps data or that something else looks up by name gets a fixed `{namespace}-{resource}` name, everything else a generated one. Every stack tags its resources `Namespace`, `Stage`, `StackName`, `ManagedBy`.
+- Stacks split by lifecycle: `{namespace}-data` holds what keeps data, with `RemovalPolicy.RETAIN`, deletion protection where the service has it, and termination protection; `{namespace}-app` holds everything that can be destroyed and recreated.
+- Data moves into new resources by copy. What cannot be recreated is imported as it is, into its own stack with termination protection and a stack policy denying replace and delete.
 - Stacks and apps reference each other by names from config. No CloudFormation exports, no `${cf:…}`.
-- Never rename stacks or construct IDs. A "replace" on a stateful resource in a diff is a stop.
+- isa-tools predates the names and keeps its own. Never rename stacks or construct IDs. A "replace" on a stateful resource in a diff is a stop.
 
 ## Code
 

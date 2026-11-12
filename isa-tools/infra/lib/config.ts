@@ -20,7 +20,7 @@ export const tableName = 'isa-tools-documents';
 export const temporaryUploadsBucketName = 'isa-tools-temporary-uploads-prod';
 
 // The image processor writes resized images under public/ of these.
-export const imageBucketNames = ['isa-users-images-prod', 'slackmap-images-prod'];
+export const imageBucketNames = ['isa-users-prod-images', 'slackmap-images-prod'];
 
 export const trustedServiceApiKeyParameter = '/isa-tools-trusted-service-api-key';
 

@@ -1,0 +1,28 @@
+{
+  "name": "isa-users-server",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "checkTs": "tsc --noEmit",
+    "build": "node scripts/build.mjs",
+    "invoke": "node scripts/invoke.mjs",
+    "script": "node scripts/script.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "3.1158.0",
+    "@aws-sdk/client-dynamodb": "3.1158.0",
+    "@aws-sdk/client-ses": "3.1158.0",
+    "@aws-sdk/lib-dynamodb": "3.1158.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "8.10.164",
+    "@types/node": "24.19.2",
+    "esbuild": "0.28.2",
+    "typescript": "5.9.3"
+  },
+  "author": "Can Sahin",
+  "license": "GPL-3.0"
+}
