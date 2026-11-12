@@ -2,7 +2,6 @@
 type: index
 title: "AWS platform"
 description: "Entry point for the ISA's AWS organization IaC (CDK): org-wide and ISA-wide resources, accounts, stacks, what to read before a deploy."
-nav: { order: 10 }
 ---
 
 # AWS platform

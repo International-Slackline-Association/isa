@@ -2,7 +2,6 @@
 type: notes
 title: "ISA users: open"
 description: "Open work in isa-users: client ownership, direct table reads by slackmap, image processing, web app cleanup."
-nav: { order: 100 }
 ---
 
 # ISA users: open

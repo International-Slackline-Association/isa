@@ -2,7 +2,6 @@
 type: index
 title: Testing
 description: Entry point for how code is tested in this repo. Unit tests and the rules that allow a new one.
-nav: { order: 21 }
 ---
 
 # Testing

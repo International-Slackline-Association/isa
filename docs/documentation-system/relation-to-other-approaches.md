@@ -5,8 +5,6 @@ description: >-
   Where this system came from and how it relates to C4, arc42, Diátaxis,
   AGENTS.md, spec-driven development, living documentation and Naur. Background
   only; not needed to use the system.
-nav:
-  order: 200
 ---
 
 # Relation to other approaches

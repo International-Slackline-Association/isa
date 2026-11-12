@@ -3,7 +3,6 @@ type: policy
 title: Infrastructure rules
 description: "How every project's AWS infrastructure is built and deployed with CDK: the infra package, config, naming and tags, stack split, importing what cannot be recreated, references between stacks and apps, Lambda bundling, secrets, alarms, the standard package scripts and running deploys."
 related: [/docs/the-monorepo.md]
-nav: { order: 14 }
 ---
 
 # Infrastructure rules

@@ -2,7 +2,6 @@
 type: notes
 title: "SlackMap: open"
 description: "Open work in slackmap: security fixes, reading users through isa-users, image processing, web cleanup, the missing-country stream failure, a Prerender alternative, small features."
-nav: { order: 100 }
 ---
 
 # SlackMap: open

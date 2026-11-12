@@ -3,7 +3,6 @@ type: explanation
 title: Code review
 description: "Why finished code is reviewed by an adversarial agent, when it runs, what humans no longer review and what comes back as questions instead of findings."
 related: [reviewing.md, ../how-we-build.md, /docs/documentation-system/the-theory.md]
-nav: { order: 30 }
 ---
 
 # Code review

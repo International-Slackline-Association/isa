@@ -2,7 +2,6 @@
 type: index
 title: "ISA: start here"
 description: Entry point for the ISA monorepo. The projects it holds, how software is built here, and the documentation system.
-nav: { order: 1, open: true }
 ---
 
 # ISA

@@ -2,7 +2,6 @@
 type: how-to
 title: Operating isa-tools
 description: "Running isa-tools locally and deploying its CDK stacks (IsaToolsData, IsaToolsApp): profile, order, verification."
-nav: { order: 10 }
 ---
 
 # Operating isa-tools

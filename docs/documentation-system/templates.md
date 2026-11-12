@@ -3,7 +3,6 @@ type: reference
 title: Templates
 description: >-
   Copy-paste skeletons for each doc type: README, explanation, policy, reference, how-to, notes. Structure below the type is a suggestion; the type is the contract.
-nav: { order: 80 }
 ---
 
 # Templates

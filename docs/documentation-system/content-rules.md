@@ -4,7 +4,6 @@ title: Content rules
 description: >-
   The hard rules for what a doc may contain: derivability, salience, the deletion test for scope, the inward boundary, once, type, task residue, the future, excess, and agent-facing prose.
 related: [the-theory.md]
-nav: { order: 20 }
 ---
 
 # Content rules

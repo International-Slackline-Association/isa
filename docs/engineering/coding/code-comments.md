@@ -3,7 +3,6 @@ type: policy
 title: Code comments
 description: What a code comment may say (only what the code around it cannot show), and where a wider why goes instead.
 related: [/docs/documentation-system/content-rules.md]
-nav: { order: 22 }
 ---
 
 # Code comments

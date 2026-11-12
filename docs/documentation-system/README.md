@@ -2,8 +2,6 @@
 type: index
 title: "Documentation system: start here"
 description: Introduction to docs system. Essentials and contents
-nav:
-  order: 20
 ---
 
 # Documentation system

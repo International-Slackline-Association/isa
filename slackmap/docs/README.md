@@ -2,7 +2,6 @@
 type: index
 title: "SlackMap"
 description: "Entry point for slackmap: the world slackline map at slackmap.com, its API at api.slackmap.com, map data at data.slackmap.com and images at images.slackmap.com, with its CDK infra."
-nav: { order: 40 }
 ---
 
 # SlackMap

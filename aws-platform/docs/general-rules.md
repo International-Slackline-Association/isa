@@ -2,7 +2,6 @@
 type: policy
 title: General rules
 description: "Rules for operating the AWS organization IaC: scope, CDK conventions, access through Identity Center."
-nav: { order: 20 }
 ---
 # General rules
 

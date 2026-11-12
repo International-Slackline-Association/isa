@@ -7,7 +7,6 @@ description: >-
   jobs of a skill; how-to or skill by audience; skill or command as the human's
   call; why a file sits at root, in a plugin or in an agent config.
 related: [agent-skill-rules.md, the-theory.md]
-nav: { order: 72 }
 ---
 
 # Agent skills

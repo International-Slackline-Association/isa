@@ -2,7 +2,6 @@
 type: how-to
 title: Operating
 description: "Deploying a stack of the AWS organization, and adding or removing a person in Identity Center."
-nav: { order: 27 }
 ---
 
 # Operating

@@ -2,7 +2,6 @@
 type: index
 title: "ISA users"
 description: "Entry point for isa-users: ISA accounts and authentication. The Cognito user pool ISA apps sign in with, the users API at account-api, the account web app, profile pictures at images, with its CDK infra."
-nav: { order: 30 }
 ---
 
 # ISA users

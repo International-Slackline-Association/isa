@@ -2,7 +2,6 @@
 type: reference
 title: "Table design"
 description: "The single-table key layout of the slackmap table: which entity lives under which PK, SK_GSI, LSI and GSI keys (lines, spots, guides, editors, changelogs)."
-nav: { order: 40 }
 ---
 
 # Table design

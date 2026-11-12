@@ -2,7 +2,6 @@
 type: index
 title: "Engineering: start here"
 description: "Entry point for how software is built in this repo. Read how we build first, then the folder of the work you are doing: architecture, coding, code review, delivery."
-nav: { order: 10, open: true }
 ---
 
 # Engineering

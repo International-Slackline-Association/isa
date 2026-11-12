@@ -3,7 +3,6 @@ type: policy
 title: Architecture rules
 description: "The rules a change's shape is held against in every project of the repo: AWS first, dependencies, the monorepo, failures seen and recoverable."
 related: [coding/coding-rules.md]
-nav: { order: 12 }
 ---
 
 # Architecture rules

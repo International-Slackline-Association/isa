@@ -2,7 +2,6 @@
 type: reference
 title: slackmap manual operations
 description: "What slackmap depends on that CDK does not manage: the API custom domain, the slackmap.com certificates, Cloudflare records, SSM parameters (Mapbox tokens included), the pre-migration backup, and the names other apps use."
-nav: { order: 30 }
 ---
 
 # Manual operations

@@ -2,7 +2,6 @@
 type: reference
 title: Manual operations
 description: "What in the AWS organization is not managed by CDK: accounts, root users, Identity Center instance, domains and DNS records, email, CDK caveats, bootstrap."
-nav: { order: 30 }
 ---
 # Manual operations
 

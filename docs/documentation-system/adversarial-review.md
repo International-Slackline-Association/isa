@@ -6,7 +6,6 @@ description: >-
   mechanics, the code opened for every document, the bounds on truth and
   questions, and what comes back.
 related: [the-theory.md, content-rules.md, updating-docs.md]
-nav: { order: 70 }
 ---
 
 # Adversarial review

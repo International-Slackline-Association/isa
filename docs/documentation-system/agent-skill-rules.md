@@ -7,7 +7,6 @@ description: >-
   skill or skill versus command, and the table of where each kind of
   instruction lives.
 related: [agent-skills.md, content-rules.md]
-nav: { order: 74 }
 ---
 
 # Agent skill rules

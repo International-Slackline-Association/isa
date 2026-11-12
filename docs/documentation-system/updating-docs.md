@@ -3,8 +3,6 @@ type: how-to
 title: Updating docs
 description: >-
   How a scope's docs change: the five ways a change starts, what is written and asked at the end of every change, then the steps for a README, an explanation or policy, a reference or how-to, and the review that closes every one.
-nav:
-  order: 60
 ---
 
 # Updating docs
@@ -38,8 +36,7 @@ Runs at the end of every change, before the pull request; nothing waits for the 
 2. Pick the scope: the lowest folder that contains everything the doc is about.
 3. Pick one type by the filing test in the frontmatter spec.
 4. Frontmatter: `type`, `description`, optionally `title`. Spend the effort on the description.
-5. Give the siblings `nav.order` in the README's reading order.
-6. If the scope has no `docs/README.md`, create it and its `CLAUDE.md` from [templates](templates.md), with its links; the orientation lines are the human's, ask for them if the session did not give them. If the README's reading order misses the doc, add the entry.
+5. If the scope has no `docs/README.md`, create it and its `CLAUDE.md` from [templates](templates.md), with its links; the orientation lines are the human's, ask for them if the session did not give them. If the README's reading order misses the doc, add the entry.
 
 ## A README
 

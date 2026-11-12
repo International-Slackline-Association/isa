@@ -2,7 +2,6 @@
 type: how-to
 title: Operating slackmap
 description: "Running slackmap locally and deploying its CDK stacks (slackmap-prod-data, slackmap-prod-app): profile, order, verification."
-nav: { order: 20 }
 ---
 
 # Operating slackmap
