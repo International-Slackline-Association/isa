@@ -13,5 +13,4 @@ nav: { order: 100 }
 - Web app cleanup like isa-tools: MUI and Redux not decided.
 - Add 'open in new tab' button to the images.
 - Martinique (MQ) is missing from `countryInfoDict.json`: since May 2026 every line or spot change fails in the stream handler, so owners are not recorded and the cluster geojson is not refreshed.
-- Delete the Prerender stack (us-east-1) once its Lambda@Edge replicas have cleared.
 - Brainstorm an alternative to Prerender (removed) for search engines and link previews.
