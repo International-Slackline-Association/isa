@@ -17,8 +17,8 @@
     "@aws-sdk/lib-dynamodb": "3.1158.0",
     "@aws-sdk/util-dynamodb": "3.996.9",
     "@turf/turf": "7.0.0",
+    "aws-jwt-verify": "5.2.1",
     "deep-diff": "1.0.2",
-    "jwt-decode": "4.0.0",
     "nanoid": "5.0.7",
     "zod": "3.23.8"
   },

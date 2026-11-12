@@ -1,5 +1,5 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { jwtDecode } from 'jwt-decode';
+import { CognitoJwtVerifier } from 'aws-jwt-verify';
 
 import { logger } from '../core/logger';
 import { generateISAIdFromUsername } from '../core/utils';
@@ -48,14 +48,24 @@ const parseBody = (event: APIGatewayProxyEvent) => {
   return body;
 };
 
-// The token is decoded, not verified; the API has no authorizer.
-const getUser = (headers: Record<string, string | undefined>): User | undefined => {
-  const authHeader = headers['authorization'];
-  if (!authHeader) return undefined;
-  const claims = jwtDecode<{ sub?: string; email?: string }>(authHeader.split(' ')[1]);
+const verifier = CognitoJwtVerifier.create({
+  userPoolId: process.env.ISA_USER_POOL_ID!,
+  clientId: process.env.SLACKMAP_CLIENT_ID!,
+  tokenUse: 'id',
+});
+
+// The API has no authorizer: a token that fails verification counts as no user.
+const getUser = async (headers: Record<string, string | undefined>): Promise<User | undefined> => {
+  const token = headers['authorization']?.split(' ')[1];
+  if (!token) return undefined;
+  const claims = await verifier.verify(token).catch((error: Error) => {
+    logger.warn('Token rejected', { reason: error.message });
+    return undefined;
+  });
+  if (!claims) return undefined;
   return {
-    isaId: claims.sub && generateISAIdFromUsername(claims.sub),
-    email: claims.email,
+    isaId: generateISAIdFromUsername(claims.sub),
+    email: typeof claims.email === 'string' ? claims.email : undefined,
     sub: claims.sub,
   };
 };
@@ -111,7 +121,7 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
 
     try {
       const body = parseBody(event);
-      user = getUser(headers);
+      user = await getUser(headers);
       const match = matchRoute(compiled, method, path);
       if (!match) {
         logger.info('Not found', { method, path });

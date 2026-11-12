@@ -68,6 +68,8 @@ export class AppStack extends Stack {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       SLACKMAP_TABLE_NAME: tableName,
       USERS_TABLE_NAME: isaUsers.tableName,
+      ISA_USER_POOL_ID: isaUsers.userPoolId,
+      SLACKMAP_CLIENT_ID: isaUsers.slackmapClientId,
       SLACKMAP_APPLICATION_DATA_S3_BUCKET: applicationDataBucketName,
       SLACKMAP_IMAGES_S3_BUCKET: imagesBucketName,
       ISA_TOOLS_TRUSTED_SERVICE_API_KEY: ssm.StringParameter.valueForStringParameter(

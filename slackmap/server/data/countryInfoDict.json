@@ -1,4 +1,12 @@
 {
+  "BQ": { "name": "Caribbean Netherlands", "iso3": "BES", "geometry": { "type": "Point", "coordinates": [-68.26, 12.18] } },
+  "SS": { "name": "South Sudan", "iso3": "SSD", "geometry": { "type": "Point", "coordinates": [30.0, 7.3] } },
+  "SX": { "name": "Sint Maarten", "iso3": "SXM", "geometry": { "type": "Point", "coordinates": [-63.06, 18.04] } },
+  "XK": { "name": "Kosovo", "iso3": "XKX", "geometry": { "type": "Point", "coordinates": [20.9, 42.6] } },
+  "CW": { "name": "Curaçao", "iso3": "CUW", "geometry": { "type": "Point", "coordinates": [-68.99, 12.17] } },
+  "GF": { "name": "French Guiana", "iso3": "GUF", "geometry": { "type": "Point", "coordinates": [-53.13, 3.93] } },
+  "GP": { "name": "Guadeloupe", "iso3": "GLP", "geometry": { "type": "Point", "coordinates": [-61.55, 16.25] } },
+  "MQ": { "name": "Martinique", "iso3": "MTQ", "geometry": { "type": "Point", "coordinates": [-61.02, 14.64] } },
   "BD": { "name": "Bangladesh", "iso3": "BGD", "geometry": { "type": "Point", "coordinates": [90.432, 23.674] } },
   "BE": { "name": "Belgium", "iso3": "BEL", "geometry": { "type": "Point", "coordinates": [4.675, 50.618] } },
   "BF": { "name": "Burkina Faso", "iso3": "BFA", "geometry": { "type": "Point", "coordinates": [-1.693, 12.109] } },
