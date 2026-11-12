@@ -9,7 +9,6 @@ Pointer only. Knowledge lives in `docs/`; this file carries what every session m
 ## Must never
 
 - Secrets, tokens or private data in code, docs or commits: the repo is public.
-- Commit unasked, or push. The user pushes.
 
 ## Conventions
 
