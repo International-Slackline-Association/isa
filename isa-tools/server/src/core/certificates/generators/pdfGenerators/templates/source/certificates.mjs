@@ -185,11 +185,11 @@ export const certificates = [
     file: 'rigger-en.pdf',
     logo: 'education',
     qrBox: true,
-    signers: ['thomasBuckingham', 'sarahGmeiner'],
+    signers: ['thomasBuckingham', 'robertoDeOliveira'],
     title: { text: 'RIGGER CERTIFICATE', y: 103.3 },
     text: [
       { text: 'The International Slackline Association confirms that', y: 129.6 },
-      { text: 'is a certifed', y: 253 },
+      { text: 'is a certified', y: 253 },
       { text: 'as outlined in the requirements under', y: 333.6 },
       { text: 'www.slacklineinternational.org/riggers/', y: 352, weight: 'semibold' },
       { text: 'The certification was acquired on', y: 392.9, x: 203.2, align: 'left', size: 11.5 },
