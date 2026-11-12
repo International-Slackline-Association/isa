@@ -1,0 +1,132 @@
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { jwtDecode } from 'jwt-decode';
+
+import { logger } from '../core/logger';
+import { generateISAIdFromUsername } from '../core/utils';
+import { parseExpectedError } from '../core/utils/error';
+
+export type User = {
+  isaId?: string;
+  sub?: string;
+  email?: string;
+};
+
+export type Request<Params extends Record<string, string> = Record<string, string>> = {
+  method: string;
+  path: string;
+  params: Params;
+  headers: Record<string, string | undefined>;
+  query: Record<string, string | undefined>;
+  body: any;
+  user?: User;
+};
+
+export type Route = (request: Request<any>) => Promise<APIGatewayProxyResult>;
+
+export const corsHeaders = { 'Access-Control-Allow-Origin': '*' };
+
+export const json = (data: unknown, statusCode = 200): APIGatewayProxyResult => ({
+  statusCode,
+  headers: { ...corsHeaders, 'Content-Type': 'application/json; charset=utf-8' },
+  body: JSON.stringify(data),
+});
+
+const maxBodyBytes = 3 * 1024 * 1024;
+
+const parseBody = (event: APIGatewayProxyEvent) => {
+  const contentType = Object.entries(event.headers ?? {}).find(
+    ([name]) => name.toLowerCase() === 'content-type',
+  )?.[1];
+  if (!contentType?.toLowerCase().startsWith('application/json') || !event.body) return {};
+
+  const text = event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString() : event.body;
+  if (Buffer.byteLength(text) > maxBodyBytes) throw new Error('request entity too large');
+  const body = JSON.parse(text);
+  if (typeof body !== 'object' || body === null) {
+    throw new SyntaxError('Request body must be a JSON object or array');
+  }
+  return body;
+};
+
+// The token is decoded, not verified; the API has no authorizer.
+const getUser = (headers: Record<string, string | undefined>): User | undefined => {
+  const authHeader = headers['authorization'];
+  if (!authHeader) return undefined;
+  const claims = jwtDecode<{ sub?: string; email?: string }>(authHeader.split(' ')[1]);
+  return {
+    isaId: claims.sub && generateISAIdFromUsername(claims.sub),
+    email: claims.email,
+    sub: claims.sub,
+  };
+};
+
+// Routes are keyed 'METHOD /path/:param'. Like Express: case-insensitive, one trailing slash allowed,
+// HEAD answered by the GET route, the first registered route that matches wins.
+const compileRoutes = (routes: Record<string, Route>) =>
+  Object.entries(routes).map(([key, route]) => {
+    const [method, path] = key.split(' ');
+    return { method, segments: path.split('/').slice(1), route };
+  });
+
+const matchRoute = (
+  compiled: ReturnType<typeof compileRoutes>,
+  method: string,
+  path: string,
+): { route: Route; params: Record<string, string> } | undefined => {
+  const routeMethod = method === 'HEAD' ? 'GET' : method;
+  const pathSegments = path.replace(/\/$/, '').split('/').slice(1);
+  for (const candidate of compiled) {
+    if (candidate.method !== routeMethod || candidate.segments.length !== pathSegments.length) {
+      continue;
+    }
+    const params: Record<string, string> = {};
+    const matches = candidate.segments.every((segment, i) => {
+      if (segment.startsWith(':')) {
+        if (!pathSegments[i]) return false;
+        params[segment.slice(1)] = pathSegments[i];
+        return true;
+      }
+      return segment.toLowerCase() === pathSegments[i].toLowerCase();
+    });
+    if (matches) {
+      for (const name of Object.keys(params)) params[name] = decodeURIComponent(params[name]);
+      return { route: candidate.route, params };
+    }
+  }
+  return undefined;
+};
+
+export const createHandler = (lambdaName: string, routes: Record<string, Route>) => {
+  logger.setLambdaName(lambdaName);
+  const compiled = compileRoutes(routes);
+
+  return async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    const method = event.httpMethod.toUpperCase();
+    const path = `/${event.pathParameters?.proxy ?? ''}`;
+    const query = event.queryStringParameters ?? {};
+    const headers = Object.fromEntries(
+      Object.entries(event.headers ?? {}).map(([name, value]) => [name.toLowerCase(), value]),
+    );
+    let user: User | undefined;
+
+    try {
+      const body = parseBody(event);
+      user = getUser(headers);
+      const match = matchRoute(compiled, method, path);
+      if (!match) {
+        logger.info('Not found', { method, path });
+        return json({ message: '404 Not Found' }, 404);
+      }
+      return await match.route({ method, path, params: match.params, headers, query, body, user });
+    } catch (error) {
+      const { status, code, errorMessage, isExpectedError } = parseExpectedError(error as Error);
+      const message = errorMessage || 'Error occurred';
+      const stack = (error as Error).stack;
+      // Body, query and the user's email hold personal data, so they stay out of the log.
+      const data = { httpRequest: { path, method, userId: user?.isaId }, status, stack };
+      if (isExpectedError) logger.warn(message, data);
+      else logger.error(message, data);
+      return json({ status: 500, message, code, stack }, status);
+    }
+  };
+};

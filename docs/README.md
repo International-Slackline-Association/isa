@@ -20,3 +20,4 @@ Monorepo of the International Slackline Association. Each project is a self-cont
 - [AWS platform](/aws-platform/docs/README.md)
 - [ISA tools](/isa-tools/docs/README.md)
 - [ISA users](/isa-users/docs/README.md)
+- [SlackMap](/slackmap/docs/README.md)

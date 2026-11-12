@@ -1,0 +1,161 @@
+import { db } from '../../../../core/db';
+import { genericFeatureFromItem } from '../../../../core/features/mapFeature';
+import {
+  addTemporaryEditorChangelogToFeature,
+  getChangelogsOfFeature,
+} from '../../../../core/features/mapFeature/changelog';
+import {
+  addTemporaryEditorToMapFeature,
+  validateMapFeatureEditor,
+} from '../../../../core/features/mapFeature/editors';
+import { GenericMapFeatureItemType } from '../../../../core/features/mapFeature/types';
+import { MapFeatureType } from '../../../../core/types';
+import { logger } from '../../../../core/logger';
+
+import { Request } from '../../../http';
+import {
+  constructPaginationResponse,
+  destructPaginationQueryParam,
+  jsonRoute,
+  validateApiPayload,
+  verifyRequestClaims,
+} from '../../utils';
+import { deleteFeatureRequestSchema } from './schema';
+
+export const getFeatureChangelogs = async (
+  req: Request<{ id: string; type: MapFeatureType }>,
+) => {
+  const { cursor } = destructPaginationQueryParam(req.query);
+
+  const { changelogs, lastEvaluatedKey } = await getChangelogsOfFeature(
+    req.params.id,
+    req.params.type,
+    {
+      limit: 20,
+      startKey: cursor,
+    },
+  );
+
+  const items = changelogs
+    .map((c) => {
+      const item = { ...c, htmlText: '' };
+      const fullname = c.user?.fullname ?? 'Unknown User';
+      switch (c.actionType) {
+        case 'created':
+          item.htmlText = `<b>${fullname}</b> has created the ${c.featureType}.`;
+          break;
+        case 'updatedDetails':
+          item.htmlText = `<b>${fullname}</b> updated the <b>${
+            c.updatedPathsString || 'details'
+          }</b> of the ${c.featureType}.`;
+          break;
+        case 'grantedTemporaryEditor':
+          item.htmlText = `<b>${fullname}</b> has been granted temporary editor rights for the ${c.featureType}.`;
+          break;
+        case 'updatedOwners':
+          item.htmlText = `<b>${fullname}</b> changed the owner of the ${c.featureType}.`;
+          break;
+        default:
+          break;
+      }
+      return item;
+    })
+    .filter((c) => c.htmlText !== '');
+
+  return { items, pagination: constructPaginationResponse(lastEvaluatedKey) };
+};
+
+export const requestTemporaryEditorship = async (
+  req: Request<{ id: string; type: MapFeatureType }>,
+) => {
+  const requestClaims = verifyRequestClaims(req);
+  const featureId = req.params.id;
+  const featureType = req.params.type;
+
+  let item: GenericMapFeatureItemType | null;
+  switch (featureType) {
+    case 'line':
+      item = await db.getLineDetails(featureId);
+      break;
+    case 'spot':
+      item = await db.getSpotDetails(featureId);
+      break;
+    case 'guide':
+      item = await db.getGuideDetails(featureId);
+      break;
+    default:
+      throw new Error('Invalid feature type');
+  }
+  if (!item) {
+    throw new Error(`NotFound: ${featureType} ${featureId} not found`);
+  }
+  const feature = genericFeatureFromItem(item);
+
+  await addTemporaryEditorToMapFeature(feature.id, feature.type, requestClaims.isaId);
+  await addTemporaryEditorChangelogToFeature(
+    feature.id,
+    feature.type,
+    requestClaims.isaId,
+    new Date(),
+    feature.country,
+  );
+
+  logger.info(`added temporary editor for ${feature.type}`, {
+    userId: req.user?.isaId,
+    featureId,
+    featureType,
+  });
+  return {};
+};
+
+export const deleteFeature = async (
+  req: Request<{ id: string; type: MapFeatureType }>,
+) => {
+  const editor = await validateMapFeatureEditor(req.params.id, req.params.type, req.user?.isaId, {
+    shouldThrow: true,
+  });
+  if (editor?.reason !== 'explicit') {
+    throw new Error('Forbidden: Only explicit editors can delete a feaure');
+  }
+  switch (req.params.type) {
+    case 'line':
+      await db.deleteLine(req.params.id);
+      break;
+    case 'spot':
+      await db.deleteSpot(req.params.id);
+      break;
+    case 'guide':
+      await db.deleteGuide(req.params.id);
+      break;
+    default:
+      throw new Error('Invalid feature type');
+  }
+
+  logger.info(`deleted ${req.params.type}`, {
+    userId: req.user?.isaId,
+    id: req.params.id,
+  });
+  return {};
+};
+
+export const deleteFeatureRequest = async (
+  req: Request<{ id: string; type: MapFeatureType }>,
+) => {
+  const body = validateApiPayload(req.body, deleteFeatureRequestSchema);
+  logger.info('Feature Delete Request', {
+    userId: req.user?.isaId,
+    feature: {
+      id: req.params.id,
+      type: req.params.type,
+    },
+    reason: body.reason,
+  });
+  return {};
+};
+
+export const featureRoutes = {
+  'GET /feature/:id/:type/changelogs': jsonRoute(getFeatureChangelogs),
+  'PUT /feature/:id/:type/requestTemporaryEditorship': jsonRoute(requestTemporaryEditorship),
+  'POST /feature/:id/:type/deleteRequest': jsonRoute(deleteFeatureRequest),
+  'DELETE /feature/:id/:type': jsonRoute(deleteFeature),
+};

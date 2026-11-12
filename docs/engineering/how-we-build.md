@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: How we build
-description: "The human's theory of how software is built here: what humans decide, what agents do, and what simplicity means in this architecture."
+description: "The human's theory of how software is built here: what humans decide, what agents do, cost as a non-profit, and what simplicity means in this architecture."
 related: [coding/coding-rules.md, code-review/the-review.md, /docs/documentation-system/the-theory.md]
 nav: { order: 10 }
 ---
@@ -9,6 +9,10 @@ nav: { order: 10 }
 # How we build
 
 Humans stop checking code for bugs and stop testing it. We abstract ourselves to system design, alignment with the future architecture, decision making and the robustness of architectural flows: anything high level. Functions, code and coding style are not ours anymore. Everything below that line is the agents', at the best quality possible, and the [coding rules](coding/coding-rules.md) are what that quality is held against. Code is fully agent-maintained and nobody reads it anymore, so there is no linter or formatter; the type check is the gate. How that line is checked is [code review](code-review/the-review.md).
+
+## Cost
+
+The ISA is a non-profit, and cost is a big consideration for us. That is why many decisions here are made the way they are architecturally, and an agent weighs cost when it designs as well.
 
 ## Simplicity, in every axis
 

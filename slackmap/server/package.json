@@ -1,0 +1,35 @@
+{
+  "name": "slackmap-server",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "checkTs": "tsc --noEmit",
+    "build": "node scripts/build.mjs",
+    "invoke": "node scripts/invoke.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "3.1158.0",
+    "@aws-sdk/client-s3": "3.1158.0",
+    "@aws-sdk/client-ses": "3.1158.0",
+    "@aws-sdk/lib-dynamodb": "3.1158.0",
+    "@aws-sdk/util-dynamodb": "3.996.9",
+    "@turf/turf": "7.0.0",
+    "deep-diff": "1.0.2",
+    "jwt-decode": "4.0.0",
+    "nanoid": "5.0.7",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "8.10.164",
+    "@types/deep-diff": "1.0.5",
+    "@types/geojson": "7946.0.14",
+    "@types/node": "24.19.2",
+    "esbuild": "0.28.2",
+    "typescript": "5.9.3"
+  },
+  "author": "Can Sahin",
+  "license": "GPL-3.0"
+}

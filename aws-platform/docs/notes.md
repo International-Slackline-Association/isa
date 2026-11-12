@@ -12,5 +12,4 @@ nav: { order: 100 }
 - Move Route 53 domain registrations out of the workload account.
 - Per-app accounts (SlackData, SportHub, perhaps slackmap); isolates developer access.
 - With Rankings: delete `isa-rankings-iam-user`, rename `rankings-dev-access`.
-- slackmap: drop stale `ses:VerifyEmailIdentity` IAM.
 - Bring ISA's org membership under CDK (`AWS::Organizations::Account`).
