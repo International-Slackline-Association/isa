@@ -1,8 +1,7 @@
 ---
 type: reference
 title: Frontmatter specification
-description: The frontmatter fields every doc carries, the six types and their filing test, what makes a doc findable, and the sidebar key.
-nav: { order: 40 }
+description: The frontmatter fields every doc carries, the six types and their filing test, what makes a doc findable.
 ---
 
 # Frontmatter specification
@@ -17,7 +16,6 @@ Every converted file under a `docs/` folder begins with YAML frontmatter delimit
 | `description` | yes | one or two sentences | The doc's search surface: agents choose what to open from title, description and path. Name what the doc is about with the terms a worker would search for (the concepts, the names, the questions it answers) so that a reader seeing only this decides correctly whether to open it. Terms, not claims: it does not restate the body's points, sections or conclusions. |
 | `title` | no | one line | Display title. Derived from the H1 or filename when absent. |
 | `related` | no | list of paths | Cross-references not in the README. Read by humans and agents; no tool acts on it. |
-| `nav` | no | `{ order, open, collapsible, sections }` | Docs-site sidebar only. See below. |
 
 Docs use no other fields.
 
@@ -42,15 +40,6 @@ Rules:
 - `index` is only for `README.md`. `notes` is one flat file per scope, `docs/notes.md`.
 - A `notes` item is one line, deleted when it lands or graduates into another type; the file lists what is open, not history. If work cannot proceed without the answer, it is not a note but an undecided sentence in the explanation.
 - `explanation` holds the whys, including decisions and what they rejected, and links the `policy`s it justifies. `policy` carries its why as a link to an `explanation`. A decision that needs a frozen, dated record gets one in `specs/`, linked from the explanation.
-
-## Sidebar (`nav`)
-
-Presentation for the docs site, under its own key so the fields above stay the contract. When to set `nav.order` is a step in [updating docs](updating-docs.md#before-any-doc); the other keys are for where the default is wrong.
-
-- `nav.order`: sparse number (10, 20, 30), lower first. On a folder's `README.md` it positions the whole folder; a folder without a README takes the lowest order among its docs. Siblings without an order follow, folders before pages, alphabetical inside each. A `docs/` folder leads its siblings without needing an order.
-- `nav.open`, folder READMEs only: is the folder expanded on load. Every folder is closed without it, at every depth, except the direct subfolders of one with `nav.sections`.
-- `nav.collapsible`, folder READMEs only: `false` drops the chevron, so the section cannot be closed.
-- `nav.sections`, folder READMEs only: its subfolders start open, each under a rule and a heading.
 
 ## Example
 

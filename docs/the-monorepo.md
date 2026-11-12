@@ -2,7 +2,6 @@
 type: explanation
 title: Why one monorepo
 description: "Why one public monorepo for the ISA projects, which projects are in scope, upgrades and migrations, critical data, per-app AWS accounts."
-nav: { order: 5 }
 ---
 
 # Why one monorepo

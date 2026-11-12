@@ -2,7 +2,6 @@
 type: notes
 title: "AWS organization: open"
 description: "Open work in the AWS organization: domain renewals, backups, per-app accounts, IAM cleanup."
-nav: { order: 100 }
 ---
 
 # AWS organization: open

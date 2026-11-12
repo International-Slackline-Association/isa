@@ -4,7 +4,6 @@ title: "Docs system: open"
 description: >-
   What is open in the docs system itself: untested ideas, deferred work,
   questions that block nothing.
-nav: { order: 100 }
 ---
 
 # Docs system: open

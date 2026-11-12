@@ -3,7 +3,6 @@ type: policy
 title: Unit tests
 description: When a new unit test may exist and the kinds that qualify (a refusal a local run cannot provoke, a decision that must never run live, a validator or parser with many edge cases, a protocol detail the live system hides, a boundary outcome a local run cannot provoke, a marked exception), what a test may assert, mocking at the process boundary, whose test data a test may use, and how a developer adds a rule.
 related: [why-a-rule.md]
-nav: { order: 10 }
 ---
 
 # Unit tests

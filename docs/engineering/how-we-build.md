@@ -3,7 +3,6 @@ type: explanation
 title: How we build
 description: "The human's theory of how software is built here: what humans decide, what agents do, cost as a non-profit, and what simplicity means in this architecture."
 related: [coding/coding-rules.md, code-review/the-review.md, /docs/documentation-system/the-theory.md]
-nav: { order: 10 }
 ---
 
 # How we build

@@ -4,7 +4,6 @@ title: Reading docs
 description: >-
   How an agent finds what it needs during a task: what loads at which depth, what to do on entering a scope, an unconverted or legacy one, and what to do when the docs are missing, contradictory or wrong.
 related: [the-theory.md]
-nav: { order: 50 }
 ---
 
 # Reading docs

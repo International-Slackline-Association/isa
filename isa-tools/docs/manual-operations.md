@@ -2,7 +2,6 @@
 type: reference
 title: isa-tools manual operations
 description: "What isa-tools depends on that CDK does not manage: the API custom domain, Cloudflare records, SSM parameters, the pre-migration backup, and the names other apps use."
-nav: { order: 20 }
 ---
 
 # Manual operations

@@ -2,7 +2,6 @@
 type: index
 title: "ISA tools"
 description: "Entry point for isa-tools: the tools API (certificates, signed-document verification, image processing, Google Sheets listings) and the verify web app, with its CDK infra."
-nav: { order: 20 }
 ---
 
 # ISA tools

@@ -2,7 +2,6 @@
 type: reference
 title: Stacks
 description: "The CDK stacks of the AWS organization, with account, region and CLI profile for each, and where config and policies live."
-nav: { order: 25 }
 ---
 
 # Stacks

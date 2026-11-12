@@ -2,7 +2,6 @@
 type: explanation
 title: "The user pool"
 description: "Why the Cognito user pool is imported into CDK and never recreated, whose app clients it holds, and which clients may change: the identity stack, its stack policy, client ownership."
-nav: { order: 10 }
 ---
 
 # The user pool

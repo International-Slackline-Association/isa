@@ -3,7 +3,6 @@ type: explanation
 title: Why a unit test needs a rule
 description: Why a unit test here exists only where a named rule allows it. What AI-written tests did to the suite, what a unit test is for, what was rejected, and why the rules bind new tests only.
 related: [unit-tests.md]
-nav: { order: 20 }
 ---
 
 # Why a unit test needs a rule

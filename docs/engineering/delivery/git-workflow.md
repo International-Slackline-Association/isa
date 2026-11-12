@@ -2,7 +2,6 @@
 type: policy
 title: Git workflow
 description: "Working on a branch and squash-merging into main when done, for now without PRs, and the PR, review and squash-merge rules for when PRs are used again."
-nav: { order: 40 }
 ---
 
 # Git workflow

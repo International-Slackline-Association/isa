@@ -2,7 +2,6 @@
 type: notes
 title: "ISA tools: open"
 description: "Open work in isa-tools: the image processor boundary."
-nav: { order: 100 }
 ---
 
 # ISA tools: open

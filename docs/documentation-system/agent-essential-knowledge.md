@@ -4,8 +4,6 @@ title: Agent essential knowledge
 description: >-
   What every session holds about the docs system: the idea, the map, and what
   must never happen. Imported by root CLAUDE.md.
-nav:
-  order: 5
 ---
 # Documentation System 
 

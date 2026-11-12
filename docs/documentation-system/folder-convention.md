@@ -3,7 +3,6 @@ type: policy
 title: Folder convention
 description: Exact rules for where docs/ folders go, what they contain, naming, the README, docs vs specs, agent instruction files, edge cases, and lifecycle.
 related: [the-theory.md]
-nav: { order: 30 }
 ---
 
 # Folder convention

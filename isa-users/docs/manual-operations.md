@@ -2,7 +2,6 @@
 type: reference
 title: isa-users manual operations
 description: "What isa-users depends on that CDK does not manage: the API custom domain, the identity stack's stack policy, Cloudflare records, the hosted UI look, groups, SES, and the names other apps use."
-nav: { order: 30 }
 ---
 
 # Manual operations

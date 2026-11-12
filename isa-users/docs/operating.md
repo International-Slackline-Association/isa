@@ -2,7 +2,6 @@
 type: how-to
 title: Operating isa-users
 description: "Running isa-users locally and deploying its CDK stacks (isa-users-prod-identity, -data, -app): order, the identity stack's guard, verification."
-nav: { order: 20 }
 ---
 
 # Operating isa-users

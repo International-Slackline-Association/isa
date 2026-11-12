@@ -3,7 +3,6 @@ type: how-to
 title: Reviewing an implementation
 description: "How the code review agent works through a change: the package's own checks, the native code-review pass, the diff against the intent, the policies along the paths, the architecture questions, the complexity a change adds, what it does not flag and what it reports."
 related: [the-review.md, ../coding/coding-rules.md]
-nav: { order: 31 }
 ---
 
 # Reviewing an implementation

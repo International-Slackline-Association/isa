@@ -5,8 +5,6 @@ description: >-
   Why the docs system exists and the three concepts it rests on (derivable or
   theory, scopes not levels, the why comes from the conversation), each a must,
   with its why and where its rules live. Read once.
-nav:
-  order: 10
 ---
 
 # The theory of this system
@@ -45,7 +43,7 @@ Rules: [content rules](content-rules.md); [frontmatter spec](frontmatter-spec.md
 
 **Every layer below the scope where knowledge is written holds pointers, not copies. Root `CLAUDE.md` imports one block, a nested `CLAUDE.md` imports its scope's README, and nothing else is imported.**
 
-An agent is never handed everything; it is handed the right context at the right time and left to reason about what to open next. The README and the docs' frontmatter are that surface: the README says what exists and what above it matters, each sibling's type and description say what it is, and the agent decides. Because every doc carries its description, a README never restates it; upward links stay hand-written, since nothing else can produce them. The README is read on every task, so it stays small and theory goes in siblings; on the site the sidebar is the reader's first view of a scope, so its order is the README's reading order, not the alphabet. Root `CLAUDE.md` loads whether or not the task needs it, so it carries only what every session needs (the idea, the map, the must-nevers, and what else the human decides is default context), and any other import there would load into every session. A nested `CLAUDE.md` loads only when the agent works in its folder, so it is the one place an import is right: a pointer saying "read the README" is a bet the agent follows it; an import is not. Past the imports, reading is optional but encouraged: agents read to save time.
+An agent is never handed everything; it is handed the right context at the right time and left to reason about what to open next. The README and the docs' frontmatter are that surface: the README says what exists and what above it matters, each sibling's type and description say what it is, and the agent decides. Because every doc carries its description, a README never restates it; upward links stay hand-written, since nothing else can produce them. The README is read on every task, so it stays small and theory goes in siblings. Root `CLAUDE.md` loads whether or not the task needs it, so it carries only what every session needs (the idea, the map, the must-nevers, and what else the human decides is default context), and any other import there would load into every session. A nested `CLAUDE.md` loads only when the agent works in its folder, so it is the one place an import is right: a pointer saying "read the README" is a bet the agent follows it; an import is not. Past the imports, reading is optional but encouraged: agents read to save time.
 
 Rules: [folder convention](folder-convention.md); [reading docs](reading-docs.md#what-you-load-and-when).
 

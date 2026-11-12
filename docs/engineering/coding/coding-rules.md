@@ -3,7 +3,6 @@ type: policy
 title: Coding rules
 description: The repo-wide coding rules and conventions every change obeys, and what the code review holds a change against.
 related: [../how-we-build.md]
-nav: { order: 20 }
 ---
 
 # Coding rules
