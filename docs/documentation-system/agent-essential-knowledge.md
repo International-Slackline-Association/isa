@@ -20,7 +20,7 @@ Quick look for you:
 1. [The theory of this system](the-theory.md): everything else follows from it; read once
 2. [Content rules](content-rules.md): what goes into a doc and what stays out, skills and agent instructions included
 3. [Folder convention](folder-convention.md): where a doc lives, what a README holds, how docs link
-4. [Frontmatter spec](frontmatter-spec.md): the fields, the six types, what makes a doc findable
+4. [Frontmatter spec](frontmatter-spec.md) and its [rules](frontmatter-rules.md): the fields, the six types, what makes a doc findable
 5. [Reading docs](reading-docs.md): how you find what you need during a task, and what to do when the docs are missing, legacy or wrong
 6. [Updating docs](updating-docs.md): how a change starts and the steps for each type, ending in the review; skeletons in [templates](templates.md)
 

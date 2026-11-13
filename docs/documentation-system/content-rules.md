@@ -8,7 +8,7 @@ related: [the-theory.md]
 
 # Content rules
 
-Why: [derivable or theory](the-theory.md#derivable-or-theory). These hold for every claim in every doc under a `docs/` folder and in every agent instruction file. `X` is the scope the doc describes. Apply per claim, not per sentence: "X is shaped so, because Y" is two claims, and the decision taken is what the code already shows while the alternative rejected is not.
+Why: [derivable or theory](the-theory.md#derivable-or-theory). These hold for every claim in every doc under a `docs/` folder and in every agent instruction file. `X` is the scope the doc describes. Apply per claim, not per sentence: "X is shaped so, because Y" is two claims.
 
 A claim survives only if it passes every rule. The default verdict is out; a doc that fails is deleted, not trimmed into something shorter that still fails.
 

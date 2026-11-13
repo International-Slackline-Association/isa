@@ -3,8 +3,7 @@
 //
 // The catalog is opt-in: any tracked .md file whose frontmatter has a non-empty
 // `type` and `description` (see docs/documentation-system/frontmatter-spec.md).
-// `status: deprecated` docs are hidden. This tool only points — it never prints
-// doc bodies; read the files it points at.
+// This tool only points — it never prints doc bodies; read the files it points at.
 //
 //   find-in-docs <keywords…>        search title+description+path
 //   find-in-docs --dir <path> [kw…] restrict to a subtree; bare --dir lists it,
@@ -75,13 +74,10 @@ function loadCatalog() {
       uncataloged.push(rel);
       continue;
     }
-    const status = typeof fm.status === 'string' ? fm.status.trim() : 'stable';
-    if (status === 'deprecated') continue; // hidden on purpose, not uncataloged
     catalog.push({
       path: rel,
       type,
       description,
-      status,
       title: typeof fm.title === 'string' ? fm.title.trim() : '',
     });
   }

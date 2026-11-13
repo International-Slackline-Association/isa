@@ -7,7 +7,7 @@ description: >-
 
 # Updating docs
 
-Why: [the why comes from the conversation](the-theory.md#the-why-comes-from-the-conversation). Rules: [folder convention](folder-convention.md), [frontmatter spec](frontmatter-spec.md), [content rules](content-rules.md). Skeletons: [templates](templates.md).
+Why: [the why comes from the conversation](the-theory.md#the-why-comes-from-the-conversation). Rules: [folder convention](folder-convention.md), [frontmatter rules](frontmatter-rules.md), [content rules](content-rules.md). Skeletons: [templates](templates.md).
 
 The best way anything gets documented is the human sharing the why as the work goes and answering the agent's questions. The agent finds the seams in the code, the human supplies what the code cannot show, the agent writes it down in their words at the end of the change. Every path below ends there; none of them ends with the agent writing a why nobody gave it. Every question to the human goes through the AskUserQuestion tool, one at a time: they answer by choosing, not by typing into a wall of text.
 

@@ -20,7 +20,7 @@ Why: [agent skills](agent-skills.md). These hold for every skill, command, agent
 
 ## Where an instruction lives
 
-The doc types are [the frontmatter spec's](frontmatter-spec.md#the-six-types); the table sets them beside the instruction kinds so one question has one place.
+The doc types are [the frontmatter spec's](frontmatter-spec.md#the-six-types).
 
 | What it is | Where it goes |
 |---|---|

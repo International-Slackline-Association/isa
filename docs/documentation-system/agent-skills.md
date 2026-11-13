@@ -35,4 +35,4 @@ An agent brief is a fresh context given a role and its bounds, `docs-review` for
 
 ## Where a file lives
 
-An instruction file lives with the runtime that loads it, never with the scope it is about; that scope is reached by a link, as a README reaches upward. Which runtime means which folder is a table in [the rules](agent-skill-rules.md#where-an-instruction-lives).
+An instruction file lives with the runtime that loads it, never with the scope it is about; that scope is reached by a link, as a README reaches upward. Theory behind a skill sits in the skill's folder: a skill ships as one folder and its docs travel with it. Which runtime means which folder is a table in [the rules](agent-skill-rules.md#where-an-instruction-lives).

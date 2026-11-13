@@ -20,7 +20,7 @@ description: "Rules for operating the AWS organization IaC: scope, CDK conventio
 ## CDK
 
 - Stacks split by account/region and change frequency.
-- Config in `config/organization.ts`, no context lookups.
+- Config in [config/organization.ts](/aws-platform/config/organization.ts), no context lookups.
 - Long-lived resources: `RemovalPolicy.RETAIN` and termination protection.
 - A "replace" of any resource in a diff is a stop.
 
