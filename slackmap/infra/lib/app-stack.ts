@@ -2,8 +2,6 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
-import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
-import * as cloudwatchActions from 'aws-cdk-lib/aws-cloudwatch-actions';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as events from 'aws-cdk-lib/aws-events';
@@ -15,18 +13,16 @@ import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
-import * as sns from 'aws-cdk-lib/aws-sns';
-import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as path from 'path';
 import { Annotations, Duration, RemovalPolicy, Size, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import {
-  alarmEmail,
   applicationDataBucketName,
   certificates,
   domains,
+  errorDigest,
   geonamesUsernameParameter,
   imagesBucketName,
   isaTools,
@@ -83,7 +79,6 @@ export class AppStack extends Stack {
         geonamesUsernameParameter,
       ),
     };
-    const logGroups: Record<string, logs.LogGroup> = {};
     const fn = (name: string, entry: string, timeout: Duration) =>
       new nodejs.NodejsFunction(this, name, {
         runtime: lambda.Runtime.NODEJS_24_X,
@@ -100,14 +95,10 @@ export class AppStack extends Stack {
           tsconfig: path.join(serverRoot, 'tsconfig.json'),
           externalModules: [],
         },
-        logGroup: (() => {
-          const logGroup = new logs.LogGroup(this, `${name}Logs`, {
-            retention: logs.RetentionDays.SIX_MONTHS,
-            removalPolicy: RemovalPolicy.DESTROY,
-          });
-          logGroups[name] = logGroup;
-          return logGroup;
-        })(),
+        logGroup: new logs.LogGroup(this, `${name}Logs`, {
+          retention: logs.RetentionDays.SIX_MONTHS,
+          removalPolicy: RemovalPolicy.DESTROY,
+        }),
       });
 
     const apiFunction = fn('ApiFunction', 'src/functions/api/handler.ts', Duration.seconds(10));
@@ -311,38 +302,34 @@ export class AppStack extends Stack {
       },
     });
 
-    const alarms = new sns.Topic(this, 'AlarmsTopic');
-    alarms.addSubscription(new subscriptions.EmailSubscription(alarmEmail));
-    const alarmAction = new cloudwatchActions.SnsAction(alarms);
-    for (const [name, f] of [
-      ['Api', apiFunction],
-      ['Streams', streamsFunction],
-      ['Cron', cronFunction],
-    ] as const) {
-      new cloudwatch.Alarm(this, `${name}ErrorsAlarm`, {
-        metric: f.metricErrors({ period: Duration.minutes(5) }),
-        threshold: 1,
-        evaluationPeriods: 1,
-        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
-      }).addAlarmAction(alarmAction);
-    }
-    // The handlers catch their errors and log them, so a failed request or stream record is not a
-    // Lambda error.
-    for (const [name, logGroup] of Object.entries(logGroups)) {
-      const metric = new logs.MetricFilter(this, `${name}ErrorLogs`, {
-        logGroup,
-        filterPattern: logs.FilterPattern.stringValue('$.level', '=', 'error'),
-        metricNamespace: namespace,
-        metricName: `${name}ErrorLogs`,
-        metricValue: '1',
-        defaultValue: 0,
-      }).metric({ period: Duration.minutes(5), statistic: 'Sum' });
-      new cloudwatch.Alarm(this, `${name}ErrorLogsAlarm`, {
-        metric,
-        threshold: 1,
-        evaluationPeriods: 1,
-        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
-      }).addAlarmAction(alarmAction);
-    }
+    const githubOidcProvider = `arn:aws:iam::${this.account}:oidc-provider/token.actions.githubusercontent.com`;
+    new iam.Role(this, 'ErrorDigestRole', {
+      roleName: errorDigest.roleName,
+      maxSessionDuration: Duration.hours(1),
+      assumedBy: new iam.FederatedPrincipal(
+        githubOidcProvider,
+        {
+          StringEquals: {
+            'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
+            'token.actions.githubusercontent.com:sub': `repo:${errorDigest.repo}:ref:refs/heads/main`,
+          },
+        },
+        'sts:AssumeRoleWithWebIdentity',
+      ),
+      inlinePolicies: {
+        ReadLogs: new iam.PolicyDocument({
+          statements: [
+            new iam.PolicyStatement({
+              actions: ['logs:StartQuery'],
+              resources: [`arn:aws:logs:${this.region}:${this.account}:log-group:${namespace}-app-*`],
+            }),
+            new iam.PolicyStatement({
+              actions: ['logs:GetQueryResults', 'logs:DescribeLogGroups'],
+              resources: ['*'],
+            }),
+          ],
+        }),
+      },
+    });
   }
 }

@@ -44,7 +44,12 @@ export const isaTools = {
   trustedServiceApiKeyParameter: '/isa-tools-trusted-service-api-key',
 };
 
+// The error digest runs as a GitHub Actions workflow of this repo, signed in through
+// the account's GitHub OIDC provider (aws-platform, IsaShared).
+export const errorDigest = {
+  repo: 'International-Slackline-Association/isa',
+  roleName: `${namespace}-error-digest`,
+};
+
 // The ISA account of slackmap@slacklineinternational.org.
 export const slackmapAdminIsaId = 'ISA_C87BE5F6';
-
-export const alarmEmail = 'aws@slacklineinternational.org';

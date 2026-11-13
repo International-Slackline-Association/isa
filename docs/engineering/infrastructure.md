@@ -1,7 +1,7 @@
 ---
 type: policy
 title: Infrastructure rules
-description: "How every project's AWS infrastructure is built and deployed with CDK: the infra package, config, naming and tags, stack split, importing what cannot be recreated, references between stacks and apps, Lambda bundling, secrets, alarms, the standard package scripts and running deploys."
+description: "How every project's AWS infrastructure is built and deployed with CDK: the infra package, config, naming and tags, stack split, importing what cannot be recreated, references between stacks and apps, Lambda bundling, secrets, the standard package scripts and running deploys."
 related: [/docs/the-monorepo.md]
 ---
 
@@ -26,7 +26,6 @@ Why: [upgrades as we go](/docs/the-monorepo.md#upgrades-as-we-go).
 - No native binaries in git. A native module is installed for the Lambda's platform at bundling time.
 - Secrets live in SSM Parameter Store, created by hand. CDK references them and never creates them.
 - Web apps are an S3 bucket behind CloudFront with origin access control, deployed by `BucketDeployment`.
-- Lambda errors raise a CloudWatch alarm to the role address `aws@slacklineinternational.org`.
 - Exact-pinned dependencies, pnpm through corepack, one lockfile per project.
 
 ## Scripts

@@ -44,5 +44,11 @@ export class SharedStack extends Stack {
     );
 
     wildcardCertificate(this);
+
+    // Shared by every project: each project's role limits which repo and branch may use it.
+    new iam.OidcProviderNative(this, 'GithubActionsOidc', {
+      url: 'https://token.actions.githubusercontent.com',
+      clientIds: ['sts.amazonaws.com'],
+    });
   }
 }

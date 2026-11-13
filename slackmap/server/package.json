@@ -5,12 +5,14 @@
   "scripts": {
     "checkTs": "tsc --noEmit",
     "build": "node scripts/build.mjs",
-    "invoke": "node scripts/invoke.mjs"
+    "invoke": "node scripts/invoke.mjs",
+    "errorDigest": "node scripts/error-digest.mjs"
   },
   "engines": {
     "node": ">=24"
   },
   "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "3.1158.0",
     "@aws-sdk/client-dynamodb": "3.1158.0",
     "@aws-sdk/client-s3": "3.1158.0",
     "@aws-sdk/client-ses": "3.1158.0",

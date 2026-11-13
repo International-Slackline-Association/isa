@@ -146,7 +146,7 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
         const message = errorMessage || 'Error occurred';
         const stack = (error as Error).stack;
         // Body, query and the user's email hold personal data, so they stay out of the log.
-        const data = { httpRequest: { path, method, userId: user?.isaId }, status, stack };
+        const data = { httpRequest: { path, method, userId: user?.isaId }, route: routeKey ?? null, status, stack };
         if (isExpectedError) logger.warn(message, data);
         else logger.error(message, data);
         return json({ status, message, code }, status);
