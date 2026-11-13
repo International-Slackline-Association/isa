@@ -13,7 +13,6 @@ export interface UpdateUserPostBody {
   phoneNumber?: string;
   city?: string;
   country?: string;
-  emergencyContact?: string;
 }
 
 export interface UpdateProfilePicturePostBody {

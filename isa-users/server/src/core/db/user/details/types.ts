@@ -14,7 +14,6 @@ interface NonKeyAttrs {
   phoneNumber?: string;
   city?: string;
   country?: string;
-  emergencyContact?: string;
   profilePictureS3Key?: string;
   createdDateTime?: string;
 }

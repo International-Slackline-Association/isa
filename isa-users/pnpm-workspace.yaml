@@ -6,5 +6,3 @@ engineStrict: true
 saveExact: true
 allowBuilds:
   esbuild: true
-overrides:
-  csstype: 3.1.3

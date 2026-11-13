@@ -16,7 +16,6 @@ Not managed by CDK.
 | Hosted UI CSS and logo | Cognito, pool `isa-users` | Copies in [infra/cognito](/isa-users/infra/cognito/). |
 | Group `timeradmin` | Cognito, pool `isa-users` | The timer's. |
 | SES identity `slacklineinternational.org` | SES | The pool's and the Cognito trigger's sender, from aws-platform. |
-| Backup `isa-users-prod-before-cdk-cutover` | DynamoDB backups | On-demand backup of the users as they were before the move to CDK; the source table is deleted. |
 | GitHub label `errors:isa-users` | the monorepo's issues | Created once by hand; the error digest workflow finds its issues by it. |
 | SSM `isa-tools-trusted-service-api-key` | Parameter Store | isa-tools' API key, sent on its image-processing and certificate calls. |
 

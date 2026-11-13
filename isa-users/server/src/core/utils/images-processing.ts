@@ -1,3 +1,6 @@
+import { DeleteObjectCommand } from '@aws-sdk/client-s3';
+
+import { s3 } from '../aws/clients';
 import { isaToolsApi } from '../external-api/isa-tools-api';
 
 export const processAndPutProfilePhoto = async (processingBucketKey: string, isaId: string) => {
@@ -24,4 +27,10 @@ export const processAndPutProfilePhoto = async (processingBucketKey: string, isa
     cacheControl: 'public, max-age=864000',
   });
   return { result, s3Key };
+};
+
+export const deleteProfilePhoto = async (s3Key: string) => {
+  await s3.send(
+    new DeleteObjectCommand({ Bucket: process.env.ISA_USERS_IMAGES_S3_BUCKET as string, Key: s3Key }),
+  );
 };
