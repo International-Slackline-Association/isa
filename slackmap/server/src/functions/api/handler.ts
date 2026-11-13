@@ -7,6 +7,7 @@ import { featureRoutes } from './endpoints/feature/api';
 import { groupRoutes } from './endpoints/group/api';
 import { guideRoutes } from './endpoints/guide/api';
 import { lineRoutes } from './endpoints/line/api';
+import { pageRoutes } from './endpoints/page/api';
 import { spotRoutes } from './endpoints/spot/api';
 
 export const main = createHandler('api', {
@@ -19,4 +20,5 @@ export const main = createHandler('api', {
   ...activityRoutes,
   ...communitiesRoutes,
   ...contactRoutes,
+  ...pageRoutes,
 });

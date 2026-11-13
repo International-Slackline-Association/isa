@@ -28,7 +28,7 @@ Both keep 180 days and hold no IP addresses. `country` and `c-country` come from
 ## What the logs can answer
 
 - Who reads the map data and photos, and how much: host, referer, user agent and bytes in the CDN log; photo hot-linking shows as a referer outside slackmap.com.
-- Outside API consumers: a request with no `origin`, or one outside slackmap.com, is not the web app.
+- Outside API consumers: a request with no `origin`, or one outside slackmap.com, is not the web app; except the `GET /page/…` routes, which are slackmap.com pages served through CloudFront, counted only when not cached.
 - Scripts and scrapers: a cloud provider's `asn`, or a non-browser user agent.
 - Countries over time, route popularity and latency, errors by route, signed-in users (`isaId`) per week.
 

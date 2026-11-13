@@ -193,6 +193,19 @@ export class AppStack extends Stack {
         "function handler(event) { var r = event.request; if (r.uri.indexOf('.') === -1) { r.uri = '/index.html'; } return r; }",
       ),
     });
+    // /line/x reaches the API as /page/line/x.
+    const pageBehavior: cloudfront.BehaviorOptions = {
+      origin: new origins.RestApiOrigin(api, { originPath: `/${stage}/page` }),
+      viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      cachePolicy: new cloudfront.CachePolicy(this, 'PageCachePolicy', {
+        minTtl: Duration.hours(1),
+        defaultTtl: Duration.hours(1),
+        maxTtl: Duration.hours(1),
+        enableAcceptEncodingGzip: true,
+        enableAcceptEncodingBrotli: true,
+      }),
+      originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+    };
     const webDistribution = new cloudfront.Distribution(this, 'WebDistribution', {
       defaultRootObject: 'index.html',
       domainNames: domains.web,
@@ -204,7 +217,26 @@ export class AppStack extends Stack {
           { function: spaRewrite, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST },
         ],
       },
+      additionalBehaviors: Object.fromEntries(
+        [
+          '/line/*',
+          '/spot/*',
+          '/guide/*',
+          '/country/*',
+          '/communities/group/*',
+          '/communities/country/*',
+        ].map((pattern) => [pattern, pageBehavior]),
+      ),
+      // The plain app when the API fails or has no page for a path, such as /line/x/edit.
+      errorResponses: [404, 500, 502, 503, 504].map((httpStatus) => ({
+        httpStatus,
+        responseHttpStatus: 200,
+        responsePagePath: '/index.html',
+        ttl: Duration.seconds(10),
+      })),
     });
+    apiFunction.addEnvironment('SLACKMAP_WEB_S3_BUCKET', webBucket.bucketName);
+    webBucket.grantRead(apiFunction);
 
     const webDist = path.join(projectRoot, 'web/dist');
     const webAssets = new s3deploy.BucketDeployment(this, 'WebAssets', {
