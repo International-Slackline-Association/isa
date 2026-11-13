@@ -108,7 +108,14 @@ const runQuery = async (start: Date, end: Date) => {
   const groups = await logsClient.send(
     new DescribeLogGroupsCommand({ logGroupNamePrefix: logGroupPrefix }),
   );
-  const logGroupNames = (groups.logGroups ?? []).map((g) => g.logGroupName!);
+  if (!groups.logGroups?.length) {
+    throw new Error(`No log group starts with ${logGroupPrefix}`);
+  }
+  // Logs Insights rejects a window that ends before a log group existed.
+  const logGroupNames = groups.logGroups
+    .filter((g) => (g.creationTime ?? 0) < end.getTime())
+    .map((g) => g.logGroupName!);
+  if (logGroupNames.length === 0) return [];
   const { queryId } = await logsClient.send(
     new StartQueryCommand({
       logGroupNames,

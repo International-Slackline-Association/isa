@@ -47,7 +47,8 @@ export const isaTools = {
 // The error digest runs as a GitHub Actions workflow of this repo, signed in through
 // the account's GitHub OIDC provider (aws-platform, IsaShared).
 export const errorDigest = {
-  repo: 'International-Slackline-Association/isa',
+  // GitHub's immutable subject: org and repo ids pinned, so a renamed or recreated repo cannot match.
+  subject: 'repo:International-Slackline-Association@40061671/isa@1454138550:ref:refs/heads/main',
   roleName: `${namespace}-error-digest`,
 };
 

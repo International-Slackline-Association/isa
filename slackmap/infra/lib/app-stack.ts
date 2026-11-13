@@ -311,7 +311,7 @@ export class AppStack extends Stack {
         {
           StringEquals: {
             'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
-            'token.actions.githubusercontent.com:sub': `repo:${errorDigest.repo}:ref:refs/heads/main`,
+            'token.actions.githubusercontent.com:sub': errorDigest.subject,
           },
         },
         'sts:AssumeRoleWithWebIdentity',
