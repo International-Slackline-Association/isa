@@ -1,0 +1,45 @@
+name: isa-tools error digest
+
+on:
+  schedule:
+    - cron: '20 3 * * 1'
+  workflow_dispatch:
+    inputs:
+      live:
+        description: Write issues (otherwise only print them)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+  id-token: write
+
+concurrency: isa-tools-error-digest
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          package_json_file: isa-tools/package.json
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: isa-tools/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --filter isa-tools-server
+        working-directory: isa-tools
+      - uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df # v4.2.1
+        with:
+          role-to-assume: arn:aws:iam::387132903656:role/isa-tools-prod-error-digest
+          aws-region: eu-central-1
+      - run: pnpm run errorDigest ${{ (github.event_name == 'schedule' || inputs.live) && '--live' || '' }}
+        working-directory: isa-tools/server
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

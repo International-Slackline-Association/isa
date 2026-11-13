@@ -38,4 +38,11 @@ export const isaTools = {
   trustedServiceApiKeyParameter: '/isa-tools-trusted-service-api-key',
 };
 
-export const alarmEmail = 'aws@slacklineinternational.org';
+// The weekly error digest runs as a GitHub Actions workflow of the monorepo, signed in through the
+// account's GitHub OIDC provider (aws-platform, IsaShared).
+export const errorDigest = {
+  // GitHub's immutable subject: org and repo ids pinned, so a renamed or recreated repo cannot match.
+  subject: 'repo:International-Slackline-Association@40061671/isa@1454138550:ref:refs/heads/main',
+  roleName: 'isa-users-prod-error-digest',
+  logGroupPrefix: 'isa-users-prod-app-',
+};

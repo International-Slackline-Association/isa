@@ -12,6 +12,7 @@ Not managed by CDK.
 |---|---|---|
 | API Gateway custom domain `tools-api.slacklineinternational.org` | API Gateway, eu-central-1 | Regional, wildcard certificate of `IsaShared`. Only its base path mapping is in `IsaToolsApp`. |
 | Cloudflare CNAMEs `tools-api`, `verify`, `tools` | Cloudflare, slacklineinternational.org | `tools-api` → the custom domain's regional name; `verify` and `tools` → the CloudFront distribution of `IsaToolsApp`. |
+| GitHub label `errors:isa-tools` | the monorepo's issues | Created once by hand; the error digest workflow finds its issues by it. |
 | SSM `isa-tools-rsa-private-key` | Parameter Store | Signs every certificate and verify token; the public key is in [verificationPublicKey.ts](/isa-tools/server/src/core/documentVerification/verificationPublicKey.ts). Replacing it invalidates every issued document. |
 | SSM `isa-tools-trusted-service-api-key` | Parameter Store | Value of the API key callers send as `x-api-key`. |
 | SSM `isa-tools-google-credentials-json` | Parameter Store | Service account for the Google Sheets. |

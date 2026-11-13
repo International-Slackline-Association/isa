@@ -18,3 +18,4 @@ The tools API at `tools-api.slacklineinternational.org` and the web app at `veri
 
 - [Infrastructure rules](/docs/engineering/infrastructure.md): the CDK shape `infra/` follows
 - [Why one monorepo](/docs/the-monorepo.md): the documents table is critical data; no staging
+- [Errors](/docs/engineering/errors.md): why errors arrive weekly as issues

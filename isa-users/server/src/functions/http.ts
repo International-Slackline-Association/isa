@@ -70,6 +70,15 @@ const getUser = (event: APIGatewayProxyEvent): User | undefined => {
   };
 };
 
+// Only the origin: a full referer can carry a path or query with personal data.
+const refererOrigin = (referer?: string) => {
+  try {
+    return referer ? new URL(referer).origin : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
 export const createHandler = (
   lambdaName: string,
   routes: Record<string, Route>,
@@ -88,22 +97,44 @@ export const createHandler = (
       Object.entries(event.headers ?? {}).map(([name, value]) => [name.toLowerCase(), value]),
     );
 
-    try {
-      const body = parseBody(event);
-      // Express answered HEAD from GET routes.
-      const routeMethod = method === 'HEAD' ? 'GET' : method;
-      const route = routesByKey[`${routeMethod} ${path.replace(/\/$/, '')}`.toLowerCase()];
-      if (!route) {
-        logger.info('Not found', { method, path });
-        return json({ message: notFoundMessage(path) }, 404);
+    const start = Date.now();
+    const user = getUser(event);
+    let routeKey: string | undefined;
+
+    const respond = async (): Promise<APIGatewayProxyResult> => {
+      try {
+        const body = parseBody(event);
+        // Express answered HEAD from GET routes.
+        const routeMethod = method === 'HEAD' ? 'GET' : method;
+        const key = `${routeMethod} ${path.replace(/\/$/, '')}`;
+        const route = routesByKey[key.toLowerCase()];
+        if (!route) {
+          logger.info('Not found', { method, path });
+          return json({ message: notFoundMessage(path) }, 404);
+        }
+        routeKey = key;
+        return await route({ method, path, headers, query, body, user });
+      } catch (error) {
+        const message = (error as Error).message || 'Error occurred';
+        const stack = (error as Error).stack;
+        // Body and query hold personal data and the verification token, so they stay out of the log.
+        logger.error(message, { httpRequest: { path, method }, route: routeKey ?? null, stack });
+        return json({ status: 500, message }, 500);
       }
-      return await route({ method, path, headers, query, body, user: getUser(event) });
-    } catch (error) {
-      const message = (error as Error).message || 'Error occurred';
-      const stack = (error as Error).stack;
-      // Body and query hold personal data and the verification token, so they stay out of the log.
-      logger.error(message, { httpRequest: { path, method }, stack });
-      return json({ status: 500, message, stack }, 500);
-    }
+    };
+
+    const response = await respond();
+    // One line per request for usage analytics; the headers as a whole carry the client's IP.
+    logger.info('Request', {
+      route: routeKey ?? null,
+      method,
+      status: response.statusCode,
+      latencyMs: Date.now() - start,
+      isaId: user?.isaId,
+      origin: headers['origin'],
+      referer: refererOrigin(headers['referer']),
+      userAgent: headers['user-agent']?.slice(0, 256),
+    });
+    return response;
   };
 };

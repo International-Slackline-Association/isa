@@ -15,3 +15,4 @@ Read first: [how we build](how-we-build.md), what stays the human's and what is 
 - [Coding](coding/coding-rules.md): the rules every change obeys, then [testing](coding/testing/README.md) and [comments](coding/code-comments.md)
 - [Code review](code-review/the-review.md): why and when finished code is read back, and [how the reviewer works](code-review/reviewing.md)
 - [Delivery](delivery/git-workflow.md): from a branch to a merge
+- [Errors](errors.md): why the projects' errors arrive weekly as issues

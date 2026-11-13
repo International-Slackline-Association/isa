@@ -17,8 +17,8 @@ ddb.middlewareStack.add(
       return await next(args);
     } catch (error) {
       logger.error(`DynamoDB Error`, {
+        // The input holds the document data, so only the command is logged.
         command: context.commandName || args.constructor.name,
-        input: args.input,
         error: (error as any).message,
       });
       throw error;

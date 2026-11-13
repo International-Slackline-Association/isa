@@ -19,3 +19,4 @@ Account and authentication management for the ISA. The Cognito user pool is the 
 
 - [Infrastructure rules](/docs/engineering/infrastructure.md): the CDK shape and names `infra/` follows
 - [Why one monorepo](/docs/the-monorepo.md): the users and the pool are critical data
+- [Errors](/docs/engineering/errors.md): why errors arrive weekly as issues

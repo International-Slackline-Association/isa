@@ -16,10 +16,10 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 - Querying or adding to the table: [table design](table-design.md)
 - Working on the communities map or groups: [communities](communities.md)
 - Answering a usage question: [usage analytics](usage-analytics.md)
-- Handling errors: [errors](errors.md)
 - What is open: [notes](notes.md)
 
 ## From higher scopes
 
 - [Infrastructure rules](/docs/engineering/infrastructure.md): the CDK shape and names `infra/` follows
 - [Why one monorepo](/docs/the-monorepo.md): the map data is critical data
+- [Errors](/docs/engineering/errors.md): why errors arrive weekly as issues

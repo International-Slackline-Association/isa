@@ -2,8 +2,6 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
-import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
-import * as cloudwatchActions from 'aws-cdk-lib/aws-cloudwatch-actions';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
@@ -11,8 +9,6 @@ import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
-import * as sns from 'aws-cdk-lib/aws-sns';
-import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -20,13 +16,13 @@ import { Duration, RemovalPolicy, Size, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import {
-  alarmEmail,
   certificates,
   domains,
   imageBucketNames,
   tableName,
   temporaryUploadsBucketName,
   trustedServiceApiKeyParameter,
+  errorDigest,
 } from './config';
 
 const projectRoot = path.join(__dirname, '../..');
@@ -202,19 +198,35 @@ export class AppStack extends Stack {
     // index.html points at the hashed assets, so it may only go live after them.
     webIndex.node.addDependency(webAssets);
 
-    const alarms = new sns.Topic(this, 'AlarmsTopic');
-    alarms.addSubscription(new subscriptions.EmailSubscription(alarmEmail));
-    const alarmAction = new cloudwatchActions.SnsAction(alarms);
-    for (const [name, fn] of [
-      ['Api', apiFunction],
-      ['ImageProcessor', imageProcessorFunction],
-    ] as const) {
-      new cloudwatch.Alarm(this, `${name}ErrorsAlarm`, {
-        metric: fn.metricErrors({ period: Duration.minutes(5) }),
-        threshold: 1,
-        evaluationPeriods: 1,
-        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
-      }).addAlarmAction(alarmAction);
-    }
+    new iam.Role(this, 'ErrorDigestRole', {
+      roleName: errorDigest.roleName,
+      maxSessionDuration: Duration.hours(1),
+      assumedBy: new iam.FederatedPrincipal(
+        `arn:aws:iam::${this.account}:oidc-provider/token.actions.githubusercontent.com`,
+        {
+          StringEquals: {
+            'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
+            'token.actions.githubusercontent.com:sub': errorDigest.subject,
+          },
+        },
+        'sts:AssumeRoleWithWebIdentity',
+      ),
+      inlinePolicies: {
+        ReadLogs: new iam.PolicyDocument({
+          statements: [
+            new iam.PolicyStatement({
+              actions: ['logs:StartQuery'],
+              resources: [
+                `arn:aws:logs:${this.region}:${this.account}:log-group:${errorDigest.logGroupPrefix}*`,
+              ],
+            }),
+            new iam.PolicyStatement({
+              actions: ['logs:GetQueryResults', 'logs:DescribeLogGroups'],
+              resources: ['*'],
+            }),
+          ],
+        }),
+      },
+    });
   }
 }

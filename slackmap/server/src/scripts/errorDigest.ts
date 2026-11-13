@@ -48,7 +48,7 @@ type Issue = {
   pull_request?: unknown;
 };
 
-// Issues are public: the message is reduced to its shape, so ids, values and secrets never reach them.
+// Issues are public: the message is reduced to its shape, masking the ids, values and secrets these patterns catch.
 const normalise = (text: string) =>
   text
     .split('\n')[0]
