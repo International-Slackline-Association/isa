@@ -11,7 +11,9 @@ import {
 } from '../../../../core/features/mapFeature/editors';
 import { GenericMapFeatureItemType } from '../../../../core/features/mapFeature/types';
 import { MapFeatureType } from '../../../../core/types';
+import { getUserDetails } from '../../../../core/features/isaUser';
 import { logger } from '../../../../core/logger';
+import { sendDeleteRequestEmail } from '../../../../core/utils/email/sendDeleteRequest';
 
 import { Request } from '../../../http';
 import {
@@ -66,6 +68,35 @@ export const getFeatureChangelogs = async (
   return { items, pagination: constructPaginationResponse(lastEvaluatedKey) };
 };
 
+const getFeatureItem = async (id: string, type: MapFeatureType) => {
+  let item: GenericMapFeatureItemType | null;
+  switch (type) {
+    case 'line':
+      item = await db.getLineDetails(id);
+      break;
+    case 'spot':
+      item = await db.getSpotDetails(id);
+      break;
+    case 'guide':
+      item = await db.getGuideDetails(id);
+      break;
+    case 'group':
+      item = await db.getGroupDetails(id);
+      break;
+    default:
+      throw new Error('Invalid feature type');
+  }
+  if (!item) {
+    throw new Error(`NotFound: ${type} ${id} not found`);
+  }
+  return item;
+};
+
+const featureUrl = (id: string, type: MapFeatureType) =>
+  type === 'group'
+    ? `https://slackmap.com/communities/group/${id}`
+    : `https://slackmap.com/${type}/${id}`;
+
 export const requestTemporaryEditorship = async (
   req: Request<{ id: string; type: MapFeatureType }>,
 ) => {
@@ -73,28 +104,9 @@ export const requestTemporaryEditorship = async (
   const featureId = req.params.id;
   const featureType = req.params.type;
 
-  let item: GenericMapFeatureItemType | null;
-  switch (featureType) {
-    case 'line':
-      item = await db.getLineDetails(featureId);
-      break;
-    case 'spot':
-      item = await db.getSpotDetails(featureId);
-      break;
-    case 'guide':
-      item = await db.getGuideDetails(featureId);
-      break;
-    case 'group':
-      item = await db.getGroupDetails(featureId);
-      if (item?.isaMemberType) {
-        throw new Error('Forbidden: Groups recognized by ISA are edited by ISA only');
-      }
-      break;
-    default:
-      throw new Error('Invalid feature type');
-  }
-  if (!item) {
-    throw new Error(`NotFound: ${featureType} ${featureId} not found`);
+  const item = await getFeatureItem(featureId, featureType);
+  if ('isaMemberType' in item && item.isaMemberType) {
+    throw new Error('Forbidden: Groups recognized by ISA are edited by ISA only');
   }
   const feature = genericFeatureFromItem(item);
 
@@ -155,14 +167,35 @@ export const deleteFeature = async (
 export const deleteFeatureRequest = async (
   req: Request<{ id: string; type: MapFeatureType }>,
 ) => {
+  const { isaId } = verifyRequestClaims(req);
   const body = validateApiPayload(req.body, deleteFeatureRequestSchema);
-  logger.info('Feature Delete Request', {
-    userId: req.user?.isaId,
-    feature: {
-      id: req.params.id,
-      type: req.params.type,
-    },
+  const { id, type } = req.params;
+  await getFeatureItem(id, type);
+
+  const requester = await getUserDetails(isaId, { includeEmail: true });
+  if (!requester?.email) {
+    throw new Error('Validation: Your account has no email to answer to');
+  }
+  // The owners are the editors who can delete it.
+  const owners = (await db.getFeatureEditors(id, type)).filter(canDeleteFeature);
+  const ownerDetails = await Promise.all(
+    owners.map((o) => getUserDetails(o.userId, { includeEmail: true })),
+  );
+  const ownerEmails = ownerDetails.map((u) => u?.email).filter((e): e is string => Boolean(e));
+
+  await sendDeleteRequestEmail({
+    requester: { name: requester.fullname, email: requester.email },
+    ownerEmails,
+    featureType: type,
+    featureUrl: featureUrl(id, type),
     reason: body.reason,
+  });
+
+  logger.info('sent delete request', {
+    userId: isaId,
+    featureId: id,
+    featureType: type,
+    ownerCount: ownerEmails.length,
   });
   return {};
 };

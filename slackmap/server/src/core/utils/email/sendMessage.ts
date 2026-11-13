@@ -4,6 +4,12 @@ import { ses } from '../../aws/clients';
 import { logger } from '../../logger';
 import newMessageHTML from './__static/newMessageHtml';
 
+const escapeHtml = (text: string) =>
+  text.replace(
+    /[&<>"']/g,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
+  );
+
 export const sendNewMessageEmail = async (params: {
   from: {
     username: string;
@@ -15,10 +21,16 @@ export const sendNewMessageEmail = async (params: {
   context_url: string;
   message: string;
 }) => {
-  let html = newMessageHTML.replace(/{{SENDER_NAME}}/g, params.from.username);
-  html = html.replace(/{{SENDER_EMAIL}}/g, params.from.email);
-  html = html.replace(/{{CONTEXT_URL}}/g, params.context_url);
-  html = html.replace(/{{MESSAGE}}/g, params.message);
+  // Every value is user-written; a replacer function keeps '$' patterns literal.
+  const values: Record<string, string> = {
+    SENDER_NAME: params.from.username,
+    SENDER_EMAIL: params.from.email,
+    CONTEXT_URL: params.context_url,
+    MESSAGE: params.message,
+  };
+  const html = newMessageHTML.replace(/{{(\w+)}}/g, (match, key: string) =>
+    key in values ? escapeHtml(values[key]) : match,
+  );
 
   logger.debug('Sending email', { contextUrl: params.context_url });
   await ses.send(

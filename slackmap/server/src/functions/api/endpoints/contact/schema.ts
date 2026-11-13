@@ -13,7 +13,10 @@ const recipientSchema = z.discriminatedUnion('type', [
 
 export const sendUserMessageSchema = z.object({
   recipient: recipientSchema,
-  context_url: z.string(),
-  message: z.string(),
+  context_url: z
+    .string()
+    .url()
+    .refine((u) => /^https?:\/\//i.test(u)),
+  message: z.string().trim().min(1).max(4096),
 });
 export type SendUserMessagePostBody = z.infer<typeof sendUserMessageSchema>;

@@ -109,7 +109,7 @@ export const FAQ = () => {
       <h3>How can I delete a line, spot or access guide?</h3>
       <p>
         Go to the details page of the feature and click to &quot;Delete&quot; button from the corner
-        menu. If you are not the owner of the feature, the request will be reviewed by the admin.
+        menu. If you are not the owner, your request is emailed to the owner, who decides.
       </p>
       <h3>How can I add or update a slackline group?</h3>
       <p>

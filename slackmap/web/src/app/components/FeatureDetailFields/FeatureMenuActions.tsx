@@ -73,8 +73,7 @@ export const FeatureMenuActions = (props: Props) => {
     } else {
       showTextBoxDialog({
         title: `Send a delete request`,
-        description:
-          'Only the owner of this feature can delete it. If you still think that it should be deleted, please provide a reason. We will process your request as soon as possible.',
+        description: `Only the owner of this ${props.feature.type} can delete it. Your name, email and reason are emailed to the owner and to the SlackMap team; the owner decides and may reply to you.`,
         textBoxLabel: 'Reason',
         confirmText: 'Send',
         onConfirm: (reason) => {
