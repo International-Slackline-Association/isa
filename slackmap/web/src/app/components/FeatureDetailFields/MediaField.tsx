@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Carousel } from 'app/components/Carousel';
 
 import LandscapeIcon from '@mui/icons-material/Landscape';
-import { Dialog, ImageList, ImageListItem, Paper, Typography } from '@mui/material';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { Dialog, IconButton, ImageList, ImageListItem, Paper, Typography } from '@mui/material';
 
 import { imageUrlFromS3Key } from 'utils';
 import { useCarouselIndex } from 'utils/hooks/useCarouselIndex';
@@ -64,8 +65,26 @@ export const FeatureMediaField = (props: Props) => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
+                position: 'relative',
               }}
             >
+              <IconButton
+                aria-label="Open in new tab"
+                component="a"
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
+                  backgroundColor: '#494949',
+                  color: 'white',
+                  '&:hover': { backgroundColor: '#494949', opacity: 0.6 },
+                }}
+              >
+                <OpenInNewIcon />
+              </IconButton>
               <img
                 style={{
                   maxWidth: '100%',

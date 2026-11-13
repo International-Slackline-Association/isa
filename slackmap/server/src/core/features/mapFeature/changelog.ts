@@ -56,10 +56,15 @@ const validPathNames = Object.entries(pathNamesMapping)
   .filter(([, v]) => v !== null)
   .map(([k]) => k);
 
+const arrayEntryKey = (v: unknown) =>
+  v && typeof v === 'object' && 'id' in v
+    ? `${(v as { id: string }).id}:${Boolean((v as { isCover?: boolean }).isCover)}`
+    : JSON.stringify(v);
+
 const valueKind = (v: unknown) => (v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v);
 
 // A top-level key counts as changed when it is added, removed, a primitive or its type changed,
-// or an array changed length. Edits inside objects or inside same-length arrays are not logged.
+// or an array changed. Images compare by id and cover flag; edits inside other objects are not logged.
 const changedTopLevelKeys = (oldItem: object, newItem: object) => {
   const o = oldItem as Record<string, unknown>;
   const n = newItem as Record<string, unknown>;
@@ -75,7 +80,7 @@ const changedTopLevelKeys = (oldItem: object, newItem: object) => {
       return true;
     }
     if (Array.isArray(l) && Array.isArray(r)) {
-      return l.length !== r.length;
+      return l.length !== r.length || l.some((v, i) => arrayEntryKey(v) !== arrayEntryKey(r[i]));
     }
     if (typeof l === 'object') {
       return false;
