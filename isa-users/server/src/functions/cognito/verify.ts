@@ -29,7 +29,7 @@ export const sendEmailVerificationLink = async (username: string, email: string)
         },
         Subject: {
           Charset: 'UTF-8',
-          Data: 'Reminder: Verify your email address!',
+          Data: 'Verify your email address',
         },
       },
       ReplyToAddresses: ['account@slacklineinternational.org'],

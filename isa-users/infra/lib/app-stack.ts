@@ -49,6 +49,9 @@ export class AppStack extends Stack {
       ISA_USERS_TABLE: tableName,
       ISA_USERS_IMAGES_S3_BUCKET: imagesBucketName,
       USERPOOL_ID: userPool.id,
+      AUTH_DOMAIN: domains.auth,
+      ACCOUNT_DOMAIN: domains.web,
+      ACCOUNT_CLIENT_ID: userPool.accountClientId,
       ISA_TOOLS_TRUSTED_SERVICE_API_KEY: ssm.StringParameter.valueForStringParameter(
         this,
         isaTools.trustedServiceApiKeyParameter,
@@ -98,7 +101,7 @@ export class AppStack extends Stack {
     imagesBucket.grantReadWrite(apiFunction);
     apiFunction.addToRolePolicy(
       new iam.PolicyStatement({
-        actions: ['cognito-idp:AdminUpdateUserAttributes'],
+        actions: ['cognito-idp:AdminUpdateUserAttributes', 'cognito-idp:AdminGetUser'],
         resources: [userPool.arn],
       }),
     );
@@ -120,7 +123,7 @@ export class AppStack extends Stack {
         cognitoUserPools: [pool],
       }),
     });
-    // Email verification links are opened without a session.
+    // Email verification links, and requests to resend them, come without a session.
     api.root.addResource('verify').addResource('{proxy+}').addMethod('ANY', integration);
 
     // The custom domain itself is managed by hand.

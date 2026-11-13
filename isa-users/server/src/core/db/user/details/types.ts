@@ -16,6 +16,7 @@ interface NonKeyAttrs {
   country?: string;
   profilePictureS3Key?: string;
   createdDateTime?: string;
+  verificationEmails?: { day: string; count: number };
 }
 
 export type DDBUserDetailItem = ParsedKeyAttrs & NonKeyAttrs;

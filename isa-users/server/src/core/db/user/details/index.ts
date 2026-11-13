@@ -1,4 +1,10 @@
-import { BatchGetCommand, GetCommand, PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import {
+  BatchGetCommand,
+  GetCommand,
+  PutCommand,
+  QueryCommand,
+  UpdateCommand,
+} from '@aws-sdk/lib-dynamodb';
 import { ddb } from '../../../aws/clients';
 import { DDBUserDetailAttrs, DDBUserDetailItem } from './types';
 import { INDEX_NAMES, TABLE_NAME, composeKey, destructKey, transformUtils } from '../../utils';
@@ -75,4 +81,45 @@ export const getAllUsers = async () => {
 
 export const putUser = async (user: DDBUserDetailItem) => {
   return ddb.send(new PutCommand({ TableName: TABLE_NAME, Item: itemToAttrs(user) }));
+};
+
+// Only the counter is written, so a profile save at the same moment is never overwritten.
+export const claimVerificationEmail = async (userId: string, day: string, max: number) => {
+  const update = (
+    expression: string,
+    condition: string,
+    names: Record<string, string>,
+    values: Record<string, unknown>,
+  ) =>
+    ddb
+      .send(
+        new UpdateCommand({
+          TableName: TABLE_NAME,
+          Key: key({ userId }),
+          UpdateExpression: expression,
+          ConditionExpression: `attribute_exists(PK) AND (${condition})`,
+          ExpressionAttributeNames: names,
+          ExpressionAttributeValues: values,
+        }),
+      )
+      .then(() => true)
+      .catch((error: Error) => {
+        if (error.name === 'ConditionalCheckFailedException') return false;
+        throw error;
+      });
+
+  return (
+    (await update(
+      'SET verificationEmails.#count = verificationEmails.#count + :one',
+      'verificationEmails.#day = :day AND verificationEmails.#count < :max',
+      { '#day': 'day', '#count': 'count' },
+      { ':one': 1, ':day': day, ':max': max },
+    )) ||
+    (await update(
+      'SET verificationEmails = :first',
+      'attribute_not_exists(verificationEmails) OR verificationEmails.#day <> :day',
+      { '#day': 'day' },
+      { ':first': { day, count: 1 }, ':day': day },
+    ))
+  );
 };

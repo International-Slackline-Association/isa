@@ -15,7 +15,7 @@ Not managed by CDK.
 | Cloudflare CNAMEs `account`, `account-api`, `images`, `auth` | Cloudflare, slacklineinternational.org | `account` and `images` → the CloudFront distributions of `isa-users-prod-app`; `account-api` → the custom domain's regional name; `auth` → the pool's custom domain. DNS only. |
 | Hosted UI CSS and logo | Cognito, pool `isa-users` | Copies in [infra/cognito](/isa-users/infra/cognito/). |
 | Group `timeradmin` | Cognito, pool `isa-users` | The timer's. |
-| SES identity `slacklineinternational.org` | SES | The pool's and the Cognito trigger's sender, from aws-platform. |
+| SES identity `slacklineinternational.org` | SES | The sender of the pool, the Cognito trigger and the API, from aws-platform. |
 | GitHub label `errors:isa-users` | the monorepo's issues | Created once by hand; the error digest workflow finds its issues by it. |
 | SSM `isa-tools-trusted-service-api-key` | Parameter Store | isa-tools' API key, sent on its image-processing and certificate calls. |
 

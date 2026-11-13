@@ -6,6 +6,7 @@ import { Icon } from './components/Icons';
 import { Sidebar } from './components/Sidebar';
 import { Spinner } from './components/Spinner';
 import { Toast } from './components/Toast';
+import { VerifyEmailBanner } from './components/VerifyEmailBanner';
 import { Certificates } from './pages/Certificates';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Profile } from './pages/Profile';
@@ -75,6 +76,7 @@ function SignedIn({ onSignOut }: { onSignOut: () => void }) {
         onSignOut={onSignOut}
       />
       <main className="page">
+        <VerifyEmailBanner />
         <Page user={user} refetchUser={refetch} />
       </main>
     </div>

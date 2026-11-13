@@ -11,7 +11,7 @@ const API_URL = 'https://account-api.slacklineinternational.org';
 export type User = NonNullable<Awaited<ReturnType<typeof getUserDetails>>>;
 export type CertificatesResponse = Awaited<ReturnType<typeof getAllCertificates>>;
 
-async function request<T>(method: 'GET' | 'PUT', path: string, body?: unknown): Promise<T> {
+async function request<T>(method: 'GET' | 'PUT' | 'POST', path: string, body?: unknown): Promise<T> {
   const token = await idToken();
   const response = await fetch(`${API_URL}/${path}`, {
     method,
@@ -35,8 +35,16 @@ async function request<T>(method: 'GET' | 'PUT', path: string, body?: unknown): 
 }
 
 export async function put<T = unknown>(path: string, body: unknown) {
+  return send<T>('PUT', path, body);
+}
+
+export async function post<T = unknown>(path: string, body: unknown) {
+  return send<T>('POST', path, body);
+}
+
+async function send<T>(method: 'PUT' | 'POST', path: string, body: unknown) {
   try {
-    return await request<T>('PUT', path, body);
+    return await request<T>(method, path, body);
   } catch (error) {
     console.error(error);
     showError(`Error: ${(error as Error).message}`);

@@ -10,7 +10,7 @@ Account and authentication management for the ISA. The Cognito user pool is the 
 
 ## Read when
 
-- Touching the user pool or its clients: [the user pool](user-pool.md): what may never change
+- Touching the user pool, its clients, or sign-up and email verification: [the user pool](user-pool.md): what may never change
 - Running locally or deploying: [operating](operating.md)
 - What is set up by hand and what other apps rely on: [manual operations](manual-operations.md)
 - What is open: [notes](notes.md)
