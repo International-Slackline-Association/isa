@@ -18,6 +18,5 @@ The rules for how this monorepo documents itself. Every session already holds th
 6. [Updating docs](updating-docs.md): how a change starts and the steps for each type, ending in the review; skeletons in [templates](templates.md)
 7. [Adversarial review](adversarial-review.md): how a review runs: the one-sentence call, existence before mechanics, the code opened for every document, the pen, what comes back
 8. [Agent skills](agent-skills.md) and their [rules](agent-skill-rules.md): before writing a skill, command, agent brief or hook, or deciding where one lives
-9. [Notes](notes.md): what is open in the system itself
 
 Background, kept as a deliberate exception to the content rules: [relation to other approaches](relation-to-other-approaches.md).
