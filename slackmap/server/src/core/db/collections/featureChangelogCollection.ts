@@ -7,6 +7,7 @@ import { DDBMapFeatureChangelogTypes } from '../entities/mapFeature/changelog/ty
 import { KEY_FIELDS, composeKey } from '../utils';
 import { CollectionKeysComposer, DDBCollectionQueryParser } from '../utils/collectionParser';
 import { DDBTableKeyAttrs } from '../utils/types';
+import { MapFeatureType } from '../../types';
 
 const keyComposers = (<T extends CollectionKeysComposer>(p: T) => p)({
   GSI2: (code: string) => composeKey('country', code),
@@ -54,7 +55,7 @@ export const getCountryChangelogs = async (
 };
 
 export const getGlobalChangelogs = async (
-  opts: { untilDate?: string; startKey?: any; limit?: number } = {},
+  opts: { untilDate?: string; startKey?: any; limit?: number; featureType?: MapFeatureType } = {},
 ) => {
   let keyConditionExpression = '#GSI3 = :GSI3';
   if (opts.untilDate) {
@@ -72,14 +73,18 @@ export const getGlobalChangelogs = async (
         ScanIndexForward: false,
         Limit: opts.limit,
         KeyConditionExpression: keyConditionExpression,
+        // The index holds keys only; the type is the last part of PK (feature:{id}:{type}).
+        FilterExpression: opts.featureType ? 'contains(#PK, :type)' : undefined,
         ExpressionAttributeNames: {
           '#GSI3': KEY_FIELDS.GSI3,
           '#GSI3_SK': KEY_FIELDS.GSI3_SK,
+          ...(opts.featureType && { '#PK': KEY_FIELDS.PK }),
         },
         ExpressionAttributeValues: {
           ':GSI3': keyComposers.GSI3(),
           ':GSI3_SK': keyComposers.GSI3_SK(opts.untilDate || ''),
           ':GSI3_SK2': opts.untilDate ? keyComposers.GSI3_SK(new Date().toISOString()) : undefined,
+          ...(opts.featureType && { ':type': `:${opts.featureType}` }),
         },
       }),
     );

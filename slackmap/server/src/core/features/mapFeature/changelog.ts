@@ -5,6 +5,7 @@ import { DDBLineDetailTypes } from '../../db/entities/line/details/types';
 import { DDBMapFeatureChangelogTypes } from '../../db/entities/mapFeature/changelog/types';
 import { DDBSpotDetailTypes } from '../../db/entities/spot/details/types';
 import { MapFeatureType } from '../../types';
+import { mapFeatureChangelogDB } from '../../db/entities/mapFeature/changelog';
 import countriesJson from '../../../../data/countryInfoDict.json';
 
 import { genericFeatureFromItem } from '.';
@@ -213,19 +214,47 @@ export const getChangelogsOfCountry = async (
   return { changelogs, lastEvaluatedKey };
 };
 
+// The action is not in the index, so 'createdOnly' reads pages until the limit is filled; the cursor
+// then points at the last returned entry.
 export const getChangelogsOfGlobal = async (
   opts: {
     startKey?: any;
     limit?: number;
+    featureType?: MapFeatureType;
+    createdOnly?: boolean;
   } = {},
 ) => {
-  const {
-    items: { mapFeatureChangelogs },
-    lastEvaluatedKey,
-  } = await db.getGlobalChangelogs(opts);
-  const featureChangelogs = await db.getMultipleFeatureChangelog(mapFeatureChangelogs);
-  const userDetailsDict = await getMultipleUserDetails(featureChangelogs.map((c) => c.userId));
-  const changelogs = featureChangelogs.map((c) => {
+  const limit = opts.limit ?? 20;
+  const collected: DDBMapFeatureChangelogTypes['Entity'][] = [];
+  let startKey = opts.startKey;
+  let lastEvaluatedKey: any;
+  do {
+    const page = await db.getGlobalChangelogs({
+      startKey,
+      limit,
+      featureType: opts.featureType,
+    });
+    const entries = (await db.getMultipleFeatureChangelog(page.items.mapFeatureChangelogs)).filter(
+      (c) => c && (!opts.createdOnly || c.action === 'created'),
+    );
+    for (const c of entries) {
+      collected.push(c);
+      if (collected.length === limit) break;
+    }
+    startKey = page.lastEvaluatedKey;
+    lastEvaluatedKey = page.lastEvaluatedKey;
+    const last = collected[collected.length - 1];
+    if (collected.length === limit && last) {
+      lastEvaluatedKey = {
+        ...mapFeatureChangelogDB.converter.key(last),
+        GSI3: 'global',
+        GSI3_SK: `featureChangelog:${last.date}`,
+      };
+    }
+  } while (startKey && collected.length < limit);
+
+  const userDetailsDict = await getMultipleUserDetails(collected.map((c) => c.userId));
+  const changelogs = collected.map((c) => {
     return { ...prettifyChangelog(c), user: userDetailsDict[c.userId] };
   });
   return { changelogs, lastEvaluatedKey };

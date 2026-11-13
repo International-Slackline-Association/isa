@@ -19,13 +19,21 @@ export const activityApi = baseApi
         }),
         providesTags: ['activityContributors'],
       }),
-      getActivityChangelogs: builder.query<GetActivityChangelogsAPIResponse, { cursor?: string }>({
+      getActivityChangelogs: builder.query<
+        GetActivityChangelogsAPIResponse,
+        { cursor?: string; type?: string; createdOnly?: boolean }
+      >({
         query: (params) => ({
-          url: `activity/changelogs?cursor=${params.cursor}`,
+          url: `activity/changelogs`,
+          params: {
+            cursor: params.cursor,
+            type: params.type,
+            createdOnly: params.createdOnly ? 'true' : undefined,
+          },
         }),
         providesTags: ['activityChangelogs'],
-        serializeQueryArgs: ({ endpointName }) => {
-          return endpointName;
+        serializeQueryArgs: ({ endpointName, queryArgs }) => {
+          return `${endpointName}:${queryArgs.type ?? 'all'}:${Boolean(queryArgs.createdOnly)}`;
         },
         merge: (currentCache, newResponse) => {
           const items = currentCache.items.concat(newResponse.items);
@@ -43,7 +51,11 @@ export const activityApi = baseApi
           currentCache.pagination = newResponse.pagination;
         },
         forceRefetch({ currentArg, previousArg }) {
-          return currentArg?.cursor !== previousArg?.cursor;
+          return (
+            currentArg?.cursor !== previousArg?.cursor ||
+            currentArg?.type !== previousArg?.type ||
+            currentArg?.createdOnly !== previousArg?.createdOnly
+          );
         },
       }),
     }),

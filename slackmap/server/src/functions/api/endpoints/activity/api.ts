@@ -1,6 +1,7 @@
 import { getGlobalContributorsSummaryFromS3 } from '../../../../core/features/contributors';
 import { getMultipleUserDetails } from '../../../../core/features/isaUser';
 import { getChangelogsOfGlobal } from '../../../../core/features/mapFeature/changelog';
+import { MapFeatureType } from '../../../../core/types';
 import countriesJson from '../../../../../data/countryInfoDict.json';
 
 import { Request } from '../../../http';
@@ -34,9 +35,13 @@ export const getGlobalContributors = async (_req: Request) => {
 export const getGlobalActivityChangelogs = async (req: Request) => {
   const { cursor } = destructPaginationQueryParam(req.query);
 
+  const featureTypes: MapFeatureType[] = ['line', 'spot', 'guide', 'group'];
+  const featureType = featureTypes.find((t) => t === req.query.type);
   const { changelogs, lastEvaluatedKey } = await getChangelogsOfGlobal({
     limit: 20,
     startKey: cursor,
+    featureType,
+    createdOnly: req.query.createdOnly === 'true',
   });
 
   const items = changelogs
