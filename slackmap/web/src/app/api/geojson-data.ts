@@ -59,6 +59,12 @@ const getSlacklineFeatureStats = (geoJson: FeatureCollection) => {
   };
 };
 
+export const getSlacklinePointOfFeature = async (id: string) => {
+  const allPointsGeoJson = await getAllSlacklinePointsGeoJson();
+  const feature = allPointsGeoJson.features.find((f) => f.properties?.id === id);
+  return feature?.geometry.type === 'Point' ? feature.geometry.coordinates : undefined;
+};
+
 export const getSlacklinePointFeaturesOfCountry = async (code: string) => {
   if (cache.slacklinePointFeaturesOfCountry[code]?.geoJson) {
     return cache.slacklinePointFeaturesOfCountry[code];

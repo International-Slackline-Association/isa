@@ -83,6 +83,7 @@ export const SlacklineMap = (props: Props) => {
   );
 
   useHighlightedFeature(
+    mapRef,
     isMapLoaded,
     props.highlightedSlacklineFeature,
     hoveredFeature,

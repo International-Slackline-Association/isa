@@ -51,7 +51,7 @@ export const genericCircleLayer = (opts: { big?: boolean } & CommonOpts): Circle
         [
           'case',
           ['==', ['feature-state', 'hover'], 'large'],
-          opts.big ? 12 : 9,
+          opts.big ? 15 : 12,
           ['==', ['feature-state', 'hover'], 'small'],
           opts.big ? 7 : 4,
           ['boolean', ['feature-state', 'isSelected'], false],
@@ -62,7 +62,7 @@ export const genericCircleLayer = (opts: { big?: boolean } & CommonOpts): Circle
         [
           'case',
           ['==', ['feature-state', 'hover'], 'large'],
-          opts.big ? 13 : 9,
+          opts.big ? 16 : 12,
           ['==', ['feature-state', 'hover'], 'small'],
           opts.big ? 10 : 5,
           ['boolean', ['feature-state', 'isSelected'], false],
@@ -73,7 +73,7 @@ export const genericCircleLayer = (opts: { big?: boolean } & CommonOpts): Circle
         [
           'case',
           ['==', ['feature-state', 'hover'], 'large'],
-          opts.big ? 15 : 11,
+          opts.big ? 18 : 14,
           ['==', ['feature-state', 'hover'], 'small'],
           opts.big ? 12 : 9,
           ['boolean', ['feature-state', 'isSelected'], false],
