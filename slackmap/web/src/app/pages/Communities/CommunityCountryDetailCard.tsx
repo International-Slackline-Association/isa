@@ -21,6 +21,8 @@ import { appColors } from 'styles/theme/colors';
 
 import { GroupsManifestText } from './GroupsManifestText';
 
+const safeHttpUrl = (url?: string) => (url && /^https?:\/\//i.test(url) ? url : undefined);
+
 interface Props {
   countryCode: string;
 }
@@ -36,10 +38,7 @@ export const CommunityCountryDetailCard = (props: Props) => {
     navigate('/communities');
   };
 
-  const slacklineGroups =
-    countryDetails?.slacklineGroups.filter(
-      (g) => !countryDetails.isaMembers.find((m) => m.groupId === g.id),
-    ) ?? [];
+  const slacklineGroups = countryDetails?.slacklineGroups ?? [];
 
   const MemberSubLink = (props: { icon: any; text: string; url?: string; groupId?: string }) => {
     if (!props.url && !props.groupId) return null;
@@ -118,10 +117,9 @@ export const CommunityCountryDetailCard = (props: Props) => {
               }
             >
               {countryDetails.isaMembers.length > 0 ? (
-                countryDetails.isaMembers.map((member, index) => (
-                  <Stack key={index} direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
+                countryDetails.isaMembers.map((member) => (
+                  <Stack key={member.id} direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
                     <Avatar
-                      src={member.profilePictureUrl}
                       sx={{
                         bgcolor: appColors.isaMemberGroupColor,
                       }}
@@ -131,13 +129,19 @@ export const CommunityCountryDetailCard = (props: Props) => {
                     <Stack sx={{ alignItems: 'flex-start', justifyContent: "center" }}>
                       <Typography variant="body2">{member.name} </Typography>
                       <Stack direction={'row'} spacing={1}>
+                        {member.email && (
+                          <MemberSubLink
+                            icon={EmailIcon}
+                            text={'Email'}
+                            url={`mailto:${encodeURIComponent(member.email)}`}
+                          />
+                        )}
+                        <MemberSubLink icon={InfoIcon} text={'Details'} groupId={member.id} />
                         <MemberSubLink
-                          icon={EmailIcon}
-                          text={'Email'}
-                          url={`mailto:${member.email}`}
+                          icon={LinkIcon}
+                          text={'Link'}
+                          url={safeHttpUrl(member.isaMembership?.infoUrl)}
                         />
-                        <MemberSubLink icon={InfoIcon} text={'Details'} groupId={member.groupId} />
-                        <MemberSubLink icon={LinkIcon} text={'Link'} url={member.infoUrl} />
                       </Stack>
                     </Stack>
                   </Stack>
@@ -162,14 +166,10 @@ export const CommunityCountryDetailCard = (props: Props) => {
                     flexWrap: 'wrap',
                   }}
                 >
-                  {slacklineGroups.map((group, index) => (
-                    <>
-                      <NavLink to={`/communities/group/${group.id}`}>
-                        <Typography key={index} variant="body2">
-                          - {group.name}
-                        </Typography>
-                      </NavLink>
-                    </>
+                  {slacklineGroups.map((group) => (
+                    <NavLink key={group.id} to={`/communities/group/${group.id}`}>
+                      <Typography variant="body2">- {group.name}</Typography>
+                    </NavLink>
                   ))}
                 </Stack>
               ) : (

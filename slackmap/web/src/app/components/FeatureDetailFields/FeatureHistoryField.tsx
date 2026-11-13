@@ -110,6 +110,7 @@ export const FeatureHistoryField = (props: Props) => {
                 Load more
               </Button>
             ) : (
+              props.featureType !== 'group' &&
               new Date(props.createdDateTime) < new Date('2023-05-06') && (
                 <EnabledHistoryTimelineItem />
               )

@@ -33,6 +33,7 @@ import {
   isaUsers,
   namespace,
   sesIdentityArn,
+  slackmapAdminIsaId,
   stage,
   tableName,
   tableStreamArn,
@@ -72,6 +73,7 @@ export class AppStack extends Stack {
       SLACKMAP_CLIENT_ID: isaUsers.slackmapClientId,
       SLACKMAP_APPLICATION_DATA_S3_BUCKET: applicationDataBucketName,
       SLACKMAP_IMAGES_S3_BUCKET: imagesBucketName,
+      SLACKMAP_ADMIN_ISA_ID: slackmapAdminIsaId,
       ISA_TOOLS_TRUSTED_SERVICE_API_KEY: ssm.StringParameter.valueForStringParameter(
         this,
         isaTools.trustedServiceApiKeyParameter,
@@ -81,6 +83,7 @@ export class AppStack extends Stack {
         geonamesUsernameParameter,
       ),
     };
+    const logGroups: Record<string, logs.LogGroup> = {};
     const fn = (name: string, entry: string, timeout: Duration) =>
       new nodejs.NodejsFunction(this, name, {
         runtime: lambda.Runtime.NODEJS_24_X,
@@ -97,10 +100,14 @@ export class AppStack extends Stack {
           tsconfig: path.join(serverRoot, 'tsconfig.json'),
           externalModules: [],
         },
-        logGroup: new logs.LogGroup(this, `${name}Logs`, {
-          retention: logs.RetentionDays.SIX_MONTHS,
-          removalPolicy: RemovalPolicy.DESTROY,
-        }),
+        logGroup: (() => {
+          const logGroup = new logs.LogGroup(this, `${name}Logs`, {
+            retention: logs.RetentionDays.SIX_MONTHS,
+            removalPolicy: RemovalPolicy.DESTROY,
+          });
+          logGroups[name] = logGroup;
+          return logGroup;
+        })(),
       });
 
     const apiFunction = fn('ApiFunction', 'src/functions/api/handler.ts', Duration.seconds(10));
@@ -300,6 +307,24 @@ export class AppStack extends Stack {
     ] as const) {
       new cloudwatch.Alarm(this, `${name}ErrorsAlarm`, {
         metric: f.metricErrors({ period: Duration.minutes(5) }),
+        threshold: 1,
+        evaluationPeriods: 1,
+        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
+      }).addAlarmAction(alarmAction);
+    }
+    // The handlers catch their errors and log them, so a failed request or stream record is not a
+    // Lambda error.
+    for (const [name, logGroup] of Object.entries(logGroups)) {
+      const metric = new logs.MetricFilter(this, `${name}ErrorLogs`, {
+        logGroup,
+        filterPattern: logs.FilterPattern.stringValue('$.level', '=', 'error'),
+        metricNamespace: namespace,
+        metricName: `${name}ErrorLogs`,
+        metricValue: '1',
+        defaultValue: 0,
+      }).metric({ period: Duration.minutes(5), statistic: 'Sum' });
+      new cloudwatch.Alarm(this, `${name}ErrorLogsAlarm`, {
+        metric,
         threshold: 1,
         evaluationPeriods: 1,
         treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,

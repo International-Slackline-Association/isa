@@ -57,5 +57,5 @@ export const useActiveFeatureGeoJson = (
     } else {
       padMapTo(mapRef, {});
     }
-  }, [activeFeatureGeoJson, isDesktop]);
+  }, [activeFeatureGeoJson, isDesktop, isMapLoaded]);
 };

@@ -6,7 +6,10 @@ import {
   addCreatedChangelogToFeature,
   addUpdatedDetailsChangelog,
 } from '../../../../core/features/mapFeature/changelog';
-import { validateMapFeatureEditor } from '../../../../core/features/mapFeature/editors';
+import {
+  canDeleteFeature,
+  validateMapFeatureEditor,
+} from '../../../../core/features/mapFeature/editors';
 import { updateFeatureImagesInS3 } from '../../../../core/features/mapFeature/image';
 import { validateSpotGeoJson } from '../../../../core/features/spot/validations';
 import { assignFromSourceToTarget } from '../../../../core/utils';
@@ -30,7 +33,7 @@ export const getSpotDetails = async (req: Request) => {
   const editPermission = await validateMapFeatureEditor(spot.spotId, 'spot', req.user?.isaId);
 
   return getSpotDetailsResponse(spot, {
-    canDelete: editPermission?.reason === 'explicit',
+    canDelete: canDeleteFeature(editPermission),
     canEdit: Boolean(editPermission),
   });
 };
@@ -75,7 +78,7 @@ export const createSpot = async (req: Request) => {
   await db.putSpot(spot);
   await addCreatedChangelogToFeature(spot, requestClaims.isaId, new Date());
 
-  logger.info('created spot', { userId: req.user?.isaId, spot });
+  logger.info('created spot', { userId: req.user?.isaId, spotId });
   return getSpotDetailsResponse(spot);
 };
 
@@ -108,7 +111,7 @@ export const updateSpot = async (req: Request) => {
   await db.putSpot(updatedSpot);
   await addUpdatedDetailsChangelog(updatedSpot, spot, requestClaims.isaId, new Date());
 
-  logger.info('updated spot', { userId: req.user?.isaId, updatedSpot });
+  logger.info('updated spot', { userId: req.user?.isaId, spotId });
   return getSpotDetailsResponse(updatedSpot);
 };
 

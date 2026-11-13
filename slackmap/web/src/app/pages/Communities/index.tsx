@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router';
 
 import { Box, Stack } from '@mui/material';
 
-import { getSlacklineGroupGeoJson, getSlacklineGroupsGeoJsonOfCountry } from 'app/api/geojson-data';
+import { communityApi } from 'app/api/community-api';
+import { getSlacklineGroupsGeoJsonOfCountry } from 'app/api/geojson-data';
 import { CommunityMap } from 'app/components/Maps/CommunityMap';
 import { parseMapFeature } from 'app/components/Maps/mapUtils';
 import { FeatureCollection } from 'geojson';
@@ -23,6 +24,10 @@ export function CommunitiesPage() {
   const [activeFeatureGeoJson, setActiveFeatureGeoJson] = useState<FeatureCollection>();
 
   const { activeFeature } = useActiveCommunityFeature();
+  const activeGroupId = activeFeature?.type === 'slacklineGroup' ? activeFeature.id : undefined;
+  const { data: activeGroup } = communityApi.useGetGroupDetailsQuery(activeGroupId!, {
+    skip: !activeGroupId,
+  });
 
   const updateActiveFeatureGeoJson = useCallback(async () => {
     if (!activeFeature) {
@@ -31,13 +36,12 @@ export function CommunitiesPage() {
     }
     const { id, type } = activeFeature;
     if (type === 'slacklineGroup') {
-      const { geoJson } = await getSlacklineGroupGeoJson(id);
-      setActiveFeatureGeoJson(geoJson);
+      setActiveFeatureGeoJson(activeGroup?.id === id ? activeGroup.geoJson : undefined);
     } else if (type === 'communityCountry') {
       const { geoJson } = await getSlacklineGroupsGeoJsonOfCountry(id);
       setActiveFeatureGeoJson(geoJson);
     }
-  }, [activeFeature]);
+  }, [activeFeature, activeGroup]);
 
   const navigateToFeature = useCallback(
     (id: string, type?: CommunityMapFeatureType) => {
@@ -54,7 +58,7 @@ export function CommunitiesPage() {
 
   useEffect(() => {
     updateActiveFeatureGeoJson();
-  }, [activeFeature]);
+  }, [updateActiveFeatureGeoJson]);
 
   const onSelectedFeatureChange = useCallback(
     (feature?: MapGeoJSONFeature) => {

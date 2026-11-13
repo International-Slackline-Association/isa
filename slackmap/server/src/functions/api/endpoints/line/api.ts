@@ -8,7 +8,10 @@ import {
   addCreatedChangelogToFeature,
   addUpdatedDetailsChangelog,
 } from '../../../../core/features/mapFeature/changelog';
-import { validateMapFeatureEditor } from '../../../../core/features/mapFeature/editors';
+import {
+  canDeleteFeature,
+  validateMapFeatureEditor,
+} from '../../../../core/features/mapFeature/editors';
 import { updateFeatureImagesInS3 } from '../../../../core/features/mapFeature/image';
 import { assignFromSourceToTarget } from '../../../../core/utils';
 import { logger } from '../../../../core/logger';
@@ -31,7 +34,7 @@ export const getLineDetails = async (req: Request) => {
   const editPermission = await validateMapFeatureEditor(line.lineId, 'line', req.user?.isaId);
 
   return getLineDetailsResponse(line, {
-    canDelete: editPermission?.reason === 'explicit',
+    canDelete: canDeleteFeature(editPermission),
     canEdit: Boolean(editPermission),
   });
 };
@@ -93,7 +96,7 @@ export const createLine = async (req: Request) => {
   await db.putLine(line);
   await addCreatedChangelogToFeature(line, requestClaims.isaId, new Date());
 
-  logger.info('created line', { userId: req.user?.isaId, line });
+  logger.info('created line', { userId: req.user?.isaId, lineId });
   return getLineDetailsResponse(line);
 };
 
@@ -146,7 +149,7 @@ export const updateLine = async (req: Request) => {
   await db.putLine(updatedLine);
   await addUpdatedDetailsChangelog(updatedLine, line, requestClaims.isaId, new Date());
 
-  logger.info('updated line', { userId: req.user?.isaId, updatedLine });
+  logger.info('updated line', { userId: req.user?.isaId, lineId });
   return getLineDetailsResponse(updatedLine);
 };
 

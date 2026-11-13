@@ -20,7 +20,7 @@ export const getCountryCodeOfGeoJson = async <Throw = false>(
   const lineCenter = calculateCenterOfFeature(geoJson);
   const countryCode = await getCountryCode(lineCenter[1], lineCenter[0]);
   if (!countryCode && !opts.dontThrowError) {
-    throw new Error('Country code cannot be determined from the coordinates');
+    throw new Error('Validation: Country cannot be determined from the coordinates');
   }
   return countryCode?.toUpperCase() as string;
 };

@@ -21,6 +21,7 @@ interface Props {
     | {
         canDelete: boolean;
         canEdit: boolean;
+        canRequestEdit?: boolean;
       }
     | undefined;
   feature: {
@@ -43,15 +44,21 @@ export const FeatureMenuActions = (props: Props) => {
   const [deleteFeature, { isSuccess: isDeleted }] = featureApi.useDeleteFeatureMutation();
   const [sendDeleteFeatureRequest] = featureApi.useDeleteFeatureRequestMutation();
 
+  const isGroup = props.feature.type === 'group';
+  const closePath = isGroup ? '/communities' : '/';
+  const editPath = isGroup
+    ? `/communities/group/${props.feature.id}/edit`
+    : `/${props.feature.type}/${props.feature.id}/edit`;
+
   useEffect(() => {
     if (isDeleted) {
-      navigate({ pathname: '/', search: searchParams.toString() });
+      navigate({ pathname: closePath, search: searchParams.toString() });
     }
   }, [isDeleted]);
 
   const onEditClick = async () => {
     closeMenu();
-    navigate(`/${props.feature.type}/${props.feature.id}/edit`);
+    navigate(editPath);
   };
 
   const onDeleteClick = async () => {
@@ -92,7 +99,7 @@ export const FeatureMenuActions = (props: Props) => {
   };
 
   const onCloseClicked = () => {
-    navigate({ pathname: '/', search: searchParams.toString() });
+    navigate({ pathname: closePath, search: searchParams.toString() });
   };
 
   const onRefreshClicked = () => {
@@ -134,7 +141,7 @@ export const FeatureMenuActions = (props: Props) => {
               <EditIcon />
               Edit
             </MenuItem>
-          ) : (
+          ) : props.editorPermissions?.canRequestEdit === false && isSignedIn ? null : (
             <MenuItem key="request" onClick={onRequestEditorshipClick} disabled={!isSignedIn}>
               <ManageHistoryIcon />
               {isSignedIn ? 'Request to Edit' : 'Request to Edit(Sign-in)'}

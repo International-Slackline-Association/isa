@@ -1,24 +1,40 @@
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
+
 import AddIcon from '@mui/icons-material/Add';
 import GroupIcon from '@mui/icons-material/Group';
 import { SpeedDial, SpeedDialAction } from '@mui/material';
 
-import { useInfoDialog } from 'app/components/Dialogs/useInfoDialog';
-
-import { GroupsManifestText } from './GroupsManifestText';
+import { useSignInDialog } from 'app/components/Dialogs/useSignInDialog';
+import { mapUrlSearchParams } from 'app/components/Maps/mapUtils';
+import { selectIsUserSignedIn, selectLastMapLocation } from 'app/slices/app/selectors';
 
 export function CreateCommunitySpeedDial() {
-  const { InfoDialog, showInfoDialog } = useInfoDialog();
+  const navigate = useNavigate();
+  const lastMapLocation = useSelector(selectLastMapLocation);
+  const isUserSignedIn = useSelector(selectIsUserSignedIn);
+  const { SignInDialog, showSignInDialog } = useSignInDialog();
 
-  const onAddGroupClick = async () => {
-    showInfoDialog({
-      title: 'Adding a new slackline group?',
-      description: <GroupsManifestText type="createGroup" />,
+  const onAddGroupClick = () => {
+    if (!isUserSignedIn) {
+      showSignInDialog();
+      return;
+    }
+    navigate({
+      pathname: '/communities/create/group',
+      search: lastMapLocation
+        ? `map=${mapUrlSearchParams.stringify(
+            lastMapLocation.longitude,
+            lastMapLocation.latitude,
+            lastMapLocation.zoom,
+          )}`
+        : undefined,
     });
   };
 
   return (
     <>
-      <InfoDialog />
+      <SignInDialog />
       <SpeedDial
         sx={{
           position: 'absolute',

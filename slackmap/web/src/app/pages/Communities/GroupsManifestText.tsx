@@ -1,52 +1,51 @@
 import { Link, Typography } from '@mui/material';
 
-import { slacklineGroupEditGoogleFormUrl, slacklineGroupsGithubUrl } from 'app/api/constants';
+import { IsaMemberType } from '@server/core/types';
 
 interface Props {
-  type: 'communityCountry' | 'groupDetail' | 'createGroup';
+  type: 'communityCountry' | 'groupDetail' | 'isaMember';
 }
 
-export const GroupsManifestText = (props: Props) => {
-  const GithubLink = (
-    <Link href={slacklineGroupsGithubUrl} target={'_blank'}>
-      Github
-    </Link>
-  );
-  const GoogleFormLink = (
-    <Link href={slacklineGroupEditGoogleFormUrl} target={'_blank'}>
-      Google Form
-    </Link>
-  );
+export const isaMemberTypeLabel = (type: IsaMemberType) => {
+  switch (type) {
+    case 'active':
+      return 'Active Member';
+    case 'observer':
+      return 'Observer Member';
+    case 'associate':
+      return 'Associate Member';
+    case 'partner':
+      return 'Partner';
+  }
+};
 
+export const GroupsManifestText = (props: Props) => {
   if (props.type === 'communityCountry') {
     return (
       <Typography variant="body2">
-        All groups informations are collectively managed by the community. We rely on you to keep
-        the data up-to-date. You can view the data on {GithubLink}
+        Slackline groups are added and kept up to date by the community. Sign in to add your group
+        with the + button, or open a group to update it.
       </Typography>
     );
   } else if (props.type === 'groupDetail') {
     return (
       <Typography variant="body2">
-        The information about this group is managed by the community. You can view the full data on{' '}
-        {GithubLink}. If you think the data is outdated, you can edit the directly on Github or
-        suggest a modification via the Google Form below.
+        The information about this group is managed by the community. If it is outdated, sign in
+        and use "Request to Edit" from the menu to update it.
       </Typography>
     );
-  } else if (props.type === 'createGroup') {
+  } else if (props.type === 'isaMember') {
     return (
       <Typography variant="body2">
-        Slackline groups are managed by the community. There are two ways to add a new group:
-        <ul>
-          <li>
-            <b>Google Form:</b> Fill out the {GoogleFormLink}. It can take some time for admins to
-            review and approve the request.
-          </li>
-          <li>
-            <b>Github:</b> Create a pull request on {GithubLink}. Much faster than the Google Form
-          </li>
-        </ul>
-        If you know how to use Github, we recommend the second option.
+        Recognized by the International Slackline Association and managed by ISA. To change it,
+        contact{' '}
+        <Link href="mailto:slackmap@slacklineinternational.org">
+          slackmap@slacklineinternational.org
+        </Link>
+        .{' '}
+        <Link href="https://www.slacklineinternational.org/members-partners/" target="_blank">
+          About ISA members
+        </Link>
       </Typography>
     );
   }

@@ -8,10 +8,11 @@ import { Feature, FeatureCollection } from 'geojson';
 
 import { MapImage } from '../../Components/MapImage';
 import { MapLoadingPlaceholder } from '../../Components/MapLoadingPlaceholder';
-import { defaultMapSettings, defaultMapViewState } from '../../constants';
+import { MAPBOX_TOKEN, defaultMapSettings, defaultMapViewState } from '../../constants';
 import { useMapStyle } from '../../hooks/useMapStyle';
 import { fitMapToGeoJson } from '../../mapUtils';
 import { SlacklineMapSources } from '../../sources/slacklineMapSources';
+import { GeocoderControl } from '../geocoderControl';
 import { useMapOptions } from '../useMapOptions';
 import { DrawControl, MapboxDrawEvent } from './DrawControl';
 
@@ -49,6 +50,8 @@ interface Props {
   onSelectionChanged?: (feature?: Feature) => void;
   drawingFeatures?: Feature[];
   drawControlStyles: object[];
+  sources?: React.ReactNode;
+  showGeocoder?: boolean;
 }
 
 export const DrawableMap = (props: Props) => {
@@ -144,10 +147,21 @@ export const DrawableMap = (props: Props) => {
           />
         )}
 
-        <SlacklineMapSources
-          displayFeature={'all'}
-          filter={{ id: (props.drawingFeatures || [])[0]?.properties?.id }}
-        />
+        {props.sources ?? (
+          <SlacklineMapSources
+            displayFeature={'all'}
+            filter={{ id: (props.drawingFeatures || [])[0]?.properties?.id }}
+          />
+        )}
+        {props.showGeocoder && (
+          <GeocoderControl
+            mapboxAccessToken={MAPBOX_TOKEN}
+            position="top-left"
+            placeholder="Search location..."
+            marker={false}
+            minLength={3}
+          />
+        )}
       </ReactMapGL>
     </>
   );

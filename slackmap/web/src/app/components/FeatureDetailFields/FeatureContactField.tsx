@@ -10,18 +10,13 @@ import { FeatureDetailFieldLayout } from './DetailFieldLayout';
 interface Props {
   content?: string;
   contactUserId: string;
+  feature: { id: string; type: 'line' | 'spot' };
 }
-
-const extractEmail = (text?: string): string | undefined => {
-  if (!text) return undefined;
-  const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-  const match = text.match(emailRegex);
-  return match ? match[0] : undefined;
-};
 
 export const ContactUserButton = (props: {
   contactUserId: string;
-  contactInfo?: string;
+  // The server sends to the email in this feature's contact info, or else to its creator.
+  feature?: { id: string; type: 'line' | 'spot' };
   noText?: boolean;
 }) => {
   const { TextBoxDialog, showTextBoxDialog } = useTextBoxDialog();
@@ -30,8 +25,6 @@ export const ContactUserButton = (props: {
   if (!props.contactUserId || props.contactUserId === 'unknown') {
     return null;
   }
-
-  const extractedEmail = extractEmail(props.contactInfo);
 
   const onClick = () => {
     showTextBoxDialog({
@@ -42,8 +35,8 @@ export const ContactUserButton = (props: {
       confirmText: 'Send',
       onConfirm: (message) => {
         sendContactMessage({
-          recipient: extractedEmail
-            ? { type: 'email', email: extractedEmail }
+          recipient: props.feature
+            ? { type: 'featureContact', featureId: props.feature.id, featureType: props.feature.type }
             : { type: 'userId', userId: props.contactUserId },
           message,
           context_url: window.location.href,
@@ -86,7 +79,7 @@ export const FeatureContactField = (props: Props) => {
           User has not provided any contact information!
         </Typography>
       )}
-      <ContactUserButton contactUserId={props.contactUserId} contactInfo={props.content} />
+      <ContactUserButton contactUserId={props.contactUserId} feature={props.feature} />
     </FeatureDetailFieldLayout>
   );
 };

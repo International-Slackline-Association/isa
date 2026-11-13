@@ -128,6 +128,7 @@ export const SpotDetailCard = (props: Props) => {
             <FeatureContactField
               content={spotDetails.contactInfo}
               contactUserId={spotDetails.creatorUserId}
+              feature={{ id: spotDetails.id, type: 'spot' }}
             />
             <FeatureDetailInfoField
               header="Additional Details"

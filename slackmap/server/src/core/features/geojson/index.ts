@@ -3,10 +3,13 @@ import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { featureCollection } from '@turf/turf';
 import { s3 } from '../../aws/clients';
 import { db } from '../../db';
+import { DDBGroupDetailTypes } from '../../db/entities/group/details/types';
 import { GuideType, SlacklineType } from '../../types';
 import countriesJson from '../../../../data/countryInfoDict.json';
-import { Feature, FeatureCollection, Geometry } from 'geojson';
+import { Feature, FeatureCollection, Geometry, Point } from 'geojson';
 import zlib from 'zlib';
+
+import { logger } from '../../logger';
 
 import { guideTypeLabel } from '../guide';
 import { calculateCenterOfFeature, optimizeGeoJsonFeature } from './utils';
@@ -85,6 +88,63 @@ export const processGuideGeoJson = (
   }
 
   return { type: 'FeatureCollection', features };
+};
+
+// Only the point is kept: anything else a client sends would be stored and published.
+export const processGroupGeoJson = (
+  geoJson: FeatureCollection,
+  meta: { groupId: string },
+): FeatureCollection<Point> => ({
+  type: 'FeatureCollection',
+  features: geoJson.features.map((feature) =>
+    optimizeGeoJsonFeature({
+      type: 'Feature',
+      properties: { id: meta.groupId },
+      geometry: { type: 'Point', coordinates: (feature.geometry as Point).coordinates.slice(0, 2) },
+    } as Feature<Point>),
+  ),
+});
+
+// The map colours a group by 'ft': 'sg' a slackline group, 'isaM' a group ISA recognizes.
+export const groupMapGeoJson = (group: DDBGroupDetailTypes['Entity']): FeatureCollection<Point> => {
+  const geoJson = JSON.parse(group.geoJson) as FeatureCollection<Point>;
+  return {
+    type: 'FeatureCollection',
+    features: geoJson.features.map((f) => ({
+      type: 'Feature',
+      properties: { id: group.groupId, ft: group.isaMemberType ? 'isaM' : 'sg', c: group.country },
+      geometry: { type: 'Point', coordinates: f.geometry.coordinates },
+    })),
+  };
+};
+
+// Always rebuilt whole: about 1.5k small items, and no lost update between parallel stream records.
+// The index read may miss the write that triggered it, so the changed group is passed in.
+export const refreshGroupGeoJsonFiles = async (
+  changed?: { group?: DDBGroupDetailTypes['Entity']; removedGroupId?: string },
+) => {
+  const changedId = changed?.group?.groupId ?? changed?.removedGroupId;
+  const groups = (await db.getAllGroups()).filter((g) => g.groupId !== changedId);
+  if (changed?.group) groups.push(changed.group);
+
+  const pointsGeoJSON = featureCollection(groups.flatMap((g) => groupMapGeoJson(g).features));
+  await writeToS3('geojson/groups/points.geojson', pointsGeoJSON);
+
+  const countriesGeoJSON: FeatureCollection = { type: 'FeatureCollection', features: [] };
+  for (const code of new Set(groups.map((g) => g.country))) {
+    const countryInfo = countriesJson[code as keyof typeof countriesJson];
+    if (!countryInfo) {
+      logger.error('Group country not in countryInfoDict.json', { country: code });
+      continue;
+    }
+    countriesGeoJSON.features.push({
+      type: 'Feature',
+      properties: { id: code, ft: 'comCt' },
+      geometry: countryInfo.geometry as Geometry,
+    });
+  }
+  await writeToS3('geojson/groups/countries.geojson', countriesGeoJSON);
+  return { groupCount: groups.length };
 };
 
 export const refreshLineGeoJsonFiles = async (

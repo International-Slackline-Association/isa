@@ -154,6 +154,7 @@ export const LineDetailCard = (props: Props) => {
             <FeatureContactField
               content={lineDetails.contactInfo}
               contactUserId={lineDetails.creatorUserId}
+              feature={{ id: lineDetails.id, type: 'line' }}
             />
             <FeatureDetailInfoField
               header="Additional Details"

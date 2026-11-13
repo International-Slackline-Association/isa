@@ -1,8 +1,12 @@
 import { appColors } from 'styles/theme/colors';
 
-export const drawControlStyles = (drawingFeatureType: 'line' | 'guide' | 'spot') => {
+export const drawControlStyles = (drawingFeatureType: 'line' | 'guide' | 'spot' | 'group') => {
   const lineStrokeColor =
-    drawingFeatureType === 'guide' ? appColors.guideFeaturesColor : appColors.lineStrokeColor;
+    drawingFeatureType === 'guide'
+      ? appColors.guideFeaturesColor
+      : drawingFeatureType === 'group'
+        ? appColors.slacklineGroupColor
+        : appColors.lineStrokeColor;
   const spotFillColor =
     drawingFeatureType === 'guide' ? appColors.guideFeaturesColor : appColors.spotFillColor;
 

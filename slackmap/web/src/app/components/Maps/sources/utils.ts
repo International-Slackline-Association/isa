@@ -12,6 +12,7 @@ export const getSourceIdForType = (type: MapFeatureEntityType): string[] => {
     case 'country':
       return [SlacklineMapSourceIds.countryPoints];
     case 'activity':
+    case 'group':
       return [];
     case 'slacklineGroup':
     case 'isaMemberGroup':

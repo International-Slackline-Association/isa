@@ -1,3 +1,4 @@
+import { DDBGroupDetailTypes } from '../../db/entities/group/details/types';
 import { DDBGuideDetailTypes } from '../../db/entities/guide/details/types';
 import { DDBLineDetailTypes } from '../../db/entities/line/details/types';
 import { DDBSpotDetailTypes } from '../../db/entities/spot/details/types';
@@ -7,7 +8,8 @@ import { FeatureCollection } from 'geojson';
 export type GenericMapFeatureItemType =
   | DDBLineDetailTypes['Entity']
   | DDBSpotDetailTypes['Entity']
-  | DDBGuideDetailTypes['Entity'];
+  | DDBGuideDetailTypes['Entity']
+  | DDBGroupDetailTypes['Entity'];
 export interface MapFeatureChangelog {
   featureId: string;
   featureType: MapFeatureType;
@@ -23,5 +25,5 @@ export interface GenericMapFeature {
   geoJson: FeatureCollection;
   country: string;
   createdDateTime: string;
-  creatorUserId: string;
+  creatorUserId?: string;
 }

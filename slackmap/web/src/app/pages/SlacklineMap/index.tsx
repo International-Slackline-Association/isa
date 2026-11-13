@@ -82,7 +82,9 @@ export function SlacklineMapPage() {
     (id: string, type?: SlacklineMapFeatureType) => {
       if (!type) return;
 
-      if (isFeatureTypeMainFeature(type)) {
+      if (type === 'group') {
+        navigate(`/communities/group/${id}`);
+      } else if (isFeatureTypeMainFeature(type)) {
         navigate(`/${type}/${id}`);
       } else if (type === 'country') {
         navigate(`/country/${id}`);

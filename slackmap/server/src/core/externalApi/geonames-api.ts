@@ -19,8 +19,12 @@ export const getCountryCode = async (lat: number, lng: number) => {
       status?: { message?: string };
     };
     const code = data.geonames?.[0]?.countryCode;
+    if (data.status) {
+      throw new Error(data.status.message);
+    }
     if (!code) {
-      throw new Error(data.status?.message);
+      // A point at sea or far from any place; the caller decides.
+      logger.warn('No country found for a point');
     }
     return code;
   } catch (err) {

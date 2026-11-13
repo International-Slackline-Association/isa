@@ -6,6 +6,7 @@ import {
 } from '../../../../core/features/mapFeature/changelog';
 import {
   addTemporaryEditorToMapFeature,
+  canDeleteFeature,
   validateMapFeatureEditor,
 } from '../../../../core/features/mapFeature/editors';
 import { GenericMapFeatureItemType } from '../../../../core/features/mapFeature/types';
@@ -83,6 +84,12 @@ export const requestTemporaryEditorship = async (
     case 'guide':
       item = await db.getGuideDetails(featureId);
       break;
+    case 'group':
+      item = await db.getGroupDetails(featureId);
+      if (item?.isaMemberType) {
+        throw new Error('Forbidden: Groups recognized by ISA are edited by ISA only');
+      }
+      break;
     default:
       throw new Error('Invalid feature type');
   }
@@ -91,6 +98,10 @@ export const requestTemporaryEditorship = async (
   }
   const feature = genericFeatureFromItem(item);
 
+  // A temporary grant would replace an owner's permanent one.
+  if (await validateMapFeatureEditor(feature.id, feature.type, requestClaims.isaId)) {
+    throw new Error(`Validation: You can already edit this ${feature.type}`);
+  }
   await addTemporaryEditorToMapFeature(feature.id, feature.type, requestClaims.isaId);
   await addTemporaryEditorChangelogToFeature(
     feature.id,
@@ -114,7 +125,7 @@ export const deleteFeature = async (
   const editor = await validateMapFeatureEditor(req.params.id, req.params.type, req.user?.isaId, {
     shouldThrow: true,
   });
-  if (editor?.reason !== 'explicit') {
+  if (!canDeleteFeature(editor)) {
     throw new Error('Forbidden: Only explicit editors can delete a feaure');
   }
   switch (req.params.type) {
@@ -126,6 +137,9 @@ export const deleteFeature = async (
       break;
     case 'guide':
       await db.deleteGuide(req.params.id);
+      break;
+    case 'group':
+      await db.deleteGroup(req.params.id);
       break;
     default:
       throw new Error('Invalid feature type');

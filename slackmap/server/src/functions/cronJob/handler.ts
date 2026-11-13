@@ -1,5 +1,6 @@
 import { refreshGlobalContributorsStatsToS3 } from '../../core/features/contributors';
 import {
+  refreshGroupGeoJsonFiles,
   refreshGuideGeoJsonFiles,
   refreshLineGeoJsonFiles,
   refreshSpotGeoJsonFiles,
@@ -25,7 +26,10 @@ const runGenericCronJob = async () => {
 
   console.log('Lines:', updatedLines?.length);
   console.log('Spots:', updatedSpots?.length);
+  const { groupCount } = await refreshGroupGeoJsonFiles();
+
   console.log('Guides:', updatedGuides?.length);
+  console.log('Groups:', groupCount);
 
   await refreshGlobalContributorsStatsToS3();
 

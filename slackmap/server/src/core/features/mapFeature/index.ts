@@ -31,5 +31,15 @@ export const genericFeatureFromItem = (feature: GenericMapFeatureItemType): Gene
       creatorUserId: feature.creatorUserId,
     };
   }
+  if ('groupId' in feature) {
+    return {
+      type: 'group',
+      id: feature.groupId,
+      geoJson: JSON.parse(feature.geoJson),
+      country: feature.country,
+      createdDateTime: feature.createdDateTime,
+      creatorUserId: feature.creatorUserId,
+    };
+  }
   throw new Error('Invalid feature type');
 };

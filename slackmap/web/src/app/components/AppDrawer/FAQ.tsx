@@ -111,6 +111,12 @@ export const FAQ = () => {
         Go to the details page of the feature and click to &quot;Delete&quot; button from the corner
         menu. If you are not the owner of the feature, the request will be reviewed by the admin.
       </p>
+      <h3>How can I add or update a slackline group?</h3>
+      <p>
+        On the Communities map, click the &quot;Add&quot; button from the right-bottom corner to add
+        a group. To update one, open it and click &quot;Request To Edit&quot; from the corner menu.
+        Groups recognized by ISA are managed by ISA.
+      </p>
       <h2>Help &amp; Support</h2>
       <h3>How can I help to volunteer?</h3>
       <p>

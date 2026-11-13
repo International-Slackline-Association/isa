@@ -38,4 +38,7 @@ export const isaTools = {
   trustedServiceApiKeyParameter: '/isa-tools-trusted-service-api-key',
 };
 
+// The ISA account of slackmap@slacklineinternational.org.
+export const slackmapAdminIsaId = 'ISA_C87BE5F6';
+
 export const alarmEmail = 'aws@slacklineinternational.org';

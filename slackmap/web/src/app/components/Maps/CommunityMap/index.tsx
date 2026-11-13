@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   AttributionControl,
   GeolocateControl,
@@ -9,6 +10,8 @@ import {
 import type { MapRef } from 'react-map-gl/mapbox';
 
 import { Box } from '@mui/material';
+
+import { appActions } from 'app/slices/app';
 
 import type { FeatureCollection } from 'geojson';
 
@@ -38,6 +41,7 @@ interface Props {
 
 export const CommunityMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
+  const dispatch = useDispatch();
   const [zoomLevel, setZoomLevel] = useState<number>();
 
   const { projection, mapStyle } = useMapStyle(zoomLevel, {});
@@ -109,6 +113,10 @@ export const CommunityMap = (props: Props) => {
         projection={projection}
         onZoom={(e) => {
           setZoomLevel(e.viewState.zoom);
+        }}
+        onMoveEnd={(e) => {
+          const { longitude, latitude, zoom } = e.viewState;
+          dispatch(appActions.updateLastMapLocation({ longitude, latitude, zoom }));
         }}
       >
         <GeolocateControl />

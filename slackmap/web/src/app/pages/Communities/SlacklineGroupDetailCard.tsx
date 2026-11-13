@@ -1,59 +1,63 @@
-import { useNavigate } from 'react-router';
-
 import CallIcon from '@mui/icons-material/Call';
-import CloseIcon from '@mui/icons-material/Close';
+import Diversity3Icon from '@mui/icons-material/Diversity3';
 import EmailIcon from '@mui/icons-material/Email';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import LinkIcon from '@mui/icons-material/Link';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import { Button, Divider, Link, Stack } from '@mui/material';
+import { Divider, Link, Stack, Typography } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
-import IconButton from '@mui/material/IconButton';
 
 import { communityApi } from 'app/api/community-api';
-import { slacklineGroupEditGoogleFormUrl } from 'app/api/constants';
 import { FeatureDetailFieldLayout } from 'app/components/FeatureDetailFields/DetailFieldLayout';
+import { FeatureHistoryField } from 'app/components/FeatureDetailFields/FeatureHistoryField';
+import { FeatureMenuActions } from 'app/components/FeatureDetailFields/FeatureMenuActions';
 import { LoadingIndicator } from 'app/components/LoadingIndicator';
 import { format } from 'date-fns';
 import { appColors } from 'styles/theme/colors';
 
-import { GroupsManifestText } from './GroupsManifestText';
+import { GroupsManifestText, isaMemberTypeLabel } from './GroupsManifestText';
 
 interface Props {
   groupId: string;
 }
 
-export const SlacklineGroupDetailCard = (props: Props) => {
-  const navigate = useNavigate();
+// The links are written by anyone who edits the group: only http(s) is rendered, with its host shown.
+const safeUrl = (url?: string) => {
+  try {
+    const parsed = new URL(url ?? '');
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed : undefined;
+  } catch {
+    return undefined;
+  }
+};
 
-  const { data: groupDetails, isFetching } = communityApi.useGetSlacklineGroupDetailsQuery(
-    props.groupId,
+const LinkField = (props: { icon: typeof LinkIcon; label: string; url?: string }) => {
+  const url = safeUrl(props.url);
+  if (!url) return null;
+  return (
+    <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
+      <props.icon color="primary" />
+      <Link href={url.href} target="_blank" rel="noopener noreferrer nofollow ugc">
+        {props.label}
+      </Link>
+      <Typography variant="caption" sx={{ color: (t) => t.palette.text.secondary }}>
+        {url.hostname}
+      </Typography>
+    </Stack>
   );
+};
 
-  const onCloseClicked = () => {
-    navigate('/communities');
-  };
-
-  const InfoField = (props: { icon: any; url?: string; text?: string }) => {
-    if (!props.url || !props.text) {
-      return null;
-    }
-    return (
-      <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-        <props.icon color="primary" />
-        <Link href={props.url} target="_blank" rel="noopener">
-          {props.text}
-        </Link>
-      </Stack>
-    );
-  };
-
-  const groupInfo = groupDetails?.info;
+export const SlacklineGroupDetailCard = (props: Props) => {
+  const {
+    data: group,
+    isFetching,
+    refetch,
+  } = communityApi.useGetGroupDetailsQuery(props.groupId);
 
   return (
     <Card
@@ -65,7 +69,7 @@ export const SlacklineGroupDetailCard = (props: Props) => {
         overflow: 'scroll',
       }}
     >
-      {isFetching || !groupInfo ? (
+      {isFetching || !group ? (
         <LoadingIndicator />
       ) : (
         <>
@@ -73,60 +77,64 @@ export const SlacklineGroupDetailCard = (props: Props) => {
             avatar={
               <Avatar
                 sx={{
-                  bgcolor: appColors.slacklineGroupColor,
+                  bgcolor: group.isaMembership
+                    ? appColors.isaMemberGroupColor
+                    : appColors.slacklineGroupColor,
                 }}
               >
                 G
               </Avatar>
             }
             action={
-              <>
-                <IconButton onClick={onCloseClicked}>
-                  <CloseIcon />
-                </IconButton>
-              </>
+              <FeatureMenuActions
+                editorPermissions={group.editorPermissions}
+                feature={{ id: group.id, type: 'group' }}
+                onRefreshClick={refetch}
+              />
             }
-            title={groupInfo.name ?? 'Unknown'}
+            title={group.name}
             slotProps={{ title: { variant: 'h6' } }}
             subheader={`Last updated: ${format(
-              new Date(groupInfo.updatedDateTime || groupInfo.createdDateTime),
+              new Date(group.lastModifiedDateTime || group.createdDateTime),
               'dd MMM yyy',
             )}`}
           />
           <Divider />
           <CardContent component={Stack} spacing={2}>
+            {group.isaMembership && (
+              <FeatureDetailFieldLayout
+                icon={<Diversity3Icon />}
+                header={`ISA ${isaMemberTypeLabel(group.isaMembership.type)}`}
+                subHeader={<GroupsManifestText type="isaMember" />}
+              >
+                <LinkField icon={LinkIcon} label="Read more" url={group.isaMembership.infoUrl} />
+              </FeatureDetailFieldLayout>
+            )}
             <FeatureDetailFieldLayout
               icon={<CallIcon />}
               header={'Contact'}
-              subHeader={<GroupsManifestText type="groupDetail" />}
+              subHeader={!group.isaMembership && <GroupsManifestText type="groupDetail" />}
             >
               <Stack spacing={1}>
-                <InfoField
-                  icon={EmailIcon}
-                  text={groupInfo.email}
-                  url={`mailto:${groupInfo.email}`}
-                />
-                <InfoField icon={FacebookIcon} text="Facebook Page" url={groupInfo.facebookPage} />
-                <InfoField
-                  icon={FacebookIcon}
-                  text="Facebook Group"
-                  url={groupInfo.facebookGroup}
-                />
-                <InfoField icon={TelegramIcon} text={'Telegram Group'} url={groupInfo.telegram} />
-                <InfoField icon={InstagramIcon} text={'Instagram Page'} url={groupInfo.instagram} />
-                <InfoField icon={WhatsAppIcon} text={'WhatsApp Group'} url={groupInfo.whatsapp} />
-                <InfoField icon={LinkIcon} text={'Web Page'} url={groupInfo.webpage} />
+                {group.email && (
+                  <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
+                    <EmailIcon color="primary" />
+                    <Link href={`mailto:${encodeURIComponent(group.email)}`}>{group.email}</Link>
+                  </Stack>
+                )}
+                <LinkField icon={FacebookIcon} label="Facebook Page" url={group.facebookPage} />
+                <LinkField icon={FacebookIcon} label="Facebook Group" url={group.facebookGroup} />
+                <LinkField icon={TelegramIcon} label="Telegram Group" url={group.telegram} />
+                <LinkField icon={InstagramIcon} label="Instagram Page" url={group.instagram} />
+                <LinkField icon={WhatsAppIcon} label="WhatsApp Group" url={group.whatsapp} />
+                <LinkField icon={LinkIcon} label="Web Page" url={group.webpage} />
               </Stack>
-              <Button
-                variant="contained"
-                color="error"
-                href={slacklineGroupEditGoogleFormUrl + encodeURIComponent(groupInfo.id)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Edit on Google Form
-              </Button>
             </FeatureDetailFieldLayout>
+            <FeatureHistoryField
+              featureId={group.id}
+              featureType={'group'}
+              createdDateTime={group.createdDateTime}
+            />
           </CardContent>
         </>
       )}

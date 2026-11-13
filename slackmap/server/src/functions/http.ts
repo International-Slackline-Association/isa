@@ -136,7 +136,7 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
       const data = { httpRequest: { path, method, userId: user?.isaId }, status, stack };
       if (isExpectedError) logger.warn(message, data);
       else logger.error(message, data);
-      return json({ status: 500, message, code, stack }, status);
+      return json({ status: 500, message, code }, status);
     }
   };
 };

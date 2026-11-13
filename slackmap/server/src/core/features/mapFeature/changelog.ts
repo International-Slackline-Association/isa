@@ -1,4 +1,5 @@
 import { db } from '../../db';
+import { DDBGroupDetailTypes } from '../../db/entities/group/details/types';
 import { DDBGuideDetailTypes } from '../../db/entities/guide/details/types';
 import { DDBLineDetailTypes } from '../../db/entities/line/details/types';
 import { DDBMapFeatureChangelogTypes } from '../../db/entities/mapFeature/changelog/types';
@@ -12,7 +13,8 @@ import { GenericMapFeatureItemType } from './types';
 
 type AllFieldNames = keyof (DDBLineDetailTypes['Entity'] &
   DDBSpotDetailTypes['Entity'] &
-  DDBGuideDetailTypes['Entity']);
+  DDBGuideDetailTypes['Entity'] &
+  DDBGroupDetailTypes['Entity']);
 
 const pathNamesMapping: { [p in AllFieldNames]: string | null } = {
   name: 'name',
@@ -38,6 +40,16 @@ const pathNamesMapping: { [p in AllFieldNames]: string | null } = {
   lineId: null,
   guideId: null,
   isMeasured: null,
+  groupId: null,
+  email: 'email',
+  facebookPage: 'Facebook page',
+  facebookGroup: 'Facebook group',
+  instagram: 'Instagram',
+  telegram: 'Telegram',
+  whatsapp: 'WhatsApp',
+  webpage: 'web page',
+  isaMemberType: 'ISA membership',
+  isaMemberInfoUrl: 'ISA membership link',
 };
 
 const validPathNames = Object.entries(pathNamesMapping)
@@ -123,6 +135,22 @@ export const addUpdatedDetailsChangelog = async (
     date: date.toISOString(),
     country: feature.country,
     updatedPaths: filteredPathsWithDefaultValues,
+  });
+};
+
+export const addUpdatedOwnersChangelog = async (
+  item: GenericMapFeatureItemType,
+  userId: string,
+  date: Date,
+) => {
+  const feature = genericFeatureFromItem(item);
+  await db.putFeatureChangelog({
+    featureId: feature.id,
+    featureType: feature.type,
+    userId: userId,
+    action: 'updatedOwners',
+    date: date.toISOString(),
+    country: feature.country,
   });
 };
 

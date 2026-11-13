@@ -16,26 +16,26 @@ const cache = {
   },
 };
 
-const fetchCache = async <T>(url: string, cache: T): Promise<NonNullable<T>> => {
-  if (cache) {
-    return cache;
+const fetchCache = async (
+  url: string,
+  key: 'allSlacklinePoints' | 'countrySlacklinePoints' | 'slacklineGroups',
+): Promise<FeatureCollection> => {
+  if (!cache[key]) {
+    cache[key] = await fetch(url).then((r) => r.json());
   }
-
-  const response = await fetch(url).then((r) => r.json());
-  cache = response;
-  return response;
+  return cache[key]!;
 };
 
 const getCountrySlacklinePointsGeoJson = async () => {
-  return fetchCache(geoJsonURL.countryPoints, cache.countrySlacklinePoints);
+  return fetchCache(geoJsonURL.countryPoints, 'countrySlacklinePoints');
 };
 
 const getAllSlacklinePointsGeoJson = async () => {
-  return fetchCache(geoJsonURL.clustersAll, cache.allSlacklinePoints);
+  return fetchCache(geoJsonURL.clustersAll, 'allSlacklinePoints');
 };
 
 const getSlacklineGroupsGeoJson = async () => {
-  return fetchCache(geoJsonURL.groups, cache.slacklineGroups);
+  return fetchCache(geoJsonURL.groups, 'slacklineGroups');
 };
 
 const getSlacklineFeatureStats = (geoJson: FeatureCollection) => {
@@ -90,15 +90,6 @@ export const getSlacklineGroupsGeoJsonOfCountry = async (code: string) => {
   const slacklineGroupGeoJson = await getSlacklineGroupsGeoJson();
   const filteredGroups = slacklineGroupGeoJson.features.filter(
     (feature) => feature.properties?.c === code,
-  );
-
-  return { geoJson: featureCollection(filteredGroups) };
-};
-
-export const getSlacklineGroupGeoJson = async (groupId: string) => {
-  const slacklineGroupGeoJson = await getSlacklineGroupsGeoJson();
-  const filteredGroups = slacklineGroupGeoJson.features.filter(
-    (feature) => feature.properties?.id === groupId,
   );
 
   return { geoJson: featureCollection(filteredGroups) };

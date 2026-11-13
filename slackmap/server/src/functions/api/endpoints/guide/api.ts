@@ -7,7 +7,10 @@ import {
   addCreatedChangelogToFeature,
   addUpdatedDetailsChangelog,
 } from '../../../../core/features/mapFeature/changelog';
-import { validateMapFeatureEditor } from '../../../../core/features/mapFeature/editors';
+import {
+  canDeleteFeature,
+  validateMapFeatureEditor,
+} from '../../../../core/features/mapFeature/editors';
 import { updateFeatureImagesInS3 } from '../../../../core/features/mapFeature/image';
 import { GuideType } from '../../../../core/types';
 import { assignFromSourceToTarget } from '../../../../core/utils';
@@ -31,7 +34,7 @@ export const getGuideDetails = async (req: Request) => {
   const editPermission = await validateMapFeatureEditor(guide.guideId, 'guide', req.user?.isaId);
 
   return getGuideDetailsResponse(guide, {
-    canDelete: editPermission?.reason === 'explicit',
+    canDelete: canDeleteFeature(editPermission),
     canEdit: Boolean(editPermission),
   });
 };
@@ -71,7 +74,7 @@ export const createGuide = async (req: Request) => {
   await db.putGuide(guide);
   await addCreatedChangelogToFeature(guide, requestClaims.isaId, new Date());
 
-  logger.info('created guide', { userId: req.user?.isaId, guide });
+  logger.info('created guide', { userId: req.user?.isaId, guideId });
   return getGuideDetailsResponse(guide);
 };
 
@@ -110,7 +113,7 @@ export const updateGuide = async (req: Request) => {
 
   await addUpdatedDetailsChangelog(updatedGuide, guide, requestClaims.isaId, new Date());
 
-  logger.info('updated guide', { userId: req.user?.isaId, updatedGuide });
+  logger.info('updated guide', { userId: req.user?.isaId, guideId });
   return getGuideDetailsResponse(updatedGuide);
 };
 

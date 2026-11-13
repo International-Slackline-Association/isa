@@ -1,7 +1,7 @@
 ---
 type: reference
 title: "Table design"
-description: "The single-table key layout of the slackmap table: which entity lives under which PK, SK_GSI, LSI and GSI keys (lines, spots, guides, editors, changelogs)."
+description: "The single-table key layout of the slackmap table: which entity lives under which PK, SK_GSI, LSI and GSI keys (lines, spots, guides, groups, editors, changelogs)."
 ---
 
 # Table design
@@ -11,5 +11,6 @@ description: "The single-table key layout of the slackmap table: which entity li
 | line:{id}           | lineDetails            |                       | type:{type} | country:{code} | featureType:line        |        |                         |
 | spot:{id}           | spotDetails            |                       | spot:{id}   | country:{code} | featureType:spot        |        |                         |
 | guide:{id}          | guideDetails           |                       | guide:{id}  | country:{code} | featureType:guide       |        |                         |
+| group:{id}          | groupDetails           |                       | group:{id}  | country:{code} | featureType:group       |        |                         |
 | feature:{id}:{type} | featureEditor:{userId} | editorReason:{reason} | type:{type} |                |                         |        |                         |
 | feature:{id}:{type} | changelog:{date}       |                       |             | country:{code} | featureChangelog:{date} | global | featureChangelog:{date} |

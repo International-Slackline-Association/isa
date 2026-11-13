@@ -17,7 +17,8 @@ export type GuideType =
   | 'riggingPath'
   | 'information'
   | 'other';
-export type MapFeatureType = 'line' | 'spot' | 'guide';
+export type MapFeatureType = 'line' | 'spot' | 'guide' | 'group';
+export type IsaMemberType = 'active' | 'observer' | 'partner' | 'associate';
 
 export type MapFeatureChangelogAction =
   | 'created'

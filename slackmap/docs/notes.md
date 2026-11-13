@@ -1,7 +1,7 @@
 ---
 type: notes
 title: "SlackMap: open"
-description: "Open work in slackmap: reading users through isa-users, image processing, web cleanup, a Prerender alternative, small features."
+description: "Open work in slackmap: reading users through isa-users, image processing, web cleanup, a Prerender alternative, delete requests, small features."
 ---
 
 # SlackMap: open
@@ -10,4 +10,5 @@ description: "Open work in slackmap: reading users through isa-users, image proc
 - Image processing moves into slackmap, out of isa-tools.
 - Add 'open in new tab' button to the images.
 - Swapping a photo or moving the cover without changing the photo count writes no changelog entry.
+- A delete request only writes a log line; it needs a real flow.
 - Brainstorm an alternative to Prerender (removed) for search engines and link previews.

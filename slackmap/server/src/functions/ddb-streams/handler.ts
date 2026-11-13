@@ -1,6 +1,7 @@
 import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 import type { DynamoDBRecord, DynamoDBStreamEvent } from 'aws-lambda';
+import { groupDetailsDB } from '../../core/db/entities/group/details';
 import { guideDetailsDB } from '../../core/db/entities/guide/details';
 import { lineDetailsDB } from '../../core/db/entities/line/details';
 import { mapFeatureChangelogDB } from '../../core/db/entities/mapFeature/changelog';
@@ -8,6 +9,7 @@ import { spotDetailsDB } from '../../core/db/entities/spot/details';
 import { logger } from '../../core/logger';
 
 import { processFeatureChangelogOperation } from './changelogHandler';
+import { processGroupDetailsOperation } from './groupHandler';
 import { processGuideDetailsOperation } from './guideHandler';
 import { processLineDetailsOperation } from './lineHandler';
 import { processSpotDetailsOperation } from './spotHandler';
@@ -24,7 +26,8 @@ const dynamodbStreamEventHandler = async (event: DynamoDBStreamEvent) => {
       processRecord(record).catch((err) => {
         logger.error('processing streams', {
           data: {
-            record: record,
+            eventName: record.eventName,
+            keys: record.dynamodb?.Keys,
             err: err.message,
             stack: err.stack,
           },
@@ -39,19 +42,22 @@ const processRecord = async (record: DynamoDBRecord) => {
   const { newItem, oldItem, keys, eventName } = parseRecord(record);
   if (lineDetailsDB.converter.isItemMatching(keys)) {
     await processLineDetailsOperation(newItem, oldItem, eventName);
-    console.log('Processed line details operation:', { newItem, oldItem, eventName });
+    console.log('Processed line details operation:', { keys, eventName });
   }
   if (spotDetailsDB.converter.isItemMatching(keys)) {
     await processSpotDetailsOperation(newItem, oldItem, eventName);
-    console.log('Processed spot details operation:', { newItem, oldItem, eventName });
+    console.log('Processed spot details operation:', { keys, eventName });
   }
   if (guideDetailsDB.converter.isItemMatching(keys)) {
     await processGuideDetailsOperation(newItem, oldItem, eventName);
-    console.log('Processed guide details operation:', { newItem, oldItem, eventName });
+    console.log('Processed guide details operation:', { keys, eventName });
+  }
+  if (groupDetailsDB.converter.isItemMatching(keys)) {
+    await processGroupDetailsOperation(newItem, oldItem, eventName);
   }
   if (mapFeatureChangelogDB.converter.isItemMatching(keys)) {
     await processFeatureChangelogOperation(newItem, oldItem, eventName);
-    console.log('Processed feature changelog operation:', { newItem, oldItem, eventName });
+    console.log('Processed feature changelog operation:', { keys, eventName });
   }
 };
 

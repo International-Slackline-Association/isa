@@ -17,6 +17,8 @@ import { AppDrawer } from './components/AppDrawer';
 import { withErrorBoundry } from './components/ErrorBoundary';
 import { MaintenancePage } from './components/MaintenancePage';
 
+const CreateGroupPage = lazy(() => import('./pages/Create/Group').then((m) => ({ default: m.CreateGroupPage })));
+const GroupEditPage = lazy(() => import('./pages/Group/GroupEditPage').then((m) => ({ default: m.GroupEditPage })));
 const CommunitiesPage = lazy(() => import('./pages/Communities').then((m) => ({ default: m.CommunitiesPage })));
 const CreateGuidePage = lazy(() => import('./pages/Create/Guide').then((m) => ({ default: m.CreateGuidePage })));
 const CreateLinePage = lazy(() => import('./pages/Create/Line').then((m) => ({ default: m.CreateLinePage })));
@@ -95,6 +97,8 @@ export function App() {
                     <Route path="/spot/:spotId/edit" element={<SpotEditPage />} />
                     <Route path="/create/guide" element={<CreateGuidePage />} />
                     <Route path="/guide/:guideId/edit" element={<GuideEditPage />} />
+                    <Route path="/communities/create/group" element={<CreateGroupPage />} />
+                    <Route path="/communities/group/:groupId/edit" element={<GroupEditPage />} />
                   </>
                 )}
                 <Route path="/x/:legacyId" element={<LegacyDetailPage />} />
