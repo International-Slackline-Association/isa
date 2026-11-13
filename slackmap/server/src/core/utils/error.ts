@@ -18,6 +18,11 @@ export const parseExpectedError = (err: Error) => {
       code = 'InvalidRequest';
       isExpectedError = true;
       break;
+    case 'Unauthorized':
+      status = 401;
+      code = 'Unauthorized';
+      isExpectedError = true;
+      break;
     case 'Forbidden':
       status = 403;
       code = 'Forbidden';

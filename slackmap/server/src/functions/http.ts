@@ -75,14 +75,14 @@ const getUser = async (headers: Record<string, string | undefined>): Promise<Use
 const compileRoutes = (routes: Record<string, Route>) =>
   Object.entries(routes).map(([key, route]) => {
     const [method, path] = key.split(' ');
-    return { method, segments: path.split('/').slice(1), route };
+    return { key, method, segments: path.split('/').slice(1), route };
   });
 
 const matchRoute = (
   compiled: ReturnType<typeof compileRoutes>,
   method: string,
   path: string,
-): { route: Route; params: Record<string, string> } | undefined => {
+): { key: string; route: Route; params: Record<string, string> } | undefined => {
   const routeMethod = method === 'HEAD' ? 'GET' : method;
   const pathSegments = path.replace(/\/$/, '').split('/').slice(1);
   for (const candidate of compiled) {
@@ -100,10 +100,19 @@ const matchRoute = (
     });
     if (matches) {
       for (const name of Object.keys(params)) params[name] = decodeURIComponent(params[name]);
-      return { route: candidate.route, params };
+      return { key: candidate.key, route: candidate.route, params };
     }
   }
   return undefined;
+};
+
+// Only the origin: a full referer can carry a path or query with personal data.
+const refererOrigin = (referer?: string) => {
+  try {
+    return referer ? new URL(referer).origin : undefined;
+  } catch {
+    return undefined;
+  }
 };
 
 export const createHandler = (lambdaName: string, routes: Record<string, Route>) => {
@@ -111,6 +120,7 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
   const compiled = compileRoutes(routes);
 
   return async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    const start = Date.now();
     const method = event.httpMethod.toUpperCase();
     const path = `/${event.pathParameters?.proxy ?? ''}`;
     const query = event.queryStringParameters ?? {};
@@ -118,25 +128,45 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
       Object.entries(event.headers ?? {}).map(([name, value]) => [name.toLowerCase(), value]),
     );
     let user: User | undefined;
+    let routeKey: string | undefined;
 
-    try {
-      const body = parseBody(event);
-      user = await getUser(headers);
-      const match = matchRoute(compiled, method, path);
-      if (!match) {
-        logger.info('Not found', { method, path });
-        return json({ message: '404 Not Found' }, 404);
+    const respond = async (): Promise<APIGatewayProxyResult> => {
+      try {
+        const body = parseBody(event);
+        user = await getUser(headers);
+        const match = matchRoute(compiled, method, path);
+        if (!match) {
+          logger.info('Not found', { method, path });
+          return json({ message: '404 Not Found' }, 404);
+        }
+        routeKey = match.key;
+        return await match.route({ method, path, params: match.params, headers, query, body, user });
+      } catch (error) {
+        const { status, code, errorMessage, isExpectedError } = parseExpectedError(error as Error);
+        const message = errorMessage || 'Error occurred';
+        const stack = (error as Error).stack;
+        // Body, query and the user's email hold personal data, so they stay out of the log.
+        const data = { httpRequest: { path, method, userId: user?.isaId }, status, stack };
+        if (isExpectedError) logger.warn(message, data);
+        else logger.error(message, data);
+        return json({ status, message, code }, status);
       }
-      return await match.route({ method, path, params: match.params, headers, query, body, user });
-    } catch (error) {
-      const { status, code, errorMessage, isExpectedError } = parseExpectedError(error as Error);
-      const message = errorMessage || 'Error occurred';
-      const stack = (error as Error).stack;
-      // Body, query and the user's email hold personal data, so they stay out of the log.
-      const data = { httpRequest: { path, method, userId: user?.isaId }, status, stack };
-      if (isExpectedError) logger.warn(message, data);
-      else logger.error(message, data);
-      return json({ status: 500, message, code }, status);
-    }
+    };
+
+    const response = await respond();
+    // One line per request for usage analytics; the headers as a whole carry the client's IP.
+    logger.info('Request', {
+      route: routeKey ?? null,
+      method,
+      status: response.statusCode,
+      latencyMs: Date.now() - start,
+      isaId: user?.isaId,
+      origin: headers['origin'],
+      referer: refererOrigin(headers['referer']),
+      userAgent: headers['user-agent']?.slice(0, 256),
+      country: headers['cloudfront-viewer-country'],
+      asn: headers['cloudfront-viewer-asn'],
+    });
+    return response;
   };
 };

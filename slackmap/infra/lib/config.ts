@@ -23,6 +23,12 @@ export const tableStreamArn =
 export const imagesBucketName = `${namespace}-images`;
 export const applicationDataBucketName = `${namespace}-application-data`;
 
+// CloudFront delivers its access logs to CloudWatch only in us-east-1.
+export const usEast1Env = { account: env.account, region: 'us-east-1' };
+// Set by the distributions of the app stack; change only if a distribution is recreated.
+export const distributionIds = { data: 'EWDMK7QRJ5I98', images: 'E1S62AITVZ4WPH' };
+export const cdnAccessLogGroupName = `${namespace}-cdn-access`;
+
 export const geonamesUsernameParameter = 'slackmap-geonames-api-username';
 export const sesIdentityArn =
   'arn:aws:ses:eu-central-1:387132903656:identity/slacklineinternational.org';

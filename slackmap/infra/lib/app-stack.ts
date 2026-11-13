@@ -297,6 +297,20 @@ export class AppStack extends Stack {
     });
     publicRead('ApplicationData', applicationDataBucket, dataDistribution);
 
+    // In front of the API so each request carries the viewer's country and network.
+    new cloudfront.Distribution(this, 'ApiDistribution', {
+      domainNames: [domains.api],
+      certificate: cloudfrontCertificate,
+      defaultBehavior: {
+        origin: new origins.RestApiOrigin(api),
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+        cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+        originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+        compress: false,
+      },
+    });
+
     const alarms = new sns.Topic(this, 'AlarmsTopic');
     alarms.addSubscription(new subscriptions.EmailSubscription(alarmEmail));
     const alarmAction = new cloudwatchActions.SnsAction(alarms);

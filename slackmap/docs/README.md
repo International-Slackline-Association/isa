@@ -15,6 +15,7 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 - What is set up by hand and what other apps rely on: [manual operations](manual-operations.md)
 - Querying or adding to the table: [table design](table-design.md)
 - Working on the communities map or groups: [communities](communities.md)
+- Answering a usage question: [usage analytics](usage-analytics.md)
 - What is open: [notes](notes.md)
 
 ## From higher scopes

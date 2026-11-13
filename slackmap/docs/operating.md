@@ -1,7 +1,7 @@
 ---
 type: how-to
 title: Operating slackmap
-description: "Running slackmap locally and deploying its CDK stacks (slackmap-prod-data, slackmap-prod-app): profile, order, verification."
+description: "Running slackmap locally and deploying its CDK stacks (slackmap-prod-data, slackmap-prod-app, slackmap-prod-cdn-logs in us-east-1): profile, order, verification."
 ---
 
 # Operating slackmap

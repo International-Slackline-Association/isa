@@ -10,9 +10,9 @@ Not managed by CDK.
 
 | Item | Where | Notes |
 |---|---|---|
-| API Gateway custom domain `api.slackmap.com` | API Gateway, eu-central-1 | Regional, its own `slackmap.com` certificate. Only its base path mapping is in `slackmap-prod-app`. |
+| API Gateway custom domain `api.slackmap.com` | API Gateway, eu-central-1 | Regional, its own `slackmap.com` certificate; only its base path mapping is in `slackmap-prod-app`. No longer receives traffic: kept as the rollback target of the `api` CNAME. |
 | Certificates `slackmap.com`, `*.slackmap.com` | ACM, us-east-1 and eu-central-1 | us-east-1 for the distributions, eu-central-1 for the API domain. |
-| Cloudflare CNAMEs `slackmap.com`, `www`, `api`, `data`, `images` | Cloudflare, slackmap.com | `api` → the custom domain's regional name; the others → the distributions of `slackmap-prod-app`. DNS only. |
+| Cloudflare CNAMEs `slackmap.com`, `www`, `api`, `data`, `images` | Cloudflare, slackmap.com | All → the distributions of `slackmap-prod-app`. DNS only. |
 | SSM `slackmap-geonames-api-username` | Parameter Store | GeoNames account for country lookups. |
 | SSM `isa-tools-trusted-service-api-key` | Parameter Store | isa-tools' API key, sent on its image-processing calls. |
 | Backup `slackmap-prod-before-cdk-cutover` | DynamoDB backups | On-demand backup of the map data as it was before the move to CDK; the source table is deleted. |
