@@ -1,7 +1,7 @@
 ---
 type: reference
 title: slackmap manual operations
-description: "What slackmap depends on that CDK does not manage: the API custom domain, the slackmap.com certificates, Cloudflare records, SSM parameters (Mapbox tokens included), the pre-migration backup, the ISA account that administers groups, and the names other apps use."
+description: "What slackmap depends on that CDK does not manage: the slackmap.com certificate, Cloudflare records, SSM parameters (Mapbox tokens included), the pre-migration backup, the ISA account that administers groups, and the names other apps use."
 ---
 
 # Manual operations
@@ -10,8 +10,7 @@ Not managed by CDK.
 
 | Item | Where | Notes |
 |---|---|---|
-| API Gateway custom domain `api.slackmap.com` | API Gateway, eu-central-1 | Regional, its own `slackmap.com` certificate; only its base path mapping is in `slackmap-prod-app`. No longer receives traffic: kept as the rollback target of the `api` CNAME. |
-| Certificates `slackmap.com`, `*.slackmap.com` | ACM, us-east-1 and eu-central-1 | us-east-1 for the distributions, eu-central-1 for the API domain. |
+| Certificate `slackmap.com`, `*.slackmap.com` | ACM, us-east-1 | For the distributions. |
 | Cloudflare CNAMEs `slackmap.com`, `www`, `api`, `data`, `images` | Cloudflare, slackmap.com | All → the distributions of `slackmap-prod-app`. DNS only. |
 | SSM `slackmap-geonames-api-username` | Parameter Store | GeoNames account for country lookups. |
 | SSM `isa-tools-trusted-service-api-key` | Parameter Store | isa-tools' API key, sent on its image-processing calls. |

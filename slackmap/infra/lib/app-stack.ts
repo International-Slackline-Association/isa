@@ -144,13 +144,6 @@ export class AppStack extends Stack {
     });
     api.root.addResource('{proxy+}').addMethod('ANY', new apigateway.LambdaIntegration(apiFunction));
 
-    // The custom domain itself is managed by hand.
-    new apigateway.CfnBasePathMapping(this, 'ApiDomainMapping', {
-      domainName: domains.api,
-      restApiId: api.restApiId,
-      stage: api.deploymentStage.stageName,
-    });
-
     // Signed-in users upload pictures straight to isa-tools' temporary-uploads bucket; the API then
     // has them resized into the images bucket.
     const uploadsIdentityPool = new cognito.CfnIdentityPool(this, 'UploadsIdentityPool', {
