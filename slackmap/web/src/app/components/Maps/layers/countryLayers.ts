@@ -24,7 +24,7 @@ export const countryPointLayer = (opts: CommonOpts): SymbolLayer => {
       'symbol-placement': 'point',
       'icon-allow-overlap': false,
       'text-field': '{id}',
-      'text-size': ['interpolate', ['exponential', 1], ['zoom'], 0, 8, 7, 12, 13, 16],
+      'text-size': ['interpolate', ['exponential', 1], ['zoom'], 0, 7, 7, 12, 13, 16],
       'text-offset': [
         'interpolate',
         ['exponential', 1],
@@ -36,7 +36,7 @@ export const countryPointLayer = (opts: CommonOpts): SymbolLayer => {
         13,
         ['literal', [0, -2.5]],
       ],
-      'icon-size': ['interpolate', ['exponential', 1], ['zoom'], 1, 0.8, 8, 0.8, 13, 0.4],
+      'icon-size': ['interpolate', ['exponential', 1], ['zoom'], 1, 0.5, 4, 0.65, 8, 0.8, 13, 0.4],
     },
   };
 };

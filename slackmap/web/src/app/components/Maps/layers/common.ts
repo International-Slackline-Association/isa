@@ -82,7 +82,7 @@ export const genericCircleLayer = (opts: { big?: boolean } & CommonOpts): Circle
         ],
       ],
       'circle-opacity': 0.8,
-      'circle-stroke-width': ['interpolate', ['exponential', 1], ['zoom'], 1, 0, 5, 0.3, 7, 1],
+      'circle-stroke-width': ['interpolate', ['exponential', 1], ['zoom'], 1, 0, 7, 0.3, 9, 1],
       'circle-stroke-color': 'white',
     },
   };

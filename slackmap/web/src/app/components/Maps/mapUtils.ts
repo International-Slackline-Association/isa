@@ -121,7 +121,11 @@ export const fitMapToGeoJson = (
       bufferedBounds = bbox(buffer(geoJson, bufferKmFromArea())!) as BBox;
     }
   } else {
-    bufferedBounds = bbox(buffer(geoJson, bufferKmFromArea())!) as BBox;
+    // A margin as wide as the area pushes a large country's box over the poles and the dateline.
+    const bounds = bbox(geoJson) as BBox;
+    const radius = Math.sqrt(area(bboxPolygon(bounds)) / Math.PI) / 1000;
+    const margin = Math.max(opts.minBufferRadiusInKm ?? 0, radius * 0.1, 0.1);
+    bufferedBounds = bbox(buffer(bboxPolygon(bounds), margin)!) as BBox;
   }
 
   map.fitBounds(bufferedBounds, {
