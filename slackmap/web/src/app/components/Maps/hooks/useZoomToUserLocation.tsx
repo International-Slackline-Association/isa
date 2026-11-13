@@ -1,5 +1,5 @@
 import { RefObject, useEffect, useState } from 'react';
-import { MapRef } from 'react-map-gl';
+import { MapRef } from 'react-map-gl/mapbox';
 
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 

@@ -1,7 +1,10 @@
-import { CircleLayer, FillLayer, LineLayer, SymbolLayer } from 'mapbox-gl';
 import { appColors } from 'styles/theme/colors';
 
 import {
+  CircleLayer,
+  FillLayer,
+  LineLayer,
+  SymbolLayer,
   genericCircleLayer,
   genericFillLayer,
   genericLabelLayer,

@@ -1,7 +1,13 @@
-import { CircleLayer, FillLayer, LineLayer } from 'mapbox-gl';
 import { appColors } from 'styles/theme/colors';
 
-import { genericCircleLayer, genericFillLayer, genericLineLayer } from './common';
+import {
+  CircleLayer,
+  FillLayer,
+  LineLayer,
+  genericCircleLayer,
+  genericFillLayer,
+  genericLineLayer,
+} from './common';
 
 type CommonOpts = {
   visible?: boolean;

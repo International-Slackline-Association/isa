@@ -1,4 +1,4 @@
-import { useMap } from 'react-map-gl';
+import { useMap } from 'react-map-gl/mapbox';
 
 export const MapImage = (props: { name: string; url: string; sdf?: boolean }) => {
   const { current: map } = useMap();

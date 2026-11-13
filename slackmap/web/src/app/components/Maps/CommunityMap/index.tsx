@@ -2,11 +2,11 @@ import { useRef, useState } from 'react';
 import {
   AttributionControl,
   GeolocateControl,
-  MapboxGeoJSONFeature,
+  MapGeoJSONFeature,
   NavigationControl,
   Map as ReactMapGL,
-} from 'react-map-gl';
-import type { MapRef } from 'react-map-gl';
+} from 'react-map-gl/mapbox';
+import type { MapRef } from 'react-map-gl/mapbox';
 
 import { Box } from '@mui/material';
 
@@ -31,7 +31,7 @@ import { MapFeatureEntity } from '../types';
 import { CommunityMapLegend } from './Legend';
 
 interface Props {
-  onSelectedFeatureChange?: (feature?: MapboxGeoJSONFeature) => void;
+  onSelectedFeatureChange?: (feature?: MapGeoJSONFeature) => void;
   activeCommunityFeature?: MapFeatureEntity<CommunityMapFeatureType>;
   activeCommunityFeatureGeoJson?: FeatureCollection;
 }
@@ -47,7 +47,7 @@ export const CommunityMap = (props: Props) => {
     useSelectedFeature(mapRef);
   const { isMapLoaded, onMapLoad, onMouseMove, onMapClick, cursor } = useMapEvents(mapRef, {
     onMouseMovedToFeature(feature) {
-      if (isMouseHoverableLayer(feature.layer.id)) {
+      if (isMouseHoverableLayer(feature.layer?.id)) {
         setHoveredMapboxFeature(feature);
       }
     },
@@ -114,7 +114,7 @@ export const CommunityMap = (props: Props) => {
         <GeolocateControl />
         <AttributionControl compact customAttribution="International Slackline Association" />
         <NavigationControl />
-        <MapImage name={'country-symbol'} url={'/images/country-symbol.png'} />
+        <MapImage name={'slackmap-country-symbol'} url={'/images/country-symbol.png'} />
         <CommunityMapSources
           filter={{
             country:

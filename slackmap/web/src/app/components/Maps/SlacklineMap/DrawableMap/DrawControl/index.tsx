@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle } from 'react';
-import { useControl } from 'react-map-gl';
-import type { ControlPosition } from 'react-map-gl';
+import { useControl } from 'react-map-gl/mapbox';
+import type { ControlPosition } from 'react-map-gl/mapbox';
 
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import StaticDrawMode from '@mapbox/mapbox-gl-draw-static-mode';

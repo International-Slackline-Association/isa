@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { RefObject } from 'react';
-import { MapRef } from 'react-map-gl';
+import { MapRef } from 'react-map-gl/mapbox';
 
 import { area, bbox, bboxPolygon, buffer, centerOfMass, getType, round } from '@turf/turf';
 import { Feature, FeatureCollection, LineString, Point, Polygon, Position } from 'geojson';
-import { FlyToOptions, MapboxGeoJSONFeature, PaddingOptions } from 'mapbox-gl';
+import type { EasingOptions as FlyToOptions, MapboxGeoJSONFeature, PaddingOptions } from 'mapbox-gl';
 
 import { MapFeatureCommonProperties, MapFeatureEntity } from './types';
 

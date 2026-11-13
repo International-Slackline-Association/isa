@@ -1,4 +1,15 @@
-import { CircleLayer, FillLayer, LineLayer, SymbolLayer } from 'mapbox-gl';
+import type {
+  CircleLayerSpecification,
+  FillLayerSpecification,
+  LineLayerSpecification,
+  SymbolLayerSpecification,
+} from 'mapbox-gl';
+
+// The enclosing <Source> supplies the source.
+export type CircleLayer = Omit<CircleLayerSpecification, 'source'>;
+export type FillLayer = Omit<FillLayerSpecification, 'source'>;
+export type LineLayer = Omit<LineLayerSpecification, 'source'>;
+export type SymbolLayer = Omit<SymbolLayerSpecification, 'source'>;
 
 type CommonOpts = {
   visible?: boolean;
@@ -188,7 +199,7 @@ export const genericLabelLayer = (opts: CommonOpts): SymbolLayer => {
     filter: opts.filter ? ['all', opts.filter, ['has', 'l']] : ['has', 'l'],
     layout: {
       ...symbolLayer.layout,
-      'icon-image': 'marker',
+      'icon-image': 'slackmap-line-marker',
       'symbol-placement': 'line-center',
       'text-field': '{l}',
       'text-size': 12,

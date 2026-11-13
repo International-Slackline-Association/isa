@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { MapboxGeoJSONFeature, ViewStateChangeEvent } from 'react-map-gl';
+import { MapGeoJSONFeature, ViewStateChangeEvent } from 'react-map-gl/mapbox';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router';
 
@@ -99,7 +99,7 @@ export function SlacklineMapPage() {
   }, [activeFeature]);
 
   const onSelectedFeatureChange = useCallback(
-    (feature?: MapboxGeoJSONFeature) => {
+    (feature?: MapGeoJSONFeature) => {
       if (!feature) return;
 
       const { id, type } = parseMapFeature<SlacklineMapFeatureType>(feature);

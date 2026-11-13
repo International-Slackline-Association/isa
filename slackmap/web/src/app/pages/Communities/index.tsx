@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { MapboxGeoJSONFeature } from 'react-map-gl';
+import { MapGeoJSONFeature } from 'react-map-gl/mapbox';
 import { useNavigate } from 'react-router';
 
 import { Box, Stack } from '@mui/material';
@@ -57,7 +57,7 @@ export function CommunitiesPage() {
   }, [activeFeature]);
 
   const onSelectedFeatureChange = useCallback(
-    (feature?: MapboxGeoJSONFeature) => {
+    (feature?: MapGeoJSONFeature) => {
       if (!feature) {
         navigate('/communities');
         return;

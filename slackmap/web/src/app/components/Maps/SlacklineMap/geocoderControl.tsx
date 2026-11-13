@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ControlPosition, MarkerProps, useControl } from 'react-map-gl';
+import { ControlPosition, MarkerProps, useControl } from 'react-map-gl/mapbox';
 
 import MapboxGeocoder, { GeocoderOptions } from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';

@@ -2,13 +2,13 @@ import { useRef, useState } from 'react';
 import {
   AttributionControl,
   GeolocateControl,
-  MapboxGeoJSONFeature,
+  MapGeoJSONFeature,
   NavigationControl,
   Map as ReactMapGL,
   ViewState,
   ViewStateChangeEvent,
-} from 'react-map-gl';
-import type { MapRef } from 'react-map-gl';
+} from 'react-map-gl/mapbox';
+import type { MapRef } from 'react-map-gl/mapbox';
 
 import { Box } from '@mui/material';
 
@@ -38,7 +38,7 @@ import { useMapOptions } from './useMapOptions';
 interface Props {
   onMapMoveEnd?: (event: ViewStateChangeEvent) => void;
   initialViewState?: Partial<ViewState>;
-  onSelectedFeatureChange?: (feature?: MapboxGeoJSONFeature) => void;
+  onSelectedFeatureChange?: (feature?: MapGeoJSONFeature) => void;
   activeSlacklineFeature?: MapFeatureEntity<SlacklineMapFeatureType>;
   highlightedSlacklineFeature?: MapFeatureEntity<SlacklineMapFeatureType>;
   activeSlacklineFeatureGeoJson?: FeatureCollection;
@@ -60,7 +60,7 @@ export const SlacklineMap = (props: Props) => {
     useSelectedFeature(mapRef);
   const { isMapLoaded, onMapLoad, onMouseMove, onMapClick, cursor } = useMapEvents(mapRef, {
     onMouseMovedToFeature(feature) {
-      if (isMouseHoverableLayer(feature.layer.id)) {
+      if (isMouseHoverableLayer(feature.layer?.id)) {
         setHoveredMapboxFeature(feature);
       }
     },
@@ -68,7 +68,7 @@ export const SlacklineMap = (props: Props) => {
       setHoveredFeature(undefined);
     },
     onClickedToFeature(feature) {
-      if (isMouseHoverableLayer(feature.layer.id)) {
+      if (isMouseHoverableLayer(feature.layer?.id)) {
         setSelectedMapboxFeature(feature);
         props.onSelectedFeatureChange?.(feature);
       }
@@ -164,8 +164,8 @@ export const SlacklineMap = (props: Props) => {
           marker={false}
           minLength={3}
         />
-        <MapImage name={'marker'} url={'/images/line-marker.png'} sdf />
-        <MapImage name={'country-symbol'} url={'/images/country-symbol.png'} />
+        <MapImage name={'slackmap-line-marker'} url={'/images/line-marker.png'} sdf />
+        <MapImage name={'slackmap-country-symbol'} url={'/images/country-symbol.png'} />
 
         <SlacklineMapSources
           displayFeature={selectedDisplayFeature}

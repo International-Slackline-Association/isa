@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Layer, Source } from 'react-map-gl';
+import { Layer, Source } from 'react-map-gl/mapbox';
 
 import { geoJsonURL } from 'app/api/constants';
 

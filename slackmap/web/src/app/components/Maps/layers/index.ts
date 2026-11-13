@@ -21,8 +21,8 @@ export const cursorInteractableLayerIds = [
   SlacklineGroupsLayerIds.groupPoint,
 ];
 
-export const isMouseHoverableLayer = (layerId: string) =>
+export const isMouseHoverableLayer = (layerId?: string) =>
   cursorInteractableLayerIds.includes(layerId as any);
 
-export const isCursorInteractableLayer = (layerId: string) =>
+export const isCursorInteractableLayer = (layerId?: string) =>
   cursorInteractableLayerIds.includes(layerId as any);

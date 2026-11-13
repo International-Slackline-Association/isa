@@ -1,7 +1,6 @@
-import { LineLayer, SymbolLayer } from 'mapbox-gl';
 import { appColors } from 'styles/theme/colors';
 
-import { genericSymbolLayer } from './common';
+import { LineLayer, SymbolLayer, genericSymbolLayer } from './common';
 
 type CommonOpts = {
   visible?: boolean;
@@ -21,7 +20,7 @@ export const countryPointLayer = (opts: CommonOpts): SymbolLayer => {
     id: CountryLayerIds.countryPoint,
     layout: {
       ...symbolLayer.layout,
-      'icon-image': 'country-symbol',
+      'icon-image': 'slackmap-country-symbol',
       'symbol-placement': 'point',
       'icon-allow-overlap': false,
       'text-field': '{id}',

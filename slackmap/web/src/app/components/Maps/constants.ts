@@ -1,4 +1,4 @@
-import { Fog } from 'mapbox-gl';
+import type { FogSpecification as Fog } from 'mapbox-gl';
 import { appColors } from 'styles/theme/colors';
 
 export const MAPBOX_TOKEN = import.meta.env.VITE_APP_SLACKMAP_MAPBOX_TOKEN;

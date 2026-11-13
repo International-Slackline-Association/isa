@@ -1,5 +1,5 @@
 import { RefObject, useCallback, useState } from 'react';
-import { MapRef } from 'react-map-gl';
+import { MapRef } from 'react-map-gl/mapbox';
 
 import { MapLayerMouseEvent, MapboxGeoJSONFeature } from 'mapbox-gl';
 
@@ -31,7 +31,7 @@ export const useMapEvents = (
         setCursor('auto');
         return;
       }
-      if (isCursorInteractableLayer(feature.layer.id)) {
+      if (isCursorInteractableLayer(feature.layer?.id)) {
         setCursor('pointer');
       }
       opts.onMouseMovedToFeature?.(feature);

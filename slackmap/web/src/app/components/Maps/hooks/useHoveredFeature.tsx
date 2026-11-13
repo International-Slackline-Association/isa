@@ -1,5 +1,5 @@
 import { RefObject, useCallback, useEffect, useState } from 'react';
-import { MapRef } from 'react-map-gl';
+import { MapRef } from 'react-map-gl/mapbox';
 
 import { MapboxGeoJSONFeature } from 'mapbox-gl';
 

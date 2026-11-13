@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Map as ReactMapGL, ViewState } from 'react-map-gl';
-import type { MapRef } from 'react-map-gl';
+import { Map as ReactMapGL, ViewState } from 'react-map-gl/mapbox';
+import type { MapRef } from 'react-map-gl/mapbox';
 
 import { MapboxDrawControls } from '@mapbox/mapbox-gl-draw';
 import { Feature, FeatureCollection } from 'geojson';
@@ -128,8 +128,8 @@ export const DrawableMap = (props: Props) => {
         ref={mapRef}
         projection={projection as any}
       >
-        <MapImage name={'marker'} url={'/images/line-marker.png'} sdf />
-        <MapImage name={'country-symbol'} url={'/images/country-symbol.png'} />
+        <MapImage name={'slackmap-line-marker'} url={'/images/line-marker.png'} sdf />
+        <MapImage name={'slackmap-country-symbol'} url={'/images/country-symbol.png'} />
 
         {isMapLoaded && (
           <DrawControl
