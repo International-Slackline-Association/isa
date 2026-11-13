@@ -1,10 +1,9 @@
 import { sendUserMessage } from '@server/functions/api/endpoints/contact/api';
 import { SendUserMessagePostBody } from '@server/functions/api/endpoints/contact/schema';
 import { baseApi } from 'store/rtk-query';
-import { AsyncReturnType } from 'type-fest';
 import { showSuccessNotification } from 'utils';
 
-type SendUserMessageAPIResponse = AsyncReturnType<typeof sendUserMessage>;
+type SendUserMessageAPIResponse = Awaited<ReturnType<typeof sendUserMessage>>;
 
 export const contactApi = baseApi
   .enhanceEndpoints({

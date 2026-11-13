@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Location, useLocation } from 'react-router-dom';
+import { Location, useLocation } from 'react-router';
 
 const parseLocation = (
   location: Location,

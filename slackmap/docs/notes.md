@@ -8,6 +8,7 @@ description: "Open work in slackmap: reading users through isa-users, image proc
 
 - Users are read straight from isa-users' table; read them through an isa-users API instead.
 - Image processing moves into slackmap, out of isa-tools.
-- Maintenance: dependency upgrades, then simplifications like isa-tools; MUI stays, since slackmap keeps growing features.
+- Upgrade the map libraries (mapbox-gl, react-map-gl, `@mapbox/*`) on their own and test by hand: past upgrades made the map glitch.
 - Add 'open in new tab' button to the images.
+- Swapping a photo or moving the cover without changing the photo count writes no changelog entry.
 - Brainstorm an alternative to Prerender (removed) for search engines and link previews.

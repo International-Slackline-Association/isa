@@ -6,7 +6,7 @@ import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { MapFeatureEntity } from '../types';
 
 export const useActiveFeature = (
-  mapRef: RefObject<MapRef>,
+  mapRef: RefObject<MapRef | null>,
   isMapLoaded: boolean,
   activeFeature: MapFeatureEntity | undefined,
   selectedFeature: MapFeatureEntity | undefined,

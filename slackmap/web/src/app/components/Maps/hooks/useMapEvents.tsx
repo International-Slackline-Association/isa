@@ -6,7 +6,7 @@ import { MapLayerMouseEvent, MapboxGeoJSONFeature } from 'mapbox-gl';
 import { isCursorInteractableLayer } from '../layers';
 
 export const useMapEvents = (
-  mapRef: RefObject<MapRef>,
+  mapRef: RefObject<MapRef | null>,
   opts: {
     onMouseMovedToFeature?: (feature: MapboxGeoJSONFeature) => void;
     onMouseMovedToVoid?: () => void;

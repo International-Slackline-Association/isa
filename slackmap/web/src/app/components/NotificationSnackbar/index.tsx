@@ -31,7 +31,7 @@ const NotificationSnackbar = () => {
       open={Boolean(snackbarNotification)}
       autoHideDuration={snackbarNotification?.duration ?? 3000}
       onClose={onClose}
-      TransitionComponent={SlideTransition}
+      slots={{ transition: SlideTransition }}
     >
       <Alert
         elevation={6}

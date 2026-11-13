@@ -4,10 +4,9 @@ import {
   UpdateSpotPostBody,
 } from '@server/functions/api/endpoints/spot/schema';
 import { baseApi } from 'store/rtk-query';
-import { AsyncReturnType } from 'type-fest';
 import { showInfoNotification } from 'utils';
 
-export type GetSpotDetailsAPIResponse = AsyncReturnType<typeof getSpotDetails>;
+export type GetSpotDetailsAPIResponse = Awaited<ReturnType<typeof getSpotDetails>>;
 
 export const spotApi = baseApi
   .enhanceEndpoints({

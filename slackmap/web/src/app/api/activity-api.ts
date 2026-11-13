@@ -3,10 +3,9 @@ import {
   getGlobalContributors,
 } from '@server/functions/api/endpoints/activity/api';
 import { baseApi } from 'store/rtk-query';
-import { AsyncReturnType } from 'type-fest';
 
-type GetActivityChangelogsAPIResponse = AsyncReturnType<typeof getGlobalActivityChangelogs>;
-type getGlobalContributorsAPIResponse = AsyncReturnType<typeof getGlobalContributors>;
+type GetActivityChangelogsAPIResponse = Awaited<ReturnType<typeof getGlobalActivityChangelogs>>;
+type getGlobalContributorsAPIResponse = Awaited<ReturnType<typeof getGlobalContributors>>;
 
 export const activityApi = baseApi
   .enhanceEndpoints({

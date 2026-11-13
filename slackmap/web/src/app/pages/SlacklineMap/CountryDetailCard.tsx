@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import BarChartIcon from '@mui/icons-material/BarChart';
 import CloseIcon from '@mui/icons-material/Close';
@@ -8,19 +8,17 @@ import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PentagonIcon from '@mui/icons-material/Pentagon';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Divider, Menu, MenuItem, Typography } from '@mui/material';
+import { Divider, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
-import { Stack } from '@mui/system';
 
 import { countryApi } from 'app/api/country-api';
 import { getSlacklinePointFeaturesOfCountry } from 'app/api/geojson-data';
 import { SlacklineFeatureIcon } from 'app/components/Icons/SlacklineFeatureIcon';
 import { LoadingIndicator } from 'app/components/LoadingIndicator';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { appColors } from 'styles/theme/colors';
 
 import { CountryHistoryField } from '../../components/FeatureDetailFields/CountryHistoryField';
@@ -34,10 +32,8 @@ interface Props {
 
 export const CountryDetailCard = (props: Props) => {
   const navigate = useNavigate();
-  const cardHeaderPopupState = usePopupState({
-    variant: 'popover',
-    popupId: 'cardHeaderMenu',
-  });
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const closeMenu = () => setMenuAnchor(null);
   const dispatch = useDispatch();
 
   const [statsInfo, setStatsInfo] = React.useState<{
@@ -68,7 +64,7 @@ export const CountryDetailCard = (props: Props) => {
   };
 
   const onRefreshClicked = () => {
-    cardHeaderPopupState.close();
+    closeMenu();
     refetch();
     dispatch(countryApi.util.invalidateTags(['countryDetails', 'countryChangelogs']));
   };
@@ -125,12 +121,17 @@ export const CountryDetailCard = (props: Props) => {
                   <CloseIcon />
                 </IconButton>
 
-                <IconButton {...bindTrigger(cardHeaderPopupState)}>
+                <IconButton aria-controls={menuAnchor ? 'cardHeaderMenu' : undefined}
+                  aria-haspopup="true"
+                  onClick={(e) => setMenuAnchor(e.currentTarget)}>
                   <MoreVertIcon />
                 </IconButton>
 
                 <Menu
-                  {...bindMenu(cardHeaderPopupState)}
+                  id="cardHeaderMenu"
+                  anchorEl={menuAnchor}
+                  open={Boolean(menuAnchor)}
+                  onClose={closeMenu}
                   sx={{
                     '& svg': {
                       mr: 1,
@@ -146,16 +147,14 @@ export const CountryDetailCard = (props: Props) => {
               </>
             }
             title={countryDetails.name ?? 'Unknown'}
-            titleTypographyProps={{
-              variant: 'h6',
-            }}
+            slotProps={{ title: { variant: 'h6' } }}
           />
           <Divider />
           <CardContent component={Stack} spacing={2}>
             <FeatureDetailFieldLayout icon={<BarChartIcon />} header={'Statistics'}>
               <Stack spacing={2}>
                 {stats.map((stat, index) => (
-                  <Stack key={index} direction={'row'} spacing={1} alignItems="center">
+                  <Stack key={index} direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
                     <Avatar
                       sx={{
                         width: 'auto',
@@ -166,7 +165,7 @@ export const CountryDetailCard = (props: Props) => {
                     >
                       {stat.icon}
                     </Avatar>
-                    <Stack direction={'row'} spacing={1} alignItems="center">
+                    <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
                       <Typography variant="body2">{stat.label}:</Typography>
                       <Typography variant="body2Bold">{stat.value}</Typography>
                     </Stack>

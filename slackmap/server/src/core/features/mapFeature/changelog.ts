@@ -5,7 +5,6 @@ import { DDBMapFeatureChangelogTypes } from '../../db/entities/mapFeature/change
 import { DDBSpotDetailTypes } from '../../db/entities/spot/details/types';
 import { MapFeatureType } from '../../types';
 import countriesJson from '../../../../data/countryInfoDict.json';
-import { diff } from 'deep-diff';
 
 import { genericFeatureFromItem } from '.';
 import { getMultipleUserDetails } from '../isaUser';
@@ -45,6 +44,34 @@ const validPathNames = Object.entries(pathNamesMapping)
   .filter(([, v]) => v !== null)
   .map(([k]) => k);
 
+const valueKind = (v: unknown) => (v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v);
+
+// A top-level key counts as changed when it is added, removed, a primitive or its type changed,
+// or an array changed length. Edits inside objects or inside same-length arrays are not logged.
+const changedTopLevelKeys = (oldItem: object, newItem: object) => {
+  const o = oldItem as Record<string, unknown>;
+  const n = newItem as Record<string, unknown>;
+  const has = (obj: object, k: string) => Object.prototype.hasOwnProperty.call(obj, k);
+  const keys = [...Object.keys(o), ...Object.keys(n).filter((k) => !has(o, k))];
+
+  return keys.filter((k) => {
+    if (has(o, k) !== has(n, k)) {
+      return true;
+    }
+    const [l, r] = [o[k], n[k]];
+    if (valueKind(l) !== valueKind(r)) {
+      return true;
+    }
+    if (Array.isArray(l) && Array.isArray(r)) {
+      return l.length !== r.length;
+    }
+    if (typeof l === 'object') {
+      return false;
+    }
+    return l !== r && !(Number.isNaN(l) && Number.isNaN(r));
+  });
+};
+
 export const addCreatedChangelogToFeature = async (
   item: GenericMapFeatureItemType,
   userId: string,
@@ -69,14 +96,13 @@ export const addUpdatedDetailsChangelog = async (
 ) => {
   const feature = genericFeatureFromItem(item);
 
-  const updatedPaths = diff(oldItem, item)
-    ?.filter((d) => d.path && d.path.length === 1 && validPathNames.includes(d.path[0]))
-    .map((d) => d.path?.[0] as string);
+  const distinctUpdatedPaths = changedTopLevelKeys(oldItem, item).filter((k) =>
+    validPathNames.includes(k),
+  );
 
-  if (!updatedPaths || updatedPaths.length === 0) {
+  if (distinctUpdatedPaths.length === 0) {
     return;
   }
-  const distinctUpdatedPaths = [...new Set(updatedPaths)];
 
   // Filter out paths that were added with default values
   const filteredPathsWithDefaultValues = distinctUpdatedPaths.filter((p) => {

@@ -1,10 +1,7 @@
-import { Middleware, MiddlewareAPI, isRejectedWithValue } from '@reduxjs/toolkit';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import type { AppState } from 'app/slices/app/types';
 import { AuthState } from 'app/slices/app/types';
 import { fetchAuthSession } from 'aws-amplify/auth';
-import { showErrorNotification } from 'utils';
-
-import { RootState } from './types';
 
 export const isaAccountApi = createApi({
   reducerPath: 'isaAccountApi',
@@ -27,7 +24,7 @@ export const baseApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: 'https://api.slackmap.com',
     prepareHeaders: async (headers, { getState }) => {
-      const isSignedIn = (getState() as RootState).app?.authState === AuthState.SignedIn;
+      const isSignedIn = (getState() as { app: AppState }).app.authState === AuthState.SignedIn;
       if (isSignedIn) {
         const token = await fetchAuthSession()
           .then((s) => s.tokens?.idToken?.toString())
@@ -41,17 +38,3 @@ export const baseApi = createApi({
   }),
   endpoints: () => ({}),
 });
-
-export const rtkQueryErrorLogger: Middleware = (api: MiddlewareAPI) => (next) => (action) => {
-  // RTK Query uses `createAsyncThunk` from redux-toolkit under the hood, so we're able to utilize these matchers!
-  if (isRejectedWithValue(action)) {
-    let e = (action?.payload as any)?.data?.message || action?.error?.message;
-    if (e && e === 'Rejected') {
-      e = 'Unknown';
-    }
-    const message = `Error: ${e}`;
-    api.dispatch(showErrorNotification(message));
-  }
-
-  return next(action);
-};

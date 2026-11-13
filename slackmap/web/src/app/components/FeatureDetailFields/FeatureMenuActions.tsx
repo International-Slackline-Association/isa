@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -13,7 +13,6 @@ import { IconButton, Menu, MenuItem } from '@mui/material';
 import { featureApi } from 'app/api/feature-api';
 import { useConfirmDialog } from 'app/components/Dialogs/useConfirmDialog';
 import { selectIsUserSignedIn } from 'app/slices/app/selectors';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
 import { useTextBoxDialog } from '../Dialogs/useTextBoxDialog';
 
@@ -32,10 +31,8 @@ interface Props {
 }
 
 export const FeatureMenuActions = (props: Props) => {
-  const cardHeaderPopupState = usePopupState({
-    variant: 'popover',
-    popupId: 'cardHeaderMenu',
-  });
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const closeMenu = () => setMenuAnchor(null);
   const navigate = useNavigate();
   const { ConfirmDialog, showConfirmDialog } = useConfirmDialog();
   const { TextBoxDialog, showTextBoxDialog } = useTextBoxDialog();
@@ -53,12 +50,12 @@ export const FeatureMenuActions = (props: Props) => {
   }, [isDeleted]);
 
   const onEditClick = async () => {
-    cardHeaderPopupState.close();
+    closeMenu();
     navigate(`/${props.feature.type}/${props.feature.id}/edit`);
   };
 
   const onDeleteClick = async () => {
-    cardHeaderPopupState.close();
+    closeMenu();
     if (props.editorPermissions?.canDelete) {
       showConfirmDialog({
         title: `Delete this ${props.feature.type}?`,
@@ -85,7 +82,7 @@ export const FeatureMenuActions = (props: Props) => {
   };
 
   const onRequestEditorshipClick = async () => {
-    cardHeaderPopupState.close();
+    closeMenu();
     showConfirmDialog({
       title: 'Get Temporary Editor Permissions?',
       description:
@@ -99,7 +96,7 @@ export const FeatureMenuActions = (props: Props) => {
   };
 
   const onRefreshClicked = () => {
-    cardHeaderPopupState.close();
+    closeMenu();
     props.onRefreshClick();
   };
 
@@ -110,11 +107,16 @@ export const FeatureMenuActions = (props: Props) => {
       <IconButton onClick={onCloseClicked}>
         <CloseIcon />
       </IconButton>
-      <IconButton {...bindTrigger(cardHeaderPopupState)}>
+      <IconButton aria-controls={menuAnchor ? 'cardHeaderMenu' : undefined}
+        aria-haspopup="true"
+        onClick={(e) => setMenuAnchor(e.currentTarget)}>
         <MoreVertIcon />
       </IconButton>
       <Menu
-        {...bindMenu(cardHeaderPopupState)}
+        id="cardHeaderMenu"
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={closeMenu}
         sx={{
           '& svg': {
             mr: 1,

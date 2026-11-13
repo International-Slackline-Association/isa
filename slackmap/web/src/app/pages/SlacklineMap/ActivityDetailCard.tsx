@@ -1,24 +1,22 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import CloseIcon from '@mui/icons-material/Close';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
-import { Avatar, Button, Divider, Menu, MenuItem, Typography } from '@mui/material';
+import { Avatar, Button, Divider, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
-import { Stack } from '@mui/system';
 
 import { activityApi } from 'app/api/activity-api';
 import { ActivityHistoryField } from 'app/components/FeatureDetailFields/ActivityHistoryField';
 import { FeatureDetailFieldLayout } from 'app/components/FeatureDetailFields/DetailFieldLayout';
 import { LoadingIndicator } from 'app/components/LoadingIndicator';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { trimString } from 'utils';
 
 interface Props {
@@ -30,10 +28,8 @@ export const ActivityDetailCard = (props: Props) => {
   const [contributorsDisplayLength, setContributorsDisplayLength] = useState(5);
 
   const navigate = useNavigate();
-  const cardHeaderPopupState = usePopupState({
-    variant: 'popover',
-    popupId: 'cardHeaderMenu',
-  });
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const closeMenu = () => setMenuAnchor(null);
   const dispatch = useDispatch();
 
   const { data: contributors, isFetching, refetch } = activityApi.useGetGlobalContributorsQuery();
@@ -43,7 +39,7 @@ export const ActivityDetailCard = (props: Props) => {
   };
 
   const onRefreshClicked = () => {
-    cardHeaderPopupState.close();
+    closeMenu();
     refetch();
     dispatch(activityApi.util.invalidateTags(['activityContributors', 'activityChangelogs']));
   };
@@ -84,12 +80,17 @@ export const ActivityDetailCard = (props: Props) => {
                   <CloseIcon />
                 </IconButton>
 
-                <IconButton {...bindTrigger(cardHeaderPopupState)}>
+                <IconButton aria-controls={menuAnchor ? 'cardHeaderMenu' : undefined}
+                  aria-haspopup="true"
+                  onClick={(e) => setMenuAnchor(e.currentTarget)}>
                   <MoreVertIcon />
                 </IconButton>
 
                 <Menu
-                  {...bindMenu(cardHeaderPopupState)}
+                  id="cardHeaderMenu"
+                  anchorEl={menuAnchor}
+                  open={Boolean(menuAnchor)}
+                  onClose={closeMenu}
                   sx={{
                     '& svg': {
                       mr: 1,
@@ -105,9 +106,7 @@ export const ActivityDetailCard = (props: Props) => {
               </>
             }
             title={'Global Activity'}
-            titleTypographyProps={{
-              variant: 'h6',
-            }}
+            slotProps={{ title: { variant: 'h6' } }}
           />
           <Divider />
           <CardContent component={Stack} spacing={2}>
@@ -137,7 +136,7 @@ export const ActivityDetailCard = (props: Props) => {
                     }
                     title={c.user.fullName}
                     subheader={
-                      <Stack direction="row" spacing={0.5} alignItems={'center'}>
+                      <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
                         {c.user.countryCode && (
                           <>
                             <Avatar

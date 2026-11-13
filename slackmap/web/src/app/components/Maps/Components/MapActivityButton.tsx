@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import { Badge, ToggleButton } from '@mui/material';

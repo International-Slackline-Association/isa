@@ -71,7 +71,7 @@ export const parseMapFeature = <T extends MapFeatureEntityType>(feature: MapboxG
 };
 
 export const centerMapToFeature = (
-  mapRef: RefObject<MapRef>,
+  mapRef: RefObject<MapRef | null>,
   feature: MapboxGeoJSONFeature | FeatureCollection,
   opts: { padding?: Partial<PaddingOptions> } = {},
 ) => {
@@ -81,7 +81,7 @@ export const centerMapToFeature = (
 
 type BBox = [number, number, number, number];
 export const fitMapToGeoJson = (
-  mapRef: RefObject<MapRef>,
+  mapRef: RefObject<MapRef | null>,
   geoJson: FeatureCollection,
   opts: {
     animation?: {
@@ -131,7 +131,7 @@ export const fitMapToGeoJson = (
 };
 
 export const flyMapTo = (
-  mapRef: RefObject<MapRef>,
+  mapRef: RefObject<MapRef | null>,
   position: Position,
   opts: { zoom?: number; padding?: Partial<PaddingOptions> } = {},
 ) => {
@@ -153,7 +153,7 @@ export const flyMapTo = (
 };
 
 export const padMapTo = (
-  mapRef: RefObject<MapRef>,
+  mapRef: RefObject<MapRef | null>,
   padding: Partial<PaddingOptions>,
   opts: {
     animate?: boolean;
@@ -175,7 +175,7 @@ export const padMapTo = (
 };
 
 export const zoomToUserLocation = async (
-  mapRef: RefObject<MapRef>,
+  mapRef: RefObject<MapRef | null>,
   opts: { zoom?: number } = {},
 ) => {
   const response = await fetch('https://ipapi.co/json/')

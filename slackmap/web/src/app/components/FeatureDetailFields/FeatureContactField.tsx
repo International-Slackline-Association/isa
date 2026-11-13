@@ -78,11 +78,11 @@ export const FeatureContactField = (props: Props) => {
   return (
     <FeatureDetailFieldLayout icon={<CallIcon fontSize="small" />} header={'Contact'}>
       {props.content && props.content.length > 0 ? (
-        <Typography variant="body2" color={(t) => t.palette.text.secondary}>
+        <Typography variant="body2" sx={{ color: (t) => t.palette.text.secondary }}>
           {props.content}
         </Typography>
       ) : (
-        <Typography variant="body2" color={(t) => t.palette.text.secondary}>
+        <Typography variant="body2" sx={{ color: (t) => t.palette.text.secondary }}>
           User has not provided any contact information!
         </Typography>
       )}

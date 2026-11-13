@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
-import { Box, Stack } from '@mui/system';
+import { Box, Stack } from '@mui/material';
 
 import { spotApi } from 'app/api/spot-api';
 import { DrawableMap } from 'app/components/Maps/SlacklineMap/DrawableMap';

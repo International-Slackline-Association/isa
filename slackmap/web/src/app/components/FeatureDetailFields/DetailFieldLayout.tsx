@@ -26,7 +26,7 @@ export const FeatureDetailFieldLayout = styled((props: Props) => {
           props.header
         )}
         {typeof props.subHeader === 'string' ? (
-          <Typography variant="body2" fontSize={'0.66rem'}>
+          <Typography variant="body2" sx={{ fontSize: '0.66rem' }}>
             {props.subHeader}
           </Typography>
         ) : (

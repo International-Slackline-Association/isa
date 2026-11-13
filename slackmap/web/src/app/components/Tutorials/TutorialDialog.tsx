@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Carousel from 'react-material-ui-carousel';
+import { Carousel } from 'app/components/Carousel';
 
 import { Button, Dialog, DialogActions, Slide, SlideProps } from '@mui/material';
 
@@ -10,7 +10,7 @@ function SlideTransition(props: SlideProps) {
 }
 
 interface Props {
-  pages: JSX.Element[];
+  pages: React.JSX.Element[];
   onClose: () => void;
   closeText?: string;
 }
@@ -25,22 +25,19 @@ export const TutorialDialog = (props: Props) => {
   };
 
   return (
-    <Dialog open={isOpen} onClose={close} TransitionComponent={SlideTransition} sx={{}}>
+    <Dialog open={isOpen} onClose={close} slots={{ transition: SlideTransition }}>
       <Carousel
-        autoPlay={false}
-        animation={'slide'}
-        navButtonsAlwaysVisible
-        indicators={true}
+        indicators
         cycleNavigation={false}
         swipe={false}
         index={carouselIndex}
-        onChange={(index) => setCarouselIndex(index as number)}
+        onChange={setCarouselIndex}
         sx={{
           width: { xs: '80vw', lg: '25vw' },
           position: 'relative',
         }}
       >
-        {...props.pages}
+        {props.pages}
       </Carousel>
       <DialogActions sx={{ justifyContent: 'space-between' }}>
         <Button onClick={close}>Skip Tutorial</Button>

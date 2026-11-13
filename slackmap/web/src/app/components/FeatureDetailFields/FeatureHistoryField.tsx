@@ -5,15 +5,14 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import HistoryIcon from '@mui/icons-material/History';
-import LoadingButton from '@mui/lab/LoadingButton';
+import Button from '@mui/material/Button';
 import Timeline from '@mui/lab/Timeline';
 import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
 import TimelineItem from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
-import { Box, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Box, Stack, Typography } from '@mui/material';
 
 import { MapFeatureChangelogAction } from '@server/core/types';
 import { featureApi } from 'app/api/feature-api';
@@ -82,7 +81,7 @@ export const FeatureHistoryField = (props: Props) => {
                   <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent sx={{}}>
-                  <Stack direction="row" spacing={1} alignItems={'center'}>
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                     <Typography
                       variant="body2"
                       sx={{
@@ -103,13 +102,13 @@ export const FeatureHistoryField = (props: Props) => {
             ))}
 
             {changelogs.pagination.cursor ? (
-              <LoadingButton
+              <Button
                 loading={isFetching}
                 onClick={() => setCursor(changelogs.pagination.cursor)}
                 variant="text"
               >
                 Load more
-              </LoadingButton>
+              </Button>
             ) : (
               new Date(props.createdDateTime) < new Date('2023-05-06') && (
                 <EnabledHistoryTimelineItem />

@@ -1,5 +1,5 @@
-import { useNavigate } from 'react-router-dom';
-import { NavLink } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { NavLink } from 'react-router';
 
 import CloseIcon from '@mui/icons-material/Close';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
@@ -7,13 +7,12 @@ import EmailIcon from '@mui/icons-material/Email';
 import GroupIcon from '@mui/icons-material/Group';
 import InfoIcon from '@mui/icons-material/Info';
 import LinkIcon from '@mui/icons-material/Link';
-import { Divider, Link, Typography } from '@mui/material';
+import { Divider, Link, Stack, Typography } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
-import { Stack } from '@mui/system';
 
 import { communityApi } from 'app/api/community-api';
 import { FeatureDetailFieldLayout } from 'app/components/FeatureDetailFields/DetailFieldLayout';
@@ -99,9 +98,7 @@ export const CommunityCountryDetailCard = (props: Props) => {
               </>
             }
             title={countryDetails.name ?? 'Unknown'}
-            titleTypographyProps={{
-              variant: 'h6',
-            }}
+            slotProps={{ title: { variant: 'h6' } }}
           />
           <Divider />
           <CardContent component={Stack} spacing={2}>
@@ -122,7 +119,7 @@ export const CommunityCountryDetailCard = (props: Props) => {
             >
               {countryDetails.isaMembers.length > 0 ? (
                 countryDetails.isaMembers.map((member, index) => (
-                  <Stack key={index} direction={'row'} spacing={1} alignItems="center">
+                  <Stack key={index} direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
                     <Avatar
                       src={member.profilePictureUrl}
                       sx={{
@@ -131,7 +128,7 @@ export const CommunityCountryDetailCard = (props: Props) => {
                     >
                       {member.name[0]}
                     </Avatar>
-                    <Stack alignItems="flex-start" justifyContent="center">
+                    <Stack sx={{ alignItems: 'flex-start', justifyContent: "center" }}>
                       <Typography variant="body2">{member.name} </Typography>
                       <Stack direction={'row'} spacing={1}>
                         <MemberSubLink

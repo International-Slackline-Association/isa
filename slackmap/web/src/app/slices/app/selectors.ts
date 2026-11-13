@@ -1,10 +1,9 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from 'store/types';
+import type { RootState } from 'store';
 
-import { initialState } from '.';
 import { AuthState } from './types';
 
-const selectSlice = (state?: RootState) => state?.app ?? initialState;
+const selectSlice = (state: RootState) => state.app;
 
 export const selectUserInfo = createSelector([selectSlice], (state) => state.userInfo);
 

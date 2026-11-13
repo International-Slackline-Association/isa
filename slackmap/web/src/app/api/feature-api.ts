@@ -6,13 +6,12 @@ import {
 } from '@server/functions/api/endpoints/feature/api';
 import { DeleteFeatureRequestPostBody } from '@server/functions/api/endpoints/feature/schema';
 import { baseApi } from 'store/rtk-query';
-import { AsyncReturnType } from 'type-fest';
 import { showSuccessNotification } from 'utils';
 
-type GetFeatureChangelogsResponse = AsyncReturnType<typeof getFeatureChangelogs>;
-type RequestTemporaryEditorshipResponse = AsyncReturnType<typeof requestTemporaryEditorship>;
-type DeleteFeatureAPIResponse = AsyncReturnType<typeof deleteFeature>;
-type DeleteFeatureRequestAPIResponse = AsyncReturnType<typeof deleteFeatureRequest>;
+type GetFeatureChangelogsResponse = Awaited<ReturnType<typeof getFeatureChangelogs>>;
+type RequestTemporaryEditorshipResponse = Awaited<ReturnType<typeof requestTemporaryEditorship>>;
+type DeleteFeatureAPIResponse = Awaited<ReturnType<typeof deleteFeature>>;
+type DeleteFeatureRequestAPIResponse = Awaited<ReturnType<typeof deleteFeatureRequest>>;
 
 export const featureApi = baseApi
   .enhanceEndpoints({

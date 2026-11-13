@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect } from 'react';
-import { NavLink, Link as RouterLink, useLocation } from 'react-router-dom';
+import { NavLink, Link as RouterLink, useLocation } from 'react-router';
 
 import PeopleIcon from '@mui/icons-material/People';
 import PublicIcon from '@mui/icons-material/Public';
@@ -41,7 +41,7 @@ export const DrawerPanel = () => {
         padding: 2,
       }}
     >
-      <Stack spacing={2} alignItems={'strech'}>
+      <Stack spacing={2} sx={{ alignItems: 'strech' }}>
         <Link component={RouterLink} to="/">
           <img
             style={{ maxWidth: '100%', maxHeight: '100%' }}
@@ -70,22 +70,6 @@ export const DrawerPanel = () => {
   );
 };
 
-// const SectionHeaderText = (props: { title: string }) => {
-//   return (
-//     <ListSubheader
-//       component={'div'}
-//       disableGutters
-//       disableSticky
-//       sx={{
-//         bgcolor: 'transparent',
-//         color: (t) => t.palette.primary.contrastText,
-//       }}
-//     >
-//       {props.title}
-//     </ListSubheader>
-//   );
-// };
-
 const NavigationItem = (props: {
   to: string;
   children: ReactNode;
@@ -98,6 +82,7 @@ const NavigationItem = (props: {
         color="inherit"
         to={props.to}
         component={NavLink}
+        nativeButton={false}
         size="small"
         disabled={props.disabled}
         sx={{

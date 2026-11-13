@@ -8,7 +8,7 @@ import { getSourceIdForType } from '../sources/utils';
 import { MapFeatureEntity } from '../types';
 
 export const useSelectedFeature = (
-  mapRef: RefObject<MapRef>,
+  mapRef: RefObject<MapRef | null>,
   opts: {
     centerOnMap?: ((feature: MapFeatureEntity) => boolean) | boolean;
     paddingRight?: number;

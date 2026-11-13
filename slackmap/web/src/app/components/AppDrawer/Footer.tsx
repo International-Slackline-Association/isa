@@ -10,8 +10,8 @@ export const Footer = () => {
   const { InfoDialog, showInfoDialog } = useInfoDialog();
 
   return (
-    <Grid container spacing={1} sx={{}}>
-      <Grid item xs={12}>
+    <Grid container spacing={1}>
+      <Grid size={12}>
         <Link
           sx={{
             display: 'flex',
@@ -24,7 +24,7 @@ export const Footer = () => {
           <img alt="ISA Logo" src="/images/isa-logo-wide-contrast.svg" width="100%" />
         </Link>
       </Grid>
-      <Grid item xs={6}>
+      <Grid size={6}>
         <IconButton
           sx={{ borderRadius: 0, padding: 0 }}
           size="small"
@@ -38,7 +38,7 @@ export const Footer = () => {
           </Typography>
         </IconButton>
       </Grid>
-      <Grid item xs={6}>
+      <Grid size={6}>
         <IconButton
           sx={{ borderRadius: 0, padding: 0 }}
           size="small"
@@ -53,7 +53,7 @@ export const Footer = () => {
           </Typography>
         </IconButton>
       </Grid>
-      <Grid item xs={6}>
+      <Grid size={6}>
         <InfoDialog />
         <IconButton
           sx={{ borderRadius: 0, padding: 0 }}
@@ -71,8 +71,8 @@ export const Footer = () => {
           </Typography>
         </IconButton>
       </Grid>
-      <Grid item xs={12}>
-        <Typography fontSize={'0.5rem'}>
+      <Grid size={12}>
+        <Typography sx={{ fontSize: '0.5rem' }}>
           Copyright © 2022 International Slackline Association. All rights reserved.
         </Typography>
       </Grid>

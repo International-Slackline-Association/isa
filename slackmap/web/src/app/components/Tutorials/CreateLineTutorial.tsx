@@ -1,5 +1,4 @@
-import { Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Stack, Typography } from '@mui/material';
 
 import { useAppLocalStorage } from 'utils/hooks/useAppLocalStorage';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
@@ -24,7 +23,7 @@ const Page = (props: { img: string; title: string; children: React.ReactNode }) 
         alt={''}
       />
       <Stack spacing={2} sx={{ px: 4, alignItems: 'center', textAlign: 'center' }}>
-        <Typography variant="h6" fontWeight={'bold'}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
           {props.title}
         </Typography>
         {props.children}
@@ -40,7 +39,7 @@ export const CreateLineTutorial = () => {
 
   if (isDesktop || isSeen.value) return null;
 
-  const pages: JSX.Element[] = [
+  const pages: React.JSX.Element[] = [
     <Page
       key={'create-line-tutorial-0'}
       img={'/images/tutorials/create-line-controls.png'}

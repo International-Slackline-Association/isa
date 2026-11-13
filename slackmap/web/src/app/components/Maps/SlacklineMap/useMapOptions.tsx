@@ -32,7 +32,7 @@ export type SelectedSlacklineType = SlacklineType | 'none';
 const features: {
   key: SelectedDisplayFeature;
   label: string;
-  icon: JSX.Element;
+  icon: React.JSX.Element;
 }[] = [
   {
     key: 'all',
@@ -104,9 +104,9 @@ export const useMapOptions = () => {
 
   const Item = (props: { text: string; children: ReactNode }) => {
     return (
-      <Stack direction={'row'} spacing={4} alignItems={'center'}>
+      <Stack direction={'row'} spacing={4} sx={{ alignItems: 'center' }}>
         <Typography variant={'body2'}>{props.text} </Typography>
-        <Stack direction={'row'} spacing={2} alignItems="center">
+        <Stack direction={'row'} spacing={2} sx={{ alignItems: 'center' }}>
           {props.children}
         </Stack>
       </Stack>
@@ -120,11 +120,7 @@ export const useMapOptions = () => {
     onClick: () => void;
   }) => {
     return (
-      <Stack
-        alignItems={'center'}
-        spacing={1}
-        sx={{
-          p: 1,
+      <Stack spacing={1} sx={{ alignItems: 'center', p: 1,
           borderRadius: '0.5rem',
           border: (theme) =>
             props.checked ? `2px solid ${theme.palette.primary.main}` : undefined,
@@ -137,9 +133,7 @@ export const useMapOptions = () => {
             '& svg': {
               color: (theme) => theme.palette.primary.main,
             },
-          },
-        }}
-      >
+          } }}>
         <IconButton
           size="small"
           onClick={props.onClick}

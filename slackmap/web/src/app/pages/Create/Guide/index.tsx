@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router';
 
-import { Box, Stack } from '@mui/system';
+import { Box, Stack } from '@mui/material';
 
 import { guideApi } from 'app/api/guide-api';
 import { DrawableMap } from 'app/components/Maps/SlacklineMap/DrawableMap';

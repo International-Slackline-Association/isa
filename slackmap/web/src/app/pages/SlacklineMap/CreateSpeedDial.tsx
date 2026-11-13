@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import AddIcon from '@mui/icons-material/Add';
 import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
@@ -75,7 +75,7 @@ export function CreateFeatureSpeedDial() {
       >
         <SpeedDialAction
           icon={<SlacklineFeatureIcon />}
-          tooltipTitle={'Add a new line'}
+          slotProps={{ tooltip: { title: 'Add a new line' } }}
           onClick={onAddLineClick}
           sx={{
             color: (t) => t.palette.primary.main,
@@ -83,7 +83,7 @@ export function CreateFeatureSpeedDial() {
         />
         <SpeedDialAction
           icon={<PentagonIcon />}
-          tooltipTitle={'Add a new spot'}
+          slotProps={{ tooltip: { title: 'Add a new spot' } }}
           onClick={onAddSpotClick}
           sx={{
             color: (t) => t.palette.primary.main,
@@ -91,7 +91,7 @@ export function CreateFeatureSpeedDial() {
         />
         <SpeedDialAction
           icon={<FollowTheSignsIcon />}
-          tooltipTitle={'Add a new access guide'}
+          slotProps={{ tooltip: { title: 'Add a new access guide' } }}
           onClick={onAddGuideClick}
           sx={{
             color: (t) => t.palette.primary.main,

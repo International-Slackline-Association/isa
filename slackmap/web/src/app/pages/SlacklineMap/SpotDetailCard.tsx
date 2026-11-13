@@ -9,7 +9,7 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
 import IconButton from '@mui/material/IconButton';
-import { Stack } from '@mui/system';
+import { Stack } from '@mui/material';
 
 import { centerOfMass } from '@turf/turf';
 import { featureApi } from 'app/api/feature-api';

@@ -22,7 +22,7 @@ export const CommunityMapLegend = () => {
   const Item = useCallback(
     (props: { color: string; label: string }) => {
       return (
-        <Stack spacing={0.5} direction={'row'} alignItems={'center'}>
+        <Stack spacing={0.5} direction={'row'} sx={{ alignItems: 'center' }}>
           <Box
             sx={{
               width: isDesktop ? '10px' : '5px',
@@ -31,7 +31,7 @@ export const CommunityMapLegend = () => {
               borderRadius: '50%',
             }}
           />
-          <Typography variant={'body2'} fontSize={isDesktop ? '0.7rem' : '0.6rem'}>
+          <Typography variant={'body2'} sx={{ fontSize: isDesktop ? '0.7rem' : '0.6rem' }}>
             {props.label}
           </Typography>
         </Stack>
@@ -62,7 +62,7 @@ export const CommunityMapLegend = () => {
         color: (t) => t.palette.primary.contrastText,
       }}
     >
-      <Stack spacing={1} direction={'row'} alignItems={'center'}>
+      <Stack spacing={1} direction={'row'} sx={{ alignItems: 'center' }}>
         <Item
           color={appColors.slacklineGroupColor}
           label={`${statsInfo.slacklineGroupsCount} slackline groups`}

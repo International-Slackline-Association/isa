@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { useWindowSize } from 'react-use';
 
 import MenuIcon from '@mui/icons-material/Menu';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
+
+import { useWindowHeight } from 'utils/hooks/useWindowHeight';
 
 import { DrawerPanel } from './DrawerPanel';
 
@@ -17,7 +18,7 @@ interface Props {
 export const AppDrawer = (props: Props) => {
   const { children } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const size = useWindowSize();
+  const windowHeight = useWindowHeight();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -79,7 +80,7 @@ export const AppDrawer = (props: Props) => {
         sx={{
           flexGrow: 1,
           //   width: { lg: `calc(100% - ${drawerWidth}px)` },
-          height: size.height,
+          height: windowHeight,
         }}
       >
         {children}

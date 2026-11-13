@@ -1,11 +1,9 @@
-import { PayloadAction } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { accountApi } from 'app/api/account-api';
-import { useInjectReducer } from 'store/injectors';
-import { createSlice } from 'utils/redux/toolkit';
 
 import { AppState, AuthState, SnackbarNotification } from './types';
 
-export const initialState: AppState = {
+const initialState: AppState = {
   authState: AuthState.Loading,
   snackbarNotification: null,
 };
@@ -64,7 +62,4 @@ const appSlice = createSlice({
 
 export const { actions: appActions } = appSlice;
 
-export const useAppSlice = () => {
-  useInjectReducer({ key: appSlice.name, reducer: appSlice.reducer });
-  return { appActions: appSlice.actions };
-};
+export default appSlice.reducer;

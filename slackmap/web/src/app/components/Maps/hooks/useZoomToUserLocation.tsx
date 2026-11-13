@@ -5,7 +5,7 @@ import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 
 import { zoomToUserLocation } from '../mapUtils';
 
-type MapRefType = RefObject<MapRef>;
+type MapRefType = RefObject<MapRef | null>;
 
 export const useZoomToUserLocationOnMapLoad = (
   mapRef: MapRefType,

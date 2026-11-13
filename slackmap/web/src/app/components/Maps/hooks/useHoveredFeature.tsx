@@ -11,7 +11,7 @@ export interface HoveredFeatureEntity extends MapFeatureEntity {
   size?: 'small' | 'large';
 }
 
-export const useHoveredFeature = (mapRef: RefObject<MapRef>) => {
+export const useHoveredFeature = (mapRef: RefObject<MapRef | null>) => {
   const [hoveredFeature, setHoveredFeature] = useState<HoveredFeatureEntity>();
   const [lastHoveredFeature, setLastHoveredFeature] = useState<HoveredFeatureEntity>();
 

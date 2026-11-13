@@ -1,48 +1,40 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import {
+  Middleware,
+  MiddlewareAPI,
+  configureStore,
+  isRejectedWithValue,
+} from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
-import { baseApi, isaAccountApi, rtkQueryErrorLogger } from './rtk-query';
-import { InjectedReducersType, StaticReducersType } from './types';
+import appReducer from 'app/slices/app';
+import { showErrorNotification } from 'utils';
 
-const staticReducers: StaticReducersType = {
-  api: baseApi.reducer,
-  isaAccountApi: isaAccountApi.reducer,
-};
+import { baseApi, isaAccountApi } from './rtk-query';
 
-export function configureAppStore() {
-  const middlewares = [baseApi.middleware, isaAccountApi.middleware, rtkQueryErrorLogger];
-
-  const store = configureStore({
-    reducer: createReducer(staticReducers),
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(middlewares),
-    devTools: import.meta.env.DEV,
-  });
-
-  store.injectedReducers = {};
-  store.injectReducer = (key, reducer) => {
-    // Check `store.injectedReducers[key] === reducer` for hot reloading when a key is the same but a reducer is different
-    if (Reflect.has(store.injectedReducers, key) && store.injectedReducers[key] === reducer) {
-      return;
+const rtkQueryErrorLogger: Middleware = (api: MiddlewareAPI) => (next) => (action) => {
+  if (isRejectedWithValue(action)) {
+    let e = (action?.payload as any)?.data?.message || action?.error?.message;
+    if (e && e === 'Rejected') {
+      e = 'Unknown';
     }
-
-    store.injectedReducers[key] = reducer;
-    store.replaceReducer(createReducer(staticReducers, store.injectedReducers));
-  };
-  setupListeners(store.dispatch);
-
-  return store;
-}
-const createReducer = (
-  staticReducers: StaticReducersType,
-  injectedReducers: InjectedReducersType = {},
-) => {
-  // Initially we don't have any injectedReducers, so returning identity function to avoid the error
-  if (Object.keys(injectedReducers).length === 0 && Object.keys(staticReducers).length === 0) {
-    return (state: any) => state;
-  } else {
-    return combineReducers({
-      ...staticReducers,
-      ...injectedReducers,
-    });
+    const message = `Error: ${e}`;
+    api.dispatch(showErrorNotification(message));
   }
+
+  return next(action);
 };
+
+export const store = configureStore({
+  reducer: {
+    api: baseApi.reducer,
+    isaAccountApi: isaAccountApi.reducer,
+    app: appReducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat([baseApi.middleware, isaAccountApi.middleware, rtkQueryErrorLogger]),
+  devTools: import.meta.env.DEV,
+});
+
+setupListeners(store.dispatch);
+
+export type RootState = ReturnType<typeof store.getState>;

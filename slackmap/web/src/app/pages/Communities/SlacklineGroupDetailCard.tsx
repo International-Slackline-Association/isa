@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import CallIcon from '@mui/icons-material/Call';
 import CloseIcon from '@mui/icons-material/Close';
@@ -8,13 +8,12 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 import LinkIcon from '@mui/icons-material/Link';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import { Button, Divider, Link } from '@mui/material';
+import { Button, Divider, Link, Stack } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
-import { Stack } from '@mui/system';
 
 import { communityApi } from 'app/api/community-api';
 import { slacklineGroupEditGoogleFormUrl } from 'app/api/constants';
@@ -45,7 +44,7 @@ export const SlacklineGroupDetailCard = (props: Props) => {
       return null;
     }
     return (
-      <Stack direction={'row'} spacing={1} alignItems="center">
+      <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
         <props.icon color="primary" />
         <Link href={props.url} target="_blank" rel="noopener">
           {props.text}
@@ -88,9 +87,7 @@ export const SlacklineGroupDetailCard = (props: Props) => {
               </>
             }
             title={groupInfo.name ?? 'Unknown'}
-            titleTypographyProps={{
-              variant: 'h6',
-            }}
+            slotProps={{ title: { variant: 'h6' } }}
             subheader={`Last updated: ${format(
               new Date(groupInfo.updatedDateTime || groupInfo.createdDateTime),
               'dd MMM yyy',

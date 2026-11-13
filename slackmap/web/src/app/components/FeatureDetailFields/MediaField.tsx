@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Carousel from 'react-material-ui-carousel';
+import { Carousel } from 'app/components/Carousel';
 
 import LandscapeIcon from '@mui/icons-material/Landscape';
 import { Dialog, ImageList, ImageListItem, Paper, Typography } from '@mui/material';
@@ -40,19 +40,12 @@ export const FeatureMediaField = (props: Props) => {
             height: 'unset',
             maxHeight: 'unset',
             p: 1,
-            'div > div:nth-child(1)': {
-              pointerEvents: { xs: 'none', lg: 'auto' }, // enable pinch zoom on mobile
-            },
           },
         }}
       >
         <Carousel
-          autoPlay={false}
-          animation={'slide'}
-          navButtonsAlwaysVisible
-          indicators={false}
           index={carouselIndex}
-          onChange={(index) => setCarouselIndex(index as number)}
+          onChange={setCarouselIndex}
           sx={{
             width: '80vw',
             maxHeight: { xs: '80vh', lg: 'unset' },
@@ -88,7 +81,7 @@ export const FeatureMediaField = (props: Props) => {
         </Carousel>
       </Dialog>
       {images.length === 0 ? (
-        <Typography variant="body2" color={(t) => t.palette.text.secondary}>
+        <Typography variant="body2" sx={{ color: (t) => t.palette.text.secondary }}>
           {noDataMessage}
         </Typography>
       ) : (

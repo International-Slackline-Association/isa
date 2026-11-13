@@ -4,10 +4,9 @@ import {
   UpdateLinePostBody,
 } from '@server/functions/api/endpoints/line/schema';
 import { baseApi } from 'store/rtk-query';
-import { AsyncReturnType } from 'type-fest';
 import { showInfoNotification, showSuccessNotification } from 'utils';
 
-export type GetLineDetailsAPIResponse = AsyncReturnType<typeof getLineDetails>;
+export type GetLineDetailsAPIResponse = Awaited<ReturnType<typeof getLineDetails>>;
 
 export const lineApi = baseApi
   .enhanceEndpoints({

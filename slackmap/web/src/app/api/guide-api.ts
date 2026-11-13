@@ -4,10 +4,9 @@ import {
   UpdateGuidePostBody,
 } from '@server/functions/api/endpoints/guide/schema';
 import { baseApi } from 'store/rtk-query';
-import { AsyncReturnType } from 'type-fest';
 import { showInfoNotification, showSuccessNotification } from 'utils';
 
-export type GetGuideDetailsAPIResponse = AsyncReturnType<typeof getGuideDetails>;
+export type GetGuideDetailsAPIResponse = Awaited<ReturnType<typeof getGuideDetails>>;
 
 export const guideApi = baseApi
   .enhanceEndpoints({

@@ -53,7 +53,7 @@ interface Props {
 
 export const DrawableMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
-  const drawRef = React.useRef<MapboxDraw>();
+  const drawRef = React.useRef<MapboxDraw | undefined>(undefined);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(props.initialViewState?.zoom);
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
-import LoadingButton from '@mui/lab/LoadingButton';
+import Button from '@mui/material/Button';
 import {
   Alert,
   MenuItem,
@@ -154,7 +154,7 @@ export const SpotEditCard = (props: Props) => {
               maxPhotoCount={3}
             />
 
-            <LoadingButton
+            <Button
               color="primary"
               variant="contained"
               fullWidth
@@ -163,7 +163,7 @@ export const SpotEditCard = (props: Props) => {
               loading={props.isSubmitting}
             >
               Submit
-            </LoadingButton>
+            </Button>
           </Stack>
         </form>
       </CardContent>

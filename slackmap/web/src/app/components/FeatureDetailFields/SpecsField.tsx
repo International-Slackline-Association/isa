@@ -10,11 +10,11 @@ interface Props {
 
 export const FeatureDetailSpecsField = (props: Props) => {
   const infoText = props.isAccurate ? (
-    <Typography variant="body2" color={(t) => t.palette.success.main}>
+    <Typography variant="body2" sx={{ color: (t) => t.palette.success.main }}>
       Measured ✓
     </Typography>
   ) : (
-    <Typography variant="body2" color={(t) => t.palette.warning.main}>
+    <Typography variant="body2" sx={{ color: (t) => t.palette.warning.main }}>
       Not Measured
     </Typography>
   );
@@ -23,14 +23,14 @@ export const FeatureDetailSpecsField = (props: Props) => {
     <FeatureDetailFieldLayout
       icon={<StraightenIcon fontSize="small" />}
       header={
-        <Stack spacing={1} direction={'row'} alignItems="center">
+        <Stack spacing={1} direction={'row'} sx={{ alignItems: 'center' }}>
           <Typography variant="body2Bold">Specs</Typography>
           {infoText}
         </Stack>
       }
     >
       {props.content.map((c) => (
-        <Typography key={c.label} variant="body2" color={(t) => t.palette.text.secondary}>
+        <Typography key={c.label} variant="body2" sx={{ color: (t) => t.palette.text.secondary }}>
           {c.label}: <b>{c.value}</b>
         </Typography>
       ))}

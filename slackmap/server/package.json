@@ -16,16 +16,14 @@
     "@aws-sdk/client-ses": "3.1158.0",
     "@aws-sdk/lib-dynamodb": "3.1158.0",
     "@aws-sdk/util-dynamodb": "3.996.9",
-    "@turf/turf": "7.0.0",
+    "@turf/turf": "7.4.0",
     "aws-jwt-verify": "5.2.1",
-    "deep-diff": "1.0.2",
-    "nanoid": "5.0.7",
+    "nanoid": "6.0.2",
     "zod": "3.23.8"
   },
   "devDependencies": {
     "@types/aws-lambda": "8.10.164",
-    "@types/deep-diff": "1.0.5",
-    "@types/geojson": "7946.0.14",
+    "@types/geojson": "7946.0.16",
     "@types/node": "24.19.2",
     "esbuild": "0.28.2",
     "typescript": "5.9.3"

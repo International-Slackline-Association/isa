@@ -31,7 +31,7 @@ export function CreateCommunitySpeedDial() {
       >
         <SpeedDialAction
           icon={<GroupIcon />}
-          tooltipTitle={'Add a new slackline group'}
+          slotProps={{ tooltip: { title: 'Add a new slackline group' } }}
           onClick={onAddGroupClick}
           sx={{
             color: (t) => t.palette.primary.main,

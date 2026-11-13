@@ -73,13 +73,13 @@ export const Profile = () => {
           >
             {name.substring(0, 1)} {surname?.substring(0, 1)}
           </Avatar>
-          <Grid spacing={0} container sx={{}}>
-            <Grid item xs={12}>
+          <Grid spacing={0} container>
+            <Grid size={12}>
               <Typography variant="body1">
                 {name} {surname}
               </Typography>
             </Grid>
-            <Grid item>
+            <Grid>
               <Tooltip title={'Go to ISA Profile'}>
                 <IconButton
                   color="inherit"
@@ -87,13 +87,14 @@ export const Profile = () => {
                   target="_blank"
                   rel="noopener"
                   component={Link}
+                  nativeButton={false}
                   size="small"
                 >
                   <AccountCircleIcon />
                 </IconButton>
               </Tooltip>
             </Grid>
-            <Grid item>
+            <Grid>
               <Tooltip title={'Logout'}>
                 <IconButton color="inherit" size="small" onClick={signOutClicked}>
                   <InputIcon />

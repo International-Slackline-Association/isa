@@ -1,9 +1,11 @@
-import { FC } from 'react';
-import { FallbackProps, withErrorBoundary } from 'react-error-boundary';
+import { Component, FC, ReactNode } from 'react';
 
-import { Alert, Backdrop, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Alert, Backdrop, Stack, Typography } from '@mui/material';
 
+interface FallbackProps {
+  error: Error;
+  resetErrorBoundary: () => void;
+}
 
 function ErrorBoundyFallBack({ error, resetErrorBoundary }: FallbackProps) {
   return (
@@ -31,11 +33,37 @@ function ErrorBoundyFallBack({ error, resetErrorBoundary }: FallbackProps) {
   );
 }
 
-export function withErrorBoundry<P extends object>(Component: FC<P>) {
-  return withErrorBoundary(Component, {
-    FallbackComponent: ErrorBoundyFallBack,
-    onError(error) {
-      console.log('Error: ', error);
-    },
-  });
+class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state = { error: null as Error | null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  componentDidCatch(error: Error) {
+    console.log('Error: ', error);
+  }
+
+  render() {
+    const { error } = this.state;
+    if (error) {
+      return (
+        <ErrorBoundyFallBack
+          error={error}
+          resetErrorBoundary={() => this.setState({ error: null })}
+        />
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export function withErrorBoundry<P extends object>(WrappedComponent: FC<P>) {
+  return function WithErrorBoundary(props: P) {
+    return (
+      <ErrorBoundary>
+        <WrappedComponent {...props} />
+      </ErrorBoundary>
+    );
+  };
 }

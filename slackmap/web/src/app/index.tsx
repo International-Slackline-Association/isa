@@ -1,12 +1,12 @@
-import { useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router';
 
 import CssBaseline from '@mui/material/CssBaseline';
 import GlobalStyles from '@mui/material/GlobalStyles';
 
 import NotificationSnackbar from 'app/components/NotificationSnackbar';
-import { appActions, useAppSlice } from 'app/slices/app';
+import { appActions } from 'app/slices/app';
 import { selectAuthState, selectIsUserSignedIn } from 'app/slices/app/selectors';
 import { AuthState } from 'app/slices/app/types';
 import { getCurrentUser, signOut } from 'aws-amplify/auth';
@@ -16,18 +16,18 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { AppDrawer } from './components/AppDrawer';
 import { withErrorBoundry } from './components/ErrorBoundary';
 import { MaintenancePage } from './components/MaintenancePage';
-import { CommunitiesPage } from './pages/Communities/Loadable';
-import { CreateGuidePage } from './pages/Create/Guide/Loadable';
-import { CreateLinePage } from './pages/Create/Line/Loadable';
-import { CreateSpotPage } from './pages/Create/Spot/Loadable';
-import { GuideEditPage } from './pages/Guide/GuideEditPage/Loadable';
-import { LegacyDetailPage } from './pages/LegacyDetailPage/Loadable';
-import { LineEditPage } from './pages/Line/LineEditPage/Loadable';
-import { SlacklineMapPage } from './pages/SlacklineMap/Loadable';
-import { SpotEditPage } from './pages/Spot/SpotEditPage/Loadable';
+
+const CommunitiesPage = lazy(() => import('./pages/Communities').then((m) => ({ default: m.CommunitiesPage })));
+const CreateGuidePage = lazy(() => import('./pages/Create/Guide').then((m) => ({ default: m.CreateGuidePage })));
+const CreateLinePage = lazy(() => import('./pages/Create/Line').then((m) => ({ default: m.CreateLinePage })));
+const CreateSpotPage = lazy(() => import('./pages/Create/Spot').then((m) => ({ default: m.CreateSpotPage })));
+const GuideEditPage = lazy(() => import('./pages/Guide/GuideEditPage').then((m) => ({ default: m.GuideEditPage })));
+const LegacyDetailPage = lazy(() => import('./pages/LegacyDetailPage').then((m) => ({ default: m.LegacyDetailPage })));
+const LineEditPage = lazy(() => import('./pages/Line/LineEditPage').then((m) => ({ default: m.LineEditPage })));
+const SlacklineMapPage = lazy(() => import('./pages/SlacklineMap').then((m) => ({ default: m.SlacklineMapPage })));
+const SpotEditPage = lazy(() => import('./pages/Spot/SpotEditPage').then((m) => ({ default: m.SpotEditPage })));
 
 export function App() {
-  useAppSlice();
   const dispatch = useDispatch();
 
   const authState = useSelector(selectAuthState);
@@ -77,28 +77,30 @@ export function App() {
       ) : (
         <BrowserRouter>
           <AppDrawer>
-            <Routes>
-              <Route path="/" element={<SlacklineMapPage />} />
-              <Route path="/line/:lineId" element={<SlacklineMapPage />} />
-              <Route path="/spot/:spotId" element={<SlacklineMapPage />} />
-              <Route path="/guide/:guideId" element={<SlacklineMapPage />} />
-              <Route path="/country/:countryCode" element={<SlacklineMapPage />} />
-              <Route path="/communities" element={<CommunitiesPage />} />
-              <Route path="/communities/group/:groupId" element={<CommunitiesPage />} />
-              <Route path="/communities/country/:countryCode" element={<CommunitiesPage />} />
-              {isSignedIn && (
-                <>
-                  <Route path="/create/line" element={<CreateLinePage />} />
-                  <Route path="/line/:lineId/edit" element={<LineEditPage />} />
-                  <Route path="/create/spot" element={<CreateSpotPage />} />
-                  <Route path="/spot/:spotId/edit" element={<SpotEditPage />} />
-                  <Route path="/create/guide" element={<CreateGuidePage />} />
-                  <Route path="/guide/:guideId/edit" element={<GuideEditPage />} />
-                </>
-              )}
-              <Route path="/x/:legacyId" element={<LegacyDetailPage />} />
-              <Route path="*" element={<SlacklineMapPage />} />
-            </Routes>
+            <Suspense fallback={null}>
+              <Routes>
+                <Route path="/" element={<SlacklineMapPage />} />
+                <Route path="/line/:lineId" element={<SlacklineMapPage />} />
+                <Route path="/spot/:spotId" element={<SlacklineMapPage />} />
+                <Route path="/guide/:guideId" element={<SlacklineMapPage />} />
+                <Route path="/country/:countryCode" element={<SlacklineMapPage />} />
+                <Route path="/communities" element={<CommunitiesPage />} />
+                <Route path="/communities/group/:groupId" element={<CommunitiesPage />} />
+                <Route path="/communities/country/:countryCode" element={<CommunitiesPage />} />
+                {isSignedIn && (
+                  <>
+                    <Route path="/create/line" element={<CreateLinePage />} />
+                    <Route path="/line/:lineId/edit" element={<LineEditPage />} />
+                    <Route path="/create/spot" element={<CreateSpotPage />} />
+                    <Route path="/spot/:spotId/edit" element={<SpotEditPage />} />
+                    <Route path="/create/guide" element={<CreateGuidePage />} />
+                    <Route path="/guide/:guideId/edit" element={<GuideEditPage />} />
+                  </>
+                )}
+                <Route path="/x/:legacyId" element={<LegacyDetailPage />} />
+                <Route path="*" element={<SlacklineMapPage />} />
+              </Routes>
+            </Suspense>
           </AppDrawer>
 
           <NotificationSnackbar />

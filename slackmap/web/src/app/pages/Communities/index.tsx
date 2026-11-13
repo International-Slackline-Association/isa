@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { MapboxGeoJSONFeature } from 'react-map-gl';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
-import { Box, Stack } from '@mui/system';
+import { Box, Stack } from '@mui/material';
 
 import { getSlacklineGroupGeoJson, getSlacklineGroupsGeoJsonOfCountry } from 'app/api/geojson-data';
 import { CommunityMap } from 'app/components/Maps/CommunityMap';

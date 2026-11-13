@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { MapboxGeoJSONFeature, ViewStateChangeEvent } from 'react-map-gl';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router';
 
-import { Slide, Stack } from '@mui/material';
-import { Box } from '@mui/system';
+import { Box, Slide, Stack } from '@mui/material';
 
 import { getSlacklinePointFeaturesOfCountry } from 'app/api/geojson-data';
 import { GetGuideDetailsAPIResponse } from 'app/api/guide-api';

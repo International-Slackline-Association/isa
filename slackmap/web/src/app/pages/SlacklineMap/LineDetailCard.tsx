@@ -9,7 +9,7 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
 import IconButton from '@mui/material/IconButton';
-import { Stack } from '@mui/system';
+import { Stack } from '@mui/material';
 
 import { centerOfMass } from '@turf/turf';
 import { featureApi } from 'app/api/feature-api';
@@ -24,7 +24,6 @@ import { FeatureDetailRestrictionField } from 'app/components/FeatureDetailField
 import { FeatureDetailSpecsField } from 'app/components/FeatureDetailFields/SpecsField';
 import { LoadingIndicator } from 'app/components/LoadingIndicator';
 import { format } from 'date-fns';
-import startCase from 'lodash.startcase';
 import { appColors } from 'styles/theme/colors';
 import { imageUrlFromS3Key } from 'utils';
 
@@ -116,7 +115,7 @@ export const LineDetailCard = (props: Props) => {
               content={[
                 {
                   label: 'Slackline Type',
-                  value: startCase(lineDetails.type) || '?',
+                  value: (lineDetails.type && lineDetails.type.charAt(0).toUpperCase() + lineDetails.type.slice(1)) || '?',
                 },
                 {
                   label: 'Length',

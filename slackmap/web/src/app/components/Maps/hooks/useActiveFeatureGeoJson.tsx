@@ -8,7 +8,7 @@ import { MAP_PADDING_RIGHT_FOR_FEATURE_CARD } from '../constants';
 import { fitMapToGeoJson, padMapTo } from '../mapUtils';
 
 export const useActiveFeatureGeoJson = (
-  mapRef: RefObject<MapRef>,
+  mapRef: RefObject<MapRef | null>,
   isMapLoaded: boolean,
   activeFeatureGeoJson: FeatureCollection | undefined,
   opts: {

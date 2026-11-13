@@ -46,13 +46,7 @@ export const FeatureDetailInfoField = (props: Props) => {
   const icon = getIcon(props.infoType);
   return (
     <FeatureDetailFieldLayout icon={icon} header={props.header}>
-      <Typography
-        variant="body2"
-        color={(t) => t.palette.text.secondary}
-        sx={{
-          whiteSpace: 'pre-line',
-        }}
-      >
+      <Typography variant="body2" sx={{ color: (t) => t.palette.text.secondary, whiteSpace: 'pre-line' }}>
         {content}
       </Typography>
     </FeatureDetailFieldLayout>

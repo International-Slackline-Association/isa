@@ -2,7 +2,7 @@ import React from 'react';
 
 import HistoryIcon from '@mui/icons-material/History';
 import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
-import LoadingButton from '@mui/lab/LoadingButton';
+import Button from '@mui/material/Button';
 import Timeline from '@mui/lab/Timeline';
 import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
@@ -118,13 +118,13 @@ export const CountryHistoryField = (props: Props) => {
               </TimelineItem>
             ))}
             {changelogs.pagination.cursor ? (
-              <LoadingButton
+              <Button
                 loading={isFetching}
                 onClick={() => setCursor(changelogs.pagination.cursor)}
                 variant="text"
               >
                 Load more
-              </LoadingButton>
+              </Button>
             ) : (
               <EnabledHistoryTimelineItem />
             )}

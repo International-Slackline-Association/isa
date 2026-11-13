@@ -1,5 +1,4 @@
-import { CircularProgress, Typography, styled } from '@mui/material';
-import { Stack } from '@mui/system';
+import { CircularProgress, Typography, styled, Stack } from '@mui/material';
 
 interface Props {
   loadingText?: string;

@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
-import LoadingButton from '@mui/lab/LoadingButton';
+import Button from '@mui/material/Button';
 import {
   Alert,
   Checkbox,
@@ -279,7 +279,7 @@ export const LineEditCard = (props: Props) => {
               htmlId="line-images"
             />
 
-            <LoadingButton
+            <Button
               color="primary"
               variant="contained"
               fullWidth
@@ -288,7 +288,7 @@ export const LineEditCard = (props: Props) => {
               loading={props.isSubmitting}
             >
               Submit
-            </LoadingButton>
+            </Button>
           </Stack>
         </form>
       </CardContent>
