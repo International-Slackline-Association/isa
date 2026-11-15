@@ -17,6 +17,7 @@ export type Request = {
   body: any;
   // Set from the authorizer claims; absent on the /verify resource, which has no authorizer.
   user?: User;
+  app?: { clientId: string; scopes: string[] };
 };
 
 export type Route = (request: Request) => Promise<APIGatewayProxyResult>;
@@ -62,12 +63,19 @@ const resolvePath = (event: APIGatewayProxyEvent) => {
 
 const getUser = (event: APIGatewayProxyEvent): User | undefined => {
   const claims = event.requestContext.authorizer?.claims;
-  if (!claims) return undefined;
+  if (!claims?.['cognito:username']) return undefined;
   return {
-    isaId: claims['cognito:username'] && generateISAIdFromUsername(claims['cognito:username']),
+    isaId: generateISAIdFromUsername(claims['cognito:username']),
     email: claims.email,
     sub: claims.sub,
   };
+};
+
+// A client-credentials token has no user, only the calling client.
+const getApp = (event: APIGatewayProxyEvent): Request['app'] => {
+  const claims = event.requestContext.authorizer?.claims;
+  if (!claims?.client_id || claims['cognito:username']) return undefined;
+  return { clientId: claims.client_id, scopes: String(claims.scope ?? '').split(' ').filter(Boolean) };
 };
 
 // Only the origin: a full referer can carry a path or query with personal data.
@@ -99,6 +107,7 @@ export const createHandler = (
 
     const start = Date.now();
     const user = getUser(event);
+    const app = getApp(event);
     let routeKey: string | undefined;
 
     const respond = async (): Promise<APIGatewayProxyResult> => {
@@ -113,7 +122,7 @@ export const createHandler = (
           return json({ message: notFoundMessage(path) }, 404);
         }
         routeKey = key;
-        return await route({ method, path, headers, query, body, user });
+        return await route({ method, path, headers, query, body, user, app });
       } catch (error) {
         const message = (error as Error).message || 'Error occurred';
         const stack = (error as Error).stack;
@@ -131,6 +140,7 @@ export const createHandler = (
       status: response.statusCode,
       latencyMs: Date.now() - start,
       isaId: user?.isaId,
+      app: app?.clientId,
       origin: headers['origin'],
       referer: refererOrigin(headers['referer']),
       userAgent: headers['user-agent']?.slice(0, 256),

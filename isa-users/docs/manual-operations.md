@@ -1,7 +1,7 @@
 ---
 type: reference
 title: isa-users manual operations
-description: "What isa-users depends on that CDK does not manage: the API custom domain, the identity stack's stack policy, Cloudflare records, the hosted UI look, groups, SES, and the names other apps use."
+description: "What isa-users depends on that CDK does not manage: the API custom domain, the identity stack's stack policy, Cloudflare records, the hosted UI look, groups, SES, app client secrets, and the names other apps use."
 ---
 
 # Manual operations
@@ -18,5 +18,6 @@ Not managed by CDK.
 | SES identity `slacklineinternational.org` | SES | The sender of the pool, the Cognito trigger and the API, from aws-platform. |
 | GitHub label `errors:isa-users` | the monorepo's issues | Created once by hand; the error digest workflow finds its issues by it. |
 | SSM `isa-tools-trusted-service-api-key` | Parameter Store | isa-tools' API key, sent on its image-processing and certificate calls. |
+| Each app's client secret | the app | Cognito generates it for the app's `{app}-service` client; handed to the app by hand. |
 
-Names other apps depend on: pool `eu-central-1_iGaYGKeyJ`, its client IDs, the `auth` domain, table `isa-users-prod-users` (slackmap reads it), the `images` URLs.
+Names other apps depend on: pool `eu-central-1_iGaYGKeyJ`, its client IDs, the `auth` domain and its token endpoint, the API's `/v1` endpoints and their scopes, the `images` URLs.

@@ -48,7 +48,6 @@ export class AppStack extends Stack {
       globalIndexes: ['GSI', 'GSI2', 'GSI3'],
       localIndexes: ['LSI', 'LSI2'],
     });
-    const usersTable = dynamodb.Table.fromTableName(this, 'UsersTable', isaUsers.tableName);
     const imagesBucket = s3.Bucket.fromBucketName(this, 'ImagesBucket', imagesBucketName);
     const applicationDataBucket = s3.Bucket.fromBucketName(
       this,
@@ -64,7 +63,6 @@ export class AppStack extends Stack {
     const environment = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       SLACKMAP_TABLE_NAME: tableName,
-      USERS_TABLE_NAME: isaUsers.tableName,
       ISA_USER_POOL_ID: isaUsers.userPoolId,
       SLACKMAP_CLIENT_ID: isaUsers.slackmapClientId,
       SLACKMAP_APPLICATION_DATA_S3_BUCKET: applicationDataBucketName,
@@ -73,6 +71,13 @@ export class AppStack extends Stack {
       ISA_TOOLS_TRUSTED_SERVICE_API_KEY: ssm.StringParameter.valueForStringParameter(
         this,
         isaTools.trustedServiceApiKeyParameter,
+      ),
+      ISA_USERS_API_URL: isaUsers.apiUrl,
+      ISA_USERS_TOKEN_URL: isaUsers.tokenUrl,
+      ISA_USERS_CLIENT_ID: isaUsers.serviceClientId,
+      ISA_USERS_CLIENT_SECRET: ssm.StringParameter.valueForStringParameter(
+        this,
+        isaUsers.serviceClientSecretParameter,
       ),
       GEONAMES_API_USERNAME: ssm.StringParameter.valueForStringParameter(
         this,
@@ -123,7 +128,6 @@ export class AppStack extends Stack {
 
     for (const f of [apiFunction, streamsFunction, cronFunction]) {
       table.grantReadWriteData(f);
-      usersTable.grantReadData(f);
       imagesBucket.grantReadWrite(f);
       applicationDataBucket.grantReadWrite(f);
       f.addToRolePolicy(

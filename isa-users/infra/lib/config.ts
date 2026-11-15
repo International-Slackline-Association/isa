@@ -7,7 +7,6 @@ export const namespace = `${project}-${stage}`;
 export const domains = {
   web: 'account.slacklineinternational.org',
   api: 'account-api.slacklineinternational.org',
-  // Profile pictures; slackmap builds the same URLs from the stored S3 keys.
   images: 'images.slacklineinternational.org',
   auth: 'auth.slacklineinternational.org',
 };
@@ -45,4 +44,13 @@ export const errorDigest = {
   subject: 'repo:International-Slackline-Association@40061671/isa@1454138550:ref:refs/heads/main',
   roleName: 'isa-users-prod-error-digest',
   logGroupPrefix: 'isa-users-prod-app-',
+};
+
+// A scope's full name is `${apiScopeServer}/${scope}`.
+export const apiScopeServer = 'isa-users';
+export const apiScopes = {
+  'users.get': 'GET /v1/users',
+} as const;
+export const apps: Record<string, (keyof typeof apiScopes)[]> = {
+  slackmap: ['users.get'],
 };

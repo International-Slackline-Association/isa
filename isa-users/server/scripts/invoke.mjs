@@ -1,6 +1,7 @@
 // pnpm run build && pnpm run invoke api GET /user/details --sub <cognito sub> --username <cognito username> --email <email>
 // pnpm run invoke api GET /verify/confirm-email?token=x
-// Calls the built api handler like API Gateway would. Without --sub/--username/--email there are no authorizer claims,
+// pnpm run invoke api GET /v1/users?ids=a,b --client <app client id>   another app's client-credentials call
+// Calls the built api handler like API Gateway would. Without --sub/--username/--email/--client there are no authorizer claims,
 // as on the /verify resource. Only the api handler is invocable here; the cognito trigger takes a Cognito event.
 import { createRequire } from 'node:module';
 import { parseArgs } from 'node:util';
@@ -13,12 +14,13 @@ const { values, positionals } = parseArgs({
     sub: { type: 'string' },
     username: { type: 'string' },
     email: { type: 'string' },
+    client: { type: 'string' },
   },
 });
 const [name, method, target] = positionals;
 if (name !== 'api' || !method || !target) {
   console.error(
-    'usage: invoke api <METHOD> </path?query> [-H name:value] [-d body] [--sub s] [--username u] [--email e]',
+    'usage: invoke api <METHOD> </path?query> [-H name:value] [-d body] [--sub s] [--username u] [--email e] [--client c]',
   );
   process.exit(1);
 }
@@ -35,18 +37,25 @@ if (values.data !== undefined && !Object.keys(headers).some((h) => h.toLowerCase
 }
 const query = Object.fromEntries(url.searchParams);
 
-const claims = { sub: values.sub, 'cognito:username': values.username, email: values.email };
+const claims = values.client
+  ? { sub: values.client, client_id: values.client, token_use: 'access', scope: 'isa-users/users.get' }
+  : { sub: values.sub, 'cognito:username': values.username, email: values.email };
 const hasClaims = Object.values(claims).some((value) => value !== undefined);
 
 // API Gateway has the unauthenticated /verify/{proxy+} resource next to the authorized /{proxy+}.
-const resource = url.pathname.startsWith('/verify/') ? '/verify/{proxy+}' : '/{proxy+}';
-const proxy = url.pathname.slice(resource.length - '{proxy+}'.length);
+// The app endpoints are resources of their own, without a proxy.
+const resource = url.pathname.startsWith('/v1/')
+  ? url.pathname
+  : url.pathname.startsWith('/verify/')
+    ? '/verify/{proxy+}'
+    : '/{proxy+}';
+const proxy = resource.endsWith('{proxy+}') ? url.pathname.slice(resource.length - '{proxy+}'.length) : undefined;
 
 const event = {
   resource,
   httpMethod: method.toUpperCase(),
   path: url.pathname,
-  pathParameters: { proxy },
+  pathParameters: proxy === undefined ? null : { proxy },
   headers,
   queryStringParameters: Object.keys(query).length ? query : null,
   body: values.data ?? null,

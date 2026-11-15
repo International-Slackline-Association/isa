@@ -16,6 +16,9 @@ import { Annotations, Duration, RemovalPolicy, Size, Stack, StackProps } from 'a
 import { Construct } from 'constructs';
 
 import {
+  apiScopeServer,
+  apiScopes,
+  apps,
   certificates,
   cognitoTriggerFunctionName,
   domains,
@@ -106,6 +109,34 @@ export class AppStack extends Stack {
       }),
     );
 
+    // Not kept on removal: an app taken out of `apps` loses its client, and with it its access.
+    const scopeServer = new cognito.CfnUserPoolResourceServer(this, 'ApiScopeServer', {
+      userPoolId: userPool.id,
+      identifier: apiScopeServer,
+      name: apiScopeServer,
+      scopes: Object.entries(apiScopes).map(([scopeName, route]) => ({
+        scopeName,
+        scopeDescription: route,
+      })),
+    });
+    for (const [app, scopes] of Object.entries(apps)) {
+      const appClient = new cognito.CfnUserPoolClient(this, `AppClient-${app}`, {
+        userPoolId: userPool.id,
+        clientName: `${app}-service`,
+        generateSecret: true,
+        allowedOAuthFlowsUserPoolClient: true,
+        allowedOAuthFlows: ['client_credentials'],
+        allowedOAuthScopes: scopes.map((scope) => `${apiScopeServer}/${scope}`),
+        supportedIdentityProviders: ['COGNITO'],
+        explicitAuthFlows: ['ALLOW_REFRESH_TOKEN_AUTH'],
+        accessTokenValidity: 60,
+        tokenValidityUnits: { accessToken: 'minutes' },
+        enableTokenRevocation: true,
+      });
+      appClient.node.addDependency(scopeServer);
+    }
+
+
     const api = new apigateway.RestApi(this, 'Api', {
       restApiName: 'isa-users',
       cloudWatchRole: false,
@@ -118,11 +149,18 @@ export class AppStack extends Stack {
       },
     });
     const integration = new apigateway.LambdaIntegration(apiFunction);
-    api.root.addResource('{proxy+}').addMethod('ANY', integration, {
-      authorizer: new apigateway.CognitoUserPoolsAuthorizer(this, 'Authorizer', {
-        cognitoUserPools: [pool],
-      }),
+    const authorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'Authorizer', {
+      cognitoUserPools: [pool],
     });
+    api.root.addResource('{proxy+}').addMethod('ANY', integration, { authorizer });
+    // Only an access token carrying the endpoint's scope passes: another app's client, never a user.
+    for (const [scope, route] of Object.entries(apiScopes)) {
+      const [method, resourcePath] = route.split(' ');
+      api.root.resourceForPath(resourcePath).addMethod(method, integration, {
+        authorizer,
+        authorizationScopes: [`${apiScopeServer}/${scope}`],
+      });
+    }
     // Email verification links, and requests to resend them, come without a session.
     api.root.addResource('verify').addResource('{proxy+}').addMethod('ANY', integration);
 

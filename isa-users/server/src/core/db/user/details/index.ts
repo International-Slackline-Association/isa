@@ -53,6 +53,10 @@ export const getUsers = async (userIds: string[]) => {
       }),
     )
     .then((data) => {
+      // Under throttling DynamoDB returns part of a batch; users silently missing would read as not found.
+      if (Object.keys(data.UnprocessedKeys ?? {}).length > 0) {
+        throw new Error('Users batch read was not fully processed');
+      }
       const items = data.Responses?.[TABLE_NAME] || [];
       return items.map((i) => attrsToItem(i as DDBUserDetailAttrs));
     });

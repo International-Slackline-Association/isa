@@ -36,7 +36,11 @@ export const sesIdentityArn =
 export const isaUsers = {
   userPoolId: 'eu-central-1_iGaYGKeyJ',
   slackmapClientId: '4f7vphq9s9ava93irhh2e7pieh',
-  tableName: 'isa-users-prod-users',
+  apiUrl: 'https://account-api.slacklineinternational.org',
+  tokenUrl: 'https://auth.slacklineinternational.org/oauth2/token',
+  // slackmap's own client for the API (slackmap-service).
+  serviceClientId: '5ok76eocc9lbkp6go3f2179ej2',
+  serviceClientSecretParameter: 'slackmap-isa-users-client-secret',
 };
 
 export const isaTools = {
