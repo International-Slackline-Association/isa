@@ -18,4 +18,4 @@ Not managed by CDK.
 | SSM `isa-tools-google-credentials-json` | Parameter Store | Service account for the Google Sheets. |
 | Backup `isa-tools-prod-before-cdk-cutover` | DynamoDB backups | On-demand backup of the documents as they were before the move to CDK; the source table is deleted. |
 
-Names callers outside this repo depend on: bucket `isa-tools-temporary-uploads-prod`, the `tools-api` and `tools` domains, the API key value, the `verify` URLs in issued QR codes.
+Names callers outside this repo depend on: bucket `isa-tools-temporary-uploads-prod`, the `tools-api` and `tools` domains, the API key value, the `/v1` endpoints and their scopes, the `verify` URLs in issued QR codes.

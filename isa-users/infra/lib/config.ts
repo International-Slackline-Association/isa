@@ -51,6 +51,9 @@ export const apiScopeServer = 'isa-users';
 export const apiScopes = {
   'users.get': 'GET /v1/users',
 } as const;
-export const apps: Record<string, (keyof typeof apiScopes)[]> = {
-  slackmap: ['users.get'],
+// Which app may call which endpoint, across every ISA service: full scope names. Another service's
+// scopes are defined in its own stack, which deploys first.
+export const apps: Record<string, string[]> = {
+  slackmap: ['isa-users/users.get'],
+  sporthub: ['isa-tools/documents.sign'],
 };

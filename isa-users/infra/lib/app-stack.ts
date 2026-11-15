@@ -126,7 +126,7 @@ export class AppStack extends Stack {
         generateSecret: true,
         allowedOAuthFlowsUserPoolClient: true,
         allowedOAuthFlows: ['client_credentials'],
-        allowedOAuthScopes: scopes.map((scope) => `${apiScopeServer}/${scope}`),
+        allowedOAuthScopes: scopes,
         supportedIdentityProviders: ['COGNITO'],
         explicitAuthFlows: ['ALLOW_REFRESH_TOKEN_AUTH'],
         accessTokenValidity: 60,

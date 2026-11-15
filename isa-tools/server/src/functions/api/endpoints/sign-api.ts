@@ -1,12 +1,11 @@
 import * as dateFns from 'date-fns';
 import { createSignedDocument, getSignedDocument } from '../../../core/documentVerification';
+import { logger } from '../../../core/logger';
 import { type Request, json, validate } from '../../http';
-import { verifyTrustedServiceRequest } from '../auth';
+import { requireAppScope, verifyTrustedServiceRequest } from '../auth';
 import { signDocumentPostBodySchema } from './schema';
 
-const sign = async (request: Request) => {
-  verifyTrustedServiceRequest(request);
-
+const createSigned = async (request: Request) => {
   const body = validate(request.body, signDocumentPostBodySchema);
 
   const { token, verificationUrl, expiresAt } = await createSignedDocument({
@@ -16,7 +15,18 @@ const sign = async (request: Request) => {
     content: body.content,
   });
 
+  logger.info('Document signed', { app: request.app?.clientId, expiresAt });
   return json({ token, verificationUrl, expiresAt });
+};
+
+const sign = async (request: Request) => {
+  verifyTrustedServiceRequest(request);
+  return createSigned(request);
+};
+
+const signForApp = async (request: Request) => {
+  requireAppScope(request, 'documents.sign');
+  return createSigned(request);
 };
 
 const verifySignedDocument = async (request: Request) => {
@@ -53,5 +63,6 @@ const verifySignedDocument = async (request: Request) => {
 
 export const signRoutes = {
   'POST /sign': sign,
+  'POST /v1/sign': signForApp,
   'GET /sign/verify': verifySignedDocument,
 };

@@ -22,6 +22,16 @@ export const temporaryUploadsBucketName = 'isa-tools-temporary-uploads-prod';
 // The image processor writes resized images under public/ of these.
 export const imageBucketNames = ['isa-users-prod-images', 'slackmap-prod-images'];
 
+// isa-users' pool, which issues other apps' access tokens.
+export const userPool = {
+  id: 'eu-central-1_iGaYGKeyJ',
+  arn: 'arn:aws:cognito-idp:eu-central-1:387132903656:userpool/eu-central-1_iGaYGKeyJ',
+};
+export const apiScopeServer = 'isa-tools';
+export const apiScopes = {
+  'documents.sign': 'POST /v1/sign',
+} as const;
+
 export const trustedServiceApiKeyParameter = '/isa-tools-trusted-service-api-key';
 
 // The weekly error digest runs as a GitHub Actions workflow of the monorepo, signed in through the

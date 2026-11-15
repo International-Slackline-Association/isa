@@ -13,7 +13,7 @@ A change is running locally, or deployed and checked online.
 ## Steps
 
 1. `corepack enable` once per machine; install from the project root.
-2. Locally: `checkTs`; `dev` for the web app (it talks to the live API); the server's `build` then `invoke` to call a handler with an API Gateway event. Export `AWS_PROFILE`, `AWS_REGION` and the variables the CDK stack sets first; `invoke` runs against production, where signing with a short code and certificate generation write data. The server's `errorDigest` prints the issues it would write; the weekly workflow runs it with `--live`.
+2. Locally: `checkTs`; `dev` for the web app (it talks to the live API); the server's `build` then `invoke` to call a handler with an API Gateway event, with another app's authorizer claims or none. Export `AWS_PROFILE`, `AWS_REGION` and the variables the CDK stack sets first; `invoke` runs against production, where signing with a short code and certificate generation write data. The server's `errorDigest` prints the issues it would write; the weekly workflow runs it with `--live`.
 3. `diff`, then `deploy`, from the project root; both build the web app first. Pass a stack name to limit them.
 4. A change to the documents table or the temporary-uploads bucket is in `IsaToolsData`; check its diff for a replace before deploying.
 

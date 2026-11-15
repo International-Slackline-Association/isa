@@ -1,5 +1,6 @@
 // pnpm run build && pnpm run invoke api GET /sheets/list/riggers -H origin:http://localhost
 // pnpm run invoke api POST /sign -H x-api-key:KEY -d '{"subject":"s","expiresInSeconds":60,"content":"0123456789"}'
+// pnpm run invoke api POST /v1/sign --client ID --scope isa-tools/documents.sign -d '…'   another app's call
 import { createRequire } from 'node:module';
 import { parseArgs } from 'node:util';
 
@@ -8,6 +9,8 @@ const { values, positionals } = parseArgs({
   options: {
     header: { type: 'string', short: 'H', multiple: true, default: [] },
     data: { type: 'string', short: 'd' },
+    client: { type: 'string' },
+    scope: { type: 'string' },
   },
 });
 const [name, method, target] = positionals;
@@ -28,10 +31,18 @@ if (values.data !== undefined && !Object.keys(headers).some((h) => h.toLowerCase
 }
 const query = Object.fromEntries(url.searchParams);
 
+// The /v1 endpoints are resources of their own, without a proxy, behind the app authorizer.
+const isAppResource = url.pathname.startsWith('/v1/');
 const event = {
+  resource: isAppResource ? url.pathname : '/{proxy+}',
   httpMethod: method.toUpperCase(),
   path: url.pathname,
-  pathParameters: { proxy: url.pathname.replace(/^\/(image-processor\/)?/, '') },
+  pathParameters: isAppResource ? null : { proxy: url.pathname.replace(/^\/(image-processor\/)?/, '') },
+  requestContext: {
+    authorizer: values.client
+      ? { claims: { client_id: values.client, token_use: 'access', scope: values.scope ?? '' } }
+      : null,
+  },
   headers,
   queryStringParameters: Object.keys(query).length ? query : null,
   body: values.data ?? null,

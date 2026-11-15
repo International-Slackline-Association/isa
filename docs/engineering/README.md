@@ -16,3 +16,4 @@ Read first: [how we build](how-we-build.md), what stays the human's and what is 
 - [Code review](code-review/the-review.md): why and when finished code is read back, and [how the reviewer works](code-review/reviewing.md)
 - [Delivery](delivery/git-workflow.md): from a branch to a merge
 - [Errors](errors.md): why the projects' errors arrive weekly as issues
+- [App access](app-access.md): before an app calls another service, or a service offers endpoints to apps; [the steps](app-access-steps.md)

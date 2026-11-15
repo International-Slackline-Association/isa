@@ -11,7 +11,6 @@ Account and authentication management for the ISA. The Cognito user pool is the 
 ## Read when
 
 - Touching the user pool, its clients, or sign-up and email verification: [the user pool](user-pool.md): what may never change
-- Giving another app access to users, or adding an endpoint for apps: [how other apps reach users](app-access.md)
 - Running locally or deploying: [operating](operating.md)
 - What is set up by hand and what other apps rely on: [manual operations](manual-operations.md)
 - What is open: [notes](notes.md)
@@ -21,3 +20,4 @@ Account and authentication management for the ISA. The Cognito user pool is the 
 - [Infrastructure rules](/docs/engineering/infrastructure.md): the CDK shape and names `infra/` follows
 - [Why one monorepo](/docs/the-monorepo.md): the users and the pool are critical data
 - [Errors](/docs/engineering/errors.md): why errors arrive weekly as issues
+- [How apps reach ISA services](/docs/engineering/app-access.md): the access list in [config](/isa-users/infra/lib/config.ts) and the `/v1` endpoints are this pattern

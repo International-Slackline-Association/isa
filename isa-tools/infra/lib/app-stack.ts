@@ -1,4 +1,5 @@
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
@@ -16,6 +17,8 @@ import { Duration, RemovalPolicy, Size, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import {
+  apiScopeServer,
+  apiScopes,
   certificates,
   domains,
   imageBucketNames,
@@ -23,6 +26,7 @@ import {
   temporaryUploadsBucketName,
   trustedServiceApiKeyParameter,
   errorDigest,
+  userPool,
 } from './config';
 
 const projectRoot = path.join(__dirname, '../..');
@@ -130,6 +134,28 @@ export class AppStack extends Stack {
     api.root
       .addResource('{proxy+}')
       .addMethod('ANY', new apigateway.LambdaIntegration(apiFunction));
+    new cognito.CfnUserPoolResourceServer(this, 'ApiScopeServer', {
+      userPoolId: userPool.id,
+      identifier: apiScopeServer,
+      name: apiScopeServer,
+      scopes: Object.entries(apiScopes).map(([scopeName, route]) => ({
+        scopeName,
+        scopeDescription: route,
+      })),
+    });
+    // Only an access token carrying the endpoint's scope passes: another app's client, never a user.
+    const appAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'AppAuthorizer', {
+      cognitoUserPools: [cognito.UserPool.fromUserPoolArn(this, 'UserPool', userPool.arn)],
+    });
+    for (const [scope, route] of Object.entries(apiScopes)) {
+      const [method, resourcePath] = route.split(' ');
+      api.root
+        .resourceForPath(resourcePath)
+        .addMethod(method, new apigateway.LambdaIntegration(apiFunction), {
+          authorizer: appAuthorizer,
+          authorizationScopes: [`${apiScopeServer}/${scope}`],
+        });
+    }
     api.root
       .addResource('image-processor')
       .addResource('{proxy+}')

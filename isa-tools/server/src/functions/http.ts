@@ -9,6 +9,7 @@ export type Request = {
   headers: Record<string, string | undefined>;
   query: Record<string, string | undefined>;
   body: any;
+  app?: { clientId: string; scopes: string[] };
 };
 
 export type Route = (request: Request) => Promise<APIGatewayProxyResult>;
@@ -46,6 +47,12 @@ const parseBody = (event: APIGatewayProxyEvent) => {
   return body;
 };
 
+const getApp = (event: APIGatewayProxyEvent): Request['app'] => {
+  const claims = event.requestContext.authorizer?.claims;
+  if (!claims?.client_id || claims['cognito:username']) return undefined;
+  return { clientId: claims.client_id, scopes: String(claims.scope ?? '').split(' ').filter(Boolean) };
+};
+
 // Only the origin: a full referer can carry a path or query with personal data.
 const refererOrigin = (referer?: string) => {
   try {
@@ -67,12 +74,14 @@ export const createHandler = (
 
   return async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const method = event.httpMethod.toUpperCase();
-    const path = `/${event.pathParameters?.proxy ?? ''}`;
+    // The /v1 resources are resources of their own, without a proxy.
+    const path = event.pathParameters?.proxy !== undefined ? `/${event.pathParameters.proxy}` : event.resource;
     const query = event.queryStringParameters ?? {};
     const headers = Object.fromEntries(
       Object.entries(event.headers ?? {}).map(([name, value]) => [name.toLowerCase(), value]),
     );
     const start = Date.now();
+    const app = getApp(event);
     let routeKey: string | undefined;
 
     const respond = async (): Promise<APIGatewayProxyResult> => {
@@ -87,7 +96,7 @@ export const createHandler = (
           return json({ message: notFoundMessage(path) }, 404);
         }
         routeKey = key;
-        return await route({ method, path, headers, query, body });
+        return await route({ method, path, headers, query, body, app });
       } catch (error) {
         const message = (error as Error).message || 'Error occurred';
         const stack = (error as Error).stack;
@@ -110,6 +119,7 @@ export const createHandler = (
       method,
       status: response.statusCode,
       latencyMs: Date.now() - start,
+      app: app?.clientId,
       origin: headers['origin'],
       referer: refererOrigin(headers['referer']),
       userAgent: headers['user-agent']?.slice(0, 256),
