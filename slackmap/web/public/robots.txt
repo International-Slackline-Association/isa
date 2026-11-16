@@ -1,0 +1,4 @@
+# Automated access to SlackMap's map data is not permitted without written permission:
+# https://slackmap.com/terms
+User-agent: *
+Allow: /

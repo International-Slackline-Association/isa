@@ -22,6 +22,7 @@ import { Construct } from 'constructs';
 import {
   applicationDataBucketName,
   certificates,
+  dataAccess,
   domains,
   errorDigest,
   geonamesUsernameParameter,
@@ -30,6 +31,7 @@ import {
   isaUsers,
   namespace,
   sesIdentityArn,
+  sessionsTableName,
   slackmapAdminIsaId,
   stage,
   tableName,
@@ -37,7 +39,9 @@ import {
 } from './config';
 
 const projectRoot = path.join(__dirname, '../..');
+const sessionPublicKey = fs.readFileSync(path.join(__dirname, '../session-public-key.pem'), 'utf8');
 const serverRoot = path.join(projectRoot, 'server');
+const termsLink = '<https://slackmap.com/terms>; rel="terms-of-service"';
 const sharpVersion: string = JSON.parse(
   fs.readFileSync(path.join(serverRoot, 'package.json'), 'utf8'),
 ).devDependencies.sharp;
@@ -143,6 +147,44 @@ export class AppStack extends Stack {
       targets: [new targets.LambdaFunction(cronFunction)],
     });
 
+    // Disposable, so outside the data stack and without a stream.
+    const sessionsTable = new dynamodb.Table(this, 'SessionsTable', {
+      tableName: sessionsTableName,
+      partitionKey: { name: 'PK', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      timeToLiveAttribute: 'ddb_ttl',
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+    sessionsTable.grantReadWriteData(apiFunction);
+
+    const originSecret = ssm.StringParameter.valueForStringParameter(
+      this,
+      dataAccess.originSecretParameter,
+    );
+    const sessionPublicKeyResource = new cloudfront.PublicKey(this, 'SessionPublicKey', {
+      encodedKey: sessionPublicKey,
+    });
+    const sessionKeyGroup = new cloudfront.KeyGroup(this, 'SessionKeyGroup', {
+      items: [sessionPublicKeyResource],
+    });
+    const apiEnvironment = {
+      SLACKMAP_SESSIONS_TABLE_NAME: sessionsTableName,
+      DATA_ACCESS_ENFORCED: String(dataAccess.enforced),
+      WEB_ORIGINS: dataAccess.webOrigins.join(','),
+      ORIGIN_SECRET: originSecret,
+      TURNSTILE_SECRET: ssm.StringParameter.valueForStringParameter(
+        this,
+        dataAccess.turnstileSecretParameter,
+      ),
+      SESSION_SIGNING_KEY: ssm.StringParameter.valueForStringParameter(
+        this,
+        dataAccess.signingKeyParameter,
+      ),
+      SESSION_PUBLIC_KEY: sessionPublicKey,
+      SESSION_KEY_PAIR_ID: sessionPublicKeyResource.publicKeyId,
+    };
+    for (const [name, value] of Object.entries(apiEnvironment)) apiFunction.addEnvironment(name, value);
+
     for (const f of [apiFunction, streamsFunction, cronFunction]) {
       table.grantReadWriteData(f);
       imagesBucket.grantReadWrite(f);
@@ -159,7 +201,8 @@ export class AppStack extends Stack {
       minCompressionSize: Size.bytes(1024),
       deployOptions: { stageName: stage },
       defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowOrigins: dataAccess.webOrigins,
+        allowCredentials: true,
         allowHeaders: [...apigateway.Cors.DEFAULT_HEADERS, 'X-Amz-User-Agent'],
       },
     });
@@ -177,7 +220,7 @@ export class AppStack extends Stack {
       lifecycleRules: [{ expiration: Duration.days(1) }],
       cors: [
         {
-          allowedOrigins: [...domains.web.map((domain) => `https://${domain}`), 'http://localhost:5173'],
+          allowedOrigins: [...dataAccess.webOrigins, 'http://localhost:5173'],
           // GET and DELETE: Amplify resumes and aborts multipart uploads of larger files.
           allowedMethods: [
             s3.HttpMethods.PUT,
@@ -242,7 +285,10 @@ export class AppStack extends Stack {
     });
     // /line/x reaches the API as /page/line/x.
     const pageBehavior: cloudfront.BehaviorOptions = {
-      origin: new origins.RestApiOrigin(api, { originPath: `/${stage}/page` }),
+      origin: new origins.RestApiOrigin(api, {
+        originPath: `/${stage}/page`,
+        customHeaders: { 'x-origin-secret': originSecret },
+      }),
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       cachePolicy: new cloudfront.CachePolicy(this, 'PageCachePolicy', {
         minTtl: Duration.hours(1),
@@ -342,6 +388,21 @@ export class AppStack extends Stack {
     });
     publicRead('Images', imagesBucket, imagesDistribution);
 
+    // The web app sends the session cookie with its requests, so the origins are named, not '*'.
+    const dataResponseHeaders = new cloudfront.ResponseHeadersPolicy(this, 'DataResponseHeaders', {
+      corsBehavior: {
+        accessControlAllowOrigins: dataAccess.webOrigins,
+        accessControlAllowCredentials: true,
+        accessControlAllowHeaders: ['Content-Type'],
+        accessControlAllowMethods: ['GET', 'HEAD'],
+        accessControlMaxAge: Duration.minutes(10),
+        originOverride: true,
+      },
+      customHeadersBehavior: {
+        customHeaders: [{ header: 'Link', value: termsLink, override: true }],
+      },
+    });
+
     // The geojson is rewritten by the stream handler and the weekly job, so it is not cached; the web app
     // fetches it cross-origin.
     const dataDistribution = new cloudfront.Distribution(this, 'DataDistribution', {
@@ -352,10 +413,11 @@ export class AppStack extends Stack {
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
         originRequestPolicy: cloudfront.OriginRequestPolicy.CORS_S3_ORIGIN,
-        responseHeadersPolicy: cloudfront.ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS,
+        responseHeadersPolicy: dataResponseHeaders,
         compress: false,
         allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
         cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
+        trustedKeyGroups: dataAccess.enforced ? [sessionKeyGroup] : undefined,
       },
     });
     publicRead('ApplicationData', applicationDataBucket, dataDistribution);
@@ -365,7 +427,7 @@ export class AppStack extends Stack {
       domainNames: [domains.api],
       certificate: cloudfrontCertificate,
       defaultBehavior: {
-        origin: new origins.RestApiOrigin(api),
+        origin: new origins.RestApiOrigin(api, { customHeaders: { 'x-origin-secret': originSecret } }),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
         cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,

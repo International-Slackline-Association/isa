@@ -1,6 +1,7 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 
+import { SessionState, checkSession } from '../core/features/session';
 import { logger } from '../core/logger';
 import { generateISAIdFromUsername } from '../core/utils';
 import { parseExpectedError } from '../core/utils/error';
@@ -23,13 +24,28 @@ export type Request<Params extends Record<string, string> = Record<string, strin
 
 export type Route = (request: Request<any>) => Promise<APIGatewayProxyResult>;
 
-export const corsHeaders = { 'Access-Control-Allow-Origin': '*' };
-
 export const json = (data: unknown, statusCode = 200): APIGatewayProxyResult => ({
   statusCode,
-  headers: { ...corsHeaders, 'Content-Type': 'application/json; charset=utf-8' },
+  headers: { 'Content-Type': 'application/json; charset=utf-8' },
   body: JSON.stringify(data),
 });
+
+const webOrigins = (process.env.WEB_ORIGINS ?? '').split(',');
+const enforced = process.env.DATA_ACCESS_ENFORCED === 'true';
+const termsLink = '<https://slackmap.com/terms>; rel="terms-of-service"';
+
+// The web app sends its session cookie, so only its own origins are allowed, by name.
+const responseHeaders = (origin: string | undefined) => ({
+  Link: termsLink,
+  Vary: 'Origin',
+  ...(origin && webOrigins.includes(origin)
+    ? { 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true' }
+    : {}),
+});
+
+// Pages are what link previews and search engines read; the session endpoint is how a browser gets in.
+const isOpenPath = (method: string, path: string) =>
+  path.toLowerCase().startsWith('/page/') || (method === 'POST' && path.toLowerCase() === '/session');
 
 const maxBodyBytes = 3 * 1024 * 1024;
 
@@ -129,9 +145,24 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
     );
     let user: User | undefined;
     let routeKey: string | undefined;
+    // Only CloudFront knows the secret; a call straight to execute-api does not have it.
+    const viaCloudFront = headers['x-origin-secret'] === process.env.ORIGIN_SECRET;
+    let session: SessionState | undefined;
 
     const respond = async (): Promise<APIGatewayProxyResult> => {
       try {
+        if (enforced && !viaCloudFront) throw new Error('Forbidden: Use api.slackmap.com');
+        if (!isOpenPath(method, path)) {
+          session = await checkSession(headers).catch((error: Error) => {
+            if (enforced) throw error;
+            logger.error('Session check failed', { reason: error.message });
+            return undefined;
+          });
+          if (enforced && session === 'overLimit') {
+            throw new Error('TooManyRequests: Session limit reached');
+          }
+          if (enforced && session !== 'valid') throw new Error('SessionRequired: Open slackmap.com');
+        }
         const body = parseBody(event);
         user = await getUser(headers);
         const match = matchRoute(compiled, method, path);
@@ -154,6 +185,7 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
     };
 
     const response = await respond();
+    response.headers = { ...response.headers, ...responseHeaders(headers['origin']) };
     // One line per request for usage analytics; the headers as a whole carry the client's IP.
     logger.info('Request', {
       route: routeKey ?? null,
@@ -166,6 +198,8 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
       userAgent: headers['user-agent']?.slice(0, 256),
       country: headers['cloudfront-viewer-country'],
       asn: headers['cloudfront-viewer-asn'],
+      session,
+      viaCloudFront,
     });
     return response;
   };

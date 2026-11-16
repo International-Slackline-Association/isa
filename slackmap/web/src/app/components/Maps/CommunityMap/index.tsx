@@ -16,6 +16,7 @@ import { appActions } from 'app/slices/app';
 import type { FeatureCollection } from 'geojson';
 
 import { MapLogo } from '../Components/Logo';
+import { MapTermsNote } from '../Components/TermsNote';
 import { MapImage } from '../Components/MapImage';
 import { MapLoadingPlaceholder } from '../Components/MapLoadingPlaceholder';
 import { defaultMapSettings, defaultMapViewState } from '../constants';
@@ -99,6 +100,7 @@ export const CommunityMap = (props: Props) => {
     >
       {!isMapLoaded && <MapLoadingPlaceholder pad={Boolean(props.activeCommunityFeature)} />}
       <MapLogo />
+      <MapTermsNote />
       {isMapLoaded && <CommunityMapLegend />}
       <ReactMapGL
         {...defaultMapSettings}

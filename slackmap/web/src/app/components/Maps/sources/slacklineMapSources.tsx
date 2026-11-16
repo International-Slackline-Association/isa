@@ -1,3 +1,4 @@
+import { useSessionReady } from 'app/session';
 import React, { useEffect } from 'react';
 import { Layer, Source } from 'react-map-gl/mapbox';
 
@@ -35,6 +36,7 @@ export const SlacklineMapSources = (props: {
     country?: string;
   };
 }) => {
+  const sessionReady = useSessionReady();
   const { displayFeature, filter } = props;
 
   const [idFilterExpr, setIdFilterExpr] = React.useState<any>();
@@ -63,6 +65,9 @@ export const SlacklineMapSources = (props: {
       setCountryFilterExpr(undefined);
     }
   }, [filter]);
+
+  // The data needs the session cookie; the map draws without it until the browser check is done.
+  if (!sessionReady) return null;
 
   return (
     <>

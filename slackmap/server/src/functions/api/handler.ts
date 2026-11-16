@@ -7,18 +7,22 @@ import { featureRoutes } from './endpoints/feature/api';
 import { groupRoutes } from './endpoints/group/api';
 import { guideRoutes } from './endpoints/guide/api';
 import { lineRoutes } from './endpoints/line/api';
+import { meRoutes, requireAgreement } from './endpoints/me/api';
 import { pageRoutes } from './endpoints/page/api';
+import { sessionRoutes } from './endpoints/session/api';
 import { spotRoutes } from './endpoints/spot/api';
 
 export const main = createHandler('api', {
-  ...lineRoutes,
-  ...spotRoutes,
-  ...guideRoutes,
-  ...groupRoutes,
-  ...featureRoutes,
+  ...requireAgreement(lineRoutes),
+  ...requireAgreement(spotRoutes),
+  ...requireAgreement(guideRoutes),
+  ...requireAgreement(groupRoutes),
+  ...requireAgreement(featureRoutes),
   ...countryRoutes,
   ...activityRoutes,
   ...communitiesRoutes,
   ...contactRoutes,
   ...pageRoutes,
+  ...sessionRoutes,
+  ...meRoutes,
 });

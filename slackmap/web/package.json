@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "checkTs": "tsc --noEmit",
-    "start": "VITE_APP_SLACKMAP_MAPBOX_TOKEN=$(aws ssm get-parameter --name slackmap-mapbox-tokens --query Parameter.Value --output text --profile isa-admin --region eu-central-1 | node -pe \"JSON.parse(require('fs').readFileSync(0)).dev\") vite dev --host",
+    "start": "VITE_APP_SLACKMAP_MAPBOX_TOKEN=$(aws ssm get-parameter --name slackmap-mapbox-tokens --query Parameter.Value --output text --profile isa-admin --region eu-central-1 | node -pe \"JSON.parse(require('fs').readFileSync(0)).dev\") SLACKMAP_DEV_KEY=$(aws ssm get-parameter --name slackmap-origin-secret --query Parameter.Value --output text --profile isa-admin --region eu-central-1) vite dev",
     "build": "VITE_APP_SLACKMAP_MAPBOX_TOKEN=$(aws ssm get-parameter --name slackmap-mapbox-tokens --query Parameter.Value --output text --profile isa-admin --region eu-central-1 | node -pe \"JSON.parse(require('fs').readFileSync(0)).prod\") vite build",
     "preview": "vite preview"
   },

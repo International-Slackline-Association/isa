@@ -1,3 +1,4 @@
+import { useSessionReady } from 'app/session';
 import React, { useEffect } from 'react';
 import { Layer, Source } from 'react-map-gl/mapbox';
 
@@ -17,6 +18,7 @@ export const CommunityMapSources = (props: {
     country?: string;
   };
 }) => {
+  const sessionReady = useSessionReady();
   const { filter } = props;
   const [countryFilterExpr, setCountryFilterExpr] = React.useState<any>();
 
@@ -27,6 +29,9 @@ export const CommunityMapSources = (props: {
       setCountryFilterExpr(undefined);
     }
   }, [filter]);
+
+  // The data needs the session cookie; the map draws without it until the browser check is done.
+  if (!sessionReady) return null;
 
   return (
     <>

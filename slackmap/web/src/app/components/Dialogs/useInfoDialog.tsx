@@ -28,7 +28,7 @@ export const useInfoDialog = () => {
     >
       <DialogTitle> {dialogProps?.title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>{dialogProps?.description}</DialogContentText>
+        <DialogContentText component="div">{dialogProps?.description}</DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button

@@ -24,7 +24,7 @@ As International Slackline Association, we think SlackMap is a highly important 
 
 - The information SlackMap offers should enable global communities to interact and share their works with the world.
 - The platform provides easy and free access/storage for slackliners to document their slacklines and enhance the local community of slackliners, making it easy for members to carry out slacklining easier and safer.
-- It is entirely open source. The code and data are never meant to be hidden for private use and are always available for people with good intentions and efforts.
+- The code is entirely open source. The map data is free for every slackliner using SlackMap; projects with good intentions can use it through a partner licence, on request.
 
 #### Basic Principles
 

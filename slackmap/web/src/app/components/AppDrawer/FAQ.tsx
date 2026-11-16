@@ -1,133 +1,160 @@
-export const FAQ = () => {
-  return (
-    <div>
-      <p>Table of Contents</p>
-      <ul>
-        <li>
-          <a>General</a>
-        </li>
-        <ul>
-          <li>
-            <a>What is the history of SlackMap?</a>
-          </li>
-          <li>
-            <a>What are the differences between a line, spot and access guide?</a>
-          </li>
-          <li>
-            <a>How can I sign up?</a>
-          </li>
-        </ul>
-        <li>
-          <a>Adding, Updating and Deleting</a>
-          <ul>
-            <li>
-              <a>How can I add a line, spot or access guide?</a>
-            </li>
-            <li>
-              <a>How can I update a line, spot or access guide?</a>
-            </li>
-            <li>
-              <a>How can I delete a line, spot or access guide?</a>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <a>Help &amp; Support</a>
-          <ul>
-            <li>
-              <a>How can I help to volunteer?</a>
-            </li>
-            <li>
-              <a>How can I help as a developer/designer?</a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-      <h2>General</h2>
-      <h3>What is the history of SlackMap?</h3>
-      <p>
-        Slackmap was originally started by Piotr Błaszczak from Poland. In the past couple years the
-        maintenance work got too overwhelming and he was looking for alternatives.
-      </p>
-      <p>
-        The ISA skipped in and Can Sahin from Turkey took on the task to recreate slackmap from
-        scratch, working with a small group of people to define the requirements of a new Slackmap.
-      </p>
-      <p>
-        Can Sahin created the new webapp with about a tenth of the code compared to the old
-        slackmap, following the principle of simplicity, building it with generic features. This
-        minimizes maintenance and also lowers the entry bar for new programmers who want help keep
-        slackmap alive in the future. This further means that new features will only be integrated
-        if they can also follow these principles. Furthermore the slackline groups data, originally
-        created by Kimberly Weglin, Ryan Jenks and Grant Mercier was imported into a worldwide
-        community map.
-      </p>
-      <p>
-        At a strategic level the ISA Nature and Access Commission, a ISA suborganization, is in
-        charge of Slackmap, deciding on the implementation and changes of new features, mentoring
-        with local communities and interest groups and deciding in case of access conflicts.
-      </p>
-      <h3>What are the differences between a line, spot and access guide?</h3>
-      <ul>
-        <li>
-          <strong>Lines:</strong> Individual slacklines marked with red color,
-        </li>
-        <li>
-          <strong>Spots:</strong> Areas with multiple lines, marked with green color,
-        </li>
-        <li>
-          <strong>Access Guides:</strong> Points, lines or areas that inform about access(parking,
-          paths, restricted areas etc.) marked with an orange color.
-        </li>
-      </ul>
-      <h3>How can I sign up?</h3>
-      <p>
-        You can sign up with your Slackline International Account. If you don&#39;t have an account,
-        you can create one from{' '}
-        <a target="_blank" rel="noreferrer">
-          here
-        </a>
-        .
-      </p>
-      <h3>How is SlackMap funded and developed?</h3>
-      <p>
-        SlackMap is funded by Slackline International and developed by volunteers from the slackline
-        community. We need your help to keep SlackMap up to date and to add new features. All the
-        work is done on a voluntary basis.
-      </p>
-      <h2>Adding, Updating and Deleting</h2>
-      <h3>How can I add a line, spot or access guide?</h3>
-      <p>
-        Click to the &quot;Add&quot; button from the right-bottom corner of the map. Then select the
-        type of the feature you want to add. You need to be logged in to add a feature.
-      </p>
-      <h3>How can I update a line, spot or access guide?</h3>
-      <p>
-        Go to the details page of the feature and click to &quot;Request To Edit&quot; button from
-        the corner menu.
-      </p>
-      <h3>How can I delete a line, spot or access guide?</h3>
-      <p>
-        Go to the details page of the feature and click to &quot;Delete&quot; button from the corner
-        menu. If you are not the owner, your request is emailed to the owner, who decides.
-      </p>
-      <h3>How can I add or update a slackline group?</h3>
-      <p>
-        On the Communities map, click the &quot;Add&quot; button from the right-bottom corner to add
-        a group. To update one, open it and click &quot;Request To Edit&quot; from the corner menu.
-        Groups recognized by ISA are managed by ISA.
-      </p>
-      <h2>Help &amp; Support</h2>
-      <h3>How can I help to volunteer?</h3>
-      <p>
-        Sign up as a volunteer{' '}
-        <a target="_blank" rel="noreferrer">
-          here
-        </a>
-        , thanks!
-      </p>
-      <h3>How can I help as a developer/designer?</h3>
-      <p>Contact us via email or Github.</p>
-    </div>
-  );
-};
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Link, Typography } from '@mui/material';
+
+import { appColors } from 'styles/theme/colors';
+
+const contact = 'slackmap@slacklineinternational.org';
+
+const sections: { title: string; items: { q: string; a: React.ReactNode }[] }[] = [
+  {
+    title: 'About SlackMap',
+    items: [
+      {
+        q: 'What is SlackMap?',
+        a: 'A free world map of slacklines, spots and access guides, documented by slackliners and run by the International Slackline Association (ISA).',
+      },
+      {
+        q: 'What is the difference between a line, a spot and an access guide?',
+        a: (
+          <>
+            <b style={{ color: appColors.lineStrokeColor }}>Lines</b> are single slacklines.{' '}
+            <b style={{ color: appColors.spotFillColor }}>Spots</b> are areas with several lines.{' '}
+            <b style={{ color: appColors.guideFeaturesColor }}>Access guides</b> tell you about access: parking, paths
+            and restricted areas.
+          </>
+        ),
+      },
+      {
+        q: 'Who is behind SlackMap?',
+        a: (
+          <>
+            Piotr Błaszczak started SlackMap in Poland. When maintaining it became too much, ISA took
+            it over, and Can Sahin rebuilt it from scratch with simplicity first, so it stays easy to
+            maintain. The groups data comes from Kimberly Weglin, Ryan Jenks and Grant Mercier. Today
+            the ISA Nature and Access Commission decides on features and access conflicts; ISA funds
+            it and volunteers from the community build it.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    title: 'Adding and editing',
+    items: [
+      {
+        q: 'How do I sign in?',
+        a: (
+          <>
+            With your ISA Account. No account yet? Create one at{' '}
+            <Link href="https://account.slacklineinternational.org" target="_blank" rel="noreferrer">
+              account.slacklineinternational.org
+            </Link>
+            .
+          </>
+        ),
+      },
+      {
+        q: 'How do I add a line, spot or access guide?',
+        a: 'Sign in, then tap the + button at the bottom right of the map and pick what you want to add.',
+      },
+      {
+        q: 'How do I change or delete one?',
+        a: 'Open it and use the menu in its corner: "Edit" or "Request to Edit", and "Delete". If it is not yours, the owner gets your request and decides.',
+      },
+      {
+        q: 'How do I add or update a slackline group?',
+        a: 'On the Communities map, tap + to add a group; to change one, open it and use "Request to Edit". Groups recognised by ISA are managed by ISA.',
+      },
+      {
+        q: 'What happens to what I add?',
+        a: (
+          <>
+            It stays yours. You give ISA a licence to show it and protect it from copying, as the{' '}
+            <Link href="/terms#contributor-agreement">contributor agreement</Link> says.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    title: 'Data and privacy',
+    items: [
+      {
+        q: 'Can I use SlackMap data in my app or website?',
+        a: (
+          <>
+            Not without permission. Browsing, planning and sharing links are free; for anything else,
+            ask us at <Link href={`mailto:${contact}`}>{contact}</Link> for a partner licence. See the{' '}
+            <Link href="/terms">terms of use</Link>.
+          </>
+        ),
+      },
+      {
+        q: 'Why do I sometimes see "Verify you are human"?',
+        a: 'SlackMap is free for people, not for automated copying, so we check that a real browser is loading the map. Most visitors never see it.',
+      },
+    ],
+  },
+  {
+    title: 'Help',
+    items: [
+      {
+        q: 'I am a developer or designer. How can I help?',
+        a: (
+          <>
+            SlackMap is open source:{' '}
+            <Link
+              href="https://github.com/International-Slackline-Association/isa"
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub
+            </Link>
+            , or write to <Link href={`mailto:${contact}`}>{contact}</Link>.
+          </>
+        ),
+      },
+    ],
+  },
+];
+
+export const FAQ = () => (
+  <Box sx={{ minWidth: { sm: 420 } }}>
+    {sections.map((section) => (
+      <Box key={section.title} sx={{ marginBottom: 2 }}>
+        <Typography
+          variant="overline"
+          component="h3"
+          sx={{ color: 'primary.main', fontWeight: 700, letterSpacing: 1 }}
+        >
+          {section.title}
+        </Typography>
+        {section.items.map((item) => (
+          <Accordion
+            key={item.q}
+            disableGutters
+            elevation={0}
+            sx={{
+              border: 1,
+              borderColor: 'divider',
+              borderRadius: 1,
+              marginBottom: 1,
+              '&:before': { display: 'none' },
+            }}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                {item.q}
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography variant="body2" component="div" color="text.secondary">
+                {item.a}
+              </Typography>
+            </AccordionDetails>
+          </Accordion>
+        ))}
+      </Box>
+    ))}
+  </Box>
+);

@@ -28,6 +28,21 @@ export const parseExpectedError = (err: Error) => {
       code = 'Forbidden';
       isExpectedError = true;
       break;
+    case 'SessionRequired':
+      status = 403;
+      code = 'SessionRequired';
+      isExpectedError = true;
+      break;
+    case 'AgreementRequired':
+      status = 403;
+      code = 'AgreementRequired';
+      isExpectedError = true;
+      break;
+    case 'TooManyRequests':
+      status = 429;
+      code = 'TooManyRequests';
+      isExpectedError = true;
+      break;
     case 'NotFound':
       status = 404;
       code = 'NotFound';

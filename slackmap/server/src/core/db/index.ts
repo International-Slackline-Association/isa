@@ -5,6 +5,7 @@ import { lineDetailsDB } from './entities/line/details';
 import { mapFeatureChangelogDB } from './entities/mapFeature/changelog';
 import { mapFeatureDB } from './entities/mapFeature/editor';
 import { spotDetailsDB } from './entities/spot/details';
+import { contributorAgreementDB } from './entities/user/agreement';
 
 export const db = {
   ...countryChangelogCollection,
@@ -14,4 +15,5 @@ export const db = {
   ...mapFeatureChangelogDB,
   ...mapFeatureDB,
   ...spotDetailsDB,
+  ...contributorAgreementDB,
 };

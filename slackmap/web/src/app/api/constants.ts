@@ -1,6 +1,8 @@
 import { countryISO2Mapping } from 'utils/countryCodes';
 
-const baseAppDataUrl = 'https://data.slackmap.com';
+export const apiBaseUrl = import.meta.env.DEV ? `${window.location.origin}/_api` : 'https://api.slackmap.com';
+export const dataBaseUrl = import.meta.env.DEV ? `${window.location.origin}/_data` : 'https://data.slackmap.com';
+const baseAppDataUrl = dataBaseUrl;
 
 export const geoJsonURL = {
   linePoints: baseAppDataUrl + '/geojson/lines/points.geojson',

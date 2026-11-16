@@ -30,6 +30,16 @@ export const usEast1Env = { account: env.account, region: 'us-east-1' };
 export const distributionIds = { data: 'EWDMK7QRJ5I98', images: 'E1S62AITVZ4WPH' };
 export const cdnAccessLogGroupName = `${namespace}-cdn-access`;
 
+export const dataAccess = {
+  // Off: cookies are issued and logged but not required. On: data. and the API turn away requests without one.
+  enforced: false,
+  turnstileSecretParameter: 'slackmap-turnstile-secret',
+  signingKeyParameter: 'slackmap-session-signing-key',
+  originSecretParameter: 'slackmap-origin-secret',
+  webOrigins: ['https://slackmap.com', 'https://www.slackmap.com'],
+};
+export const sessionsTableName = `${namespace}-sessions`;
+
 export const geonamesUsernameParameter = 'slackmap-geonames-api-username';
 export const sesIdentityArn =
   'arn:aws:ses:eu-central-1:387132903656:identity/slacklineinternational.org';

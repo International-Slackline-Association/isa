@@ -14,6 +14,7 @@ import { Hub } from 'aws-amplify/utils';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 import { AppDrawer } from './components/AppDrawer';
+import { ContributorAgreementDialog } from './components/ContributorAgreement';
 import { withErrorBoundry } from './components/ErrorBoundary';
 import { MaintenancePage } from './components/MaintenancePage';
 
@@ -27,6 +28,7 @@ const GuideEditPage = lazy(() => import('./pages/Guide/GuideEditPage').then((m) 
 const LegacyDetailPage = lazy(() => import('./pages/LegacyDetailPage').then((m) => ({ default: m.LegacyDetailPage })));
 const LineEditPage = lazy(() => import('./pages/Line/LineEditPage').then((m) => ({ default: m.LineEditPage })));
 const SlacklineMapPage = lazy(() => import('./pages/SlacklineMap').then((m) => ({ default: m.SlacklineMapPage })));
+const TermsPage = lazy(() => import('./pages/Terms').then((m) => ({ default: m.TermsPage })));
 const SpotEditPage = lazy(() => import('./pages/Spot/SpotEditPage').then((m) => ({ default: m.SpotEditPage })));
 
 export function App() {
@@ -101,12 +103,14 @@ export function App() {
                     <Route path="/communities/group/:groupId/edit" element={<GroupEditPage />} />
                   </>
                 )}
+                <Route path="/terms" element={<TermsPage />} />
                 <Route path="/x/:legacyId" element={<LegacyDetailPage />} />
                 <Route path="*" element={<SlacklineMapPage />} />
               </Routes>
             </Suspense>
           </AppDrawer>
 
+          <ContributorAgreementDialog />
           <NotificationSnackbar />
         </BrowserRouter>
       )}

@@ -1,6 +1,8 @@
 import { featureCollection } from '@turf/turf';
 import { Feature, FeatureCollection } from 'geojson';
 
+import { ensureSession, showSessionFailure } from 'app/session';
+
 import { geoJsonURL } from './constants';
 
 const cache = {
@@ -21,7 +23,14 @@ const fetchCache = async (
   key: 'allSlacklinePoints' | 'countrySlacklinePoints' | 'slacklineGroups',
 ): Promise<FeatureCollection> => {
   if (!cache[key]) {
-    cache[key] = await fetch(url).then((r) => r.json());
+    await ensureSession();
+    let response = await fetch(url, { credentials: 'include' });
+    if (response.status === 403) {
+      await ensureSession(true);
+      response = await fetch(url, { credentials: 'include' });
+      if (response.status === 403) showSessionFailure();
+    }
+    cache[key] = await response.json();
   }
   return cache[key]!;
 };

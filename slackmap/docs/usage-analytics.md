@@ -1,7 +1,7 @@
 ---
 type: how-to
 title: "Usage analytics"
-description: "How to answer questions about slackmap usage on demand: the API request log and the CloudFront access logs of data.slackmap.com and images.slackmap.com, their fields, and what they answer with CloudWatch Logs Insights (consumers, countries, networks, routes, signed-in users, errors)."
+description: "How to answer questions about slackmap usage on demand: the API request log and the CloudFront access logs of data.slackmap.com and images.slackmap.com, their fields, and what they answer with CloudWatch Logs Insights (consumers, countries, networks, routes, signed-in users, sessions, errors)."
 ---
 
 # Usage analytics
@@ -30,6 +30,7 @@ Both keep 180 days and hold no IP addresses. `country` and `c-country` come from
 - Who reads the map data and photos, and how much: host, referer, user agent and bytes in the CDN log; photo hot-linking shows as a referer outside slackmap.com.
 - Outside API consumers: a request with no `origin`, or one outside slackmap.com, is not the web app; except the `GET /page/…` routes, which are slackmap.com pages served through CloudFront, counted only when not cached.
 - Scripts and scrapers: a cloud provider's `asn`, or a non-browser user agent.
+- Who passes the browser check: `session` on the API line; calls that skipped CloudFront: `viaCloudFront` false.
 - Countries over time, route popularity and latency, errors by route, signed-in users (`isaId`) per week.
 
 Counts are approximate: CloudFront delivers its logs best-effort, and calls made straight to the API's `execute-api` address carry no country.

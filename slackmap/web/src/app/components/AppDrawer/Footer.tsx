@@ -73,7 +73,15 @@ export const Footer = () => {
       </Grid>
       <Grid size={12}>
         <Typography sx={{ fontSize: '0.5rem' }}>
-          Copyright © 2022 International Slackline Association. All rights reserved.
+          © International Slackline Association. Map data: all rights reserved.{' '}
+          <Link href="/terms" color="inherit">
+            Terms of use and data use policy
+          </Link>{' '}
+          ·{' '}
+          <Link href="/terms#privacy" color="inherit">
+            Privacy
+          </Link>
+          . Partner access: contact us.
         </Typography>
       </Grid>
     </Grid>

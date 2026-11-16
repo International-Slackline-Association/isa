@@ -16,6 +16,7 @@ import type { FeatureCollection } from 'geojson';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 import { MapLogo } from '../Components/Logo';
+import { MapTermsNote } from '../Components/TermsNote';
 import { MapActivityButton } from '../Components/MapActivityButton';
 import { MapImage } from '../Components/MapImage';
 import { MapLoadingPlaceholder } from '../Components/MapLoadingPlaceholder';
@@ -136,6 +137,7 @@ export const SlacklineMap = (props: Props) => {
     >
       {!isMapLoaded && <MapLoadingPlaceholder pad={Boolean(props.activeSlacklineFeature)} />}
       <MapLogo />
+      <MapTermsNote />
       {isMapLoaded && !props.activeSlacklineFeature && <SlacklineMapLegend />}
       <MapActivityButton isSelected={props.activeSlacklineFeature?.type === 'activity'} />
       {MapOptionsComponent}

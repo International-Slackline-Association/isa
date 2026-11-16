@@ -1,4 +1,5 @@
 import type { FogSpecification as Fog } from 'mapbox-gl';
+import { dataBaseUrl } from 'app/api/constants';
 import { appColors } from 'styles/theme/colors';
 
 export const MAPBOX_TOKEN = import.meta.env.VITE_APP_SLACKMAP_MAPBOX_TOKEN;
@@ -8,6 +9,11 @@ export const defaultMapSettings = {
   attributionControl: false,
   pitchWithRotate: false,
   maxPitch: 0,
+  // The map data needs the session cookie, which a cross-origin request only sends when asked to.
+  transformRequest: (url: string) =>
+    url.startsWith(`${dataBaseUrl}/`)
+      ? { url, credentials: 'include' as const }
+      : { url },
   fog: {
     'horizon-blend': 0.05,
     color: appColors.slackmapBlue,
