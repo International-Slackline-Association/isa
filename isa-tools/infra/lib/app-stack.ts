@@ -10,7 +10,6 @@ import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
-import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as path from 'path';
 import { Duration, RemovalPolicy, Size, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -22,7 +21,6 @@ import {
   domains,
   tableName,
   temporaryUploadsBucketName,
-  trustedServiceApiKeyParameter,
   errorDigest,
   userPool,
 } from './config';
@@ -40,16 +38,11 @@ export class AppStack extends Stack {
       'TemporaryUploadsBucket',
       temporaryUploadsBucketName,
     );
-    const trustedServiceApiKey = ssm.StringParameter.valueForStringParameter(
-      this,
-      trustedServiceApiKeyParameter,
-    );
 
     const environment = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       ISA_DOCUMENTS_TABLE_NAME: tableName,
       TEMPORARY_UPLOADS_S3_BUCKET: temporaryUploadsBucketName,
-      ISA_DOCUMENTS_TRUSTED_SERVICE_API_KEY: trustedServiceApiKey,
     };
     const bundling: nodejs.BundlingOptions = {
       sourceMap: true,
@@ -96,7 +89,7 @@ export class AppStack extends Stack {
       deployOptions: { stageName: 'prod' },
       defaultCorsPreflightOptions: {
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowHeaders: [...apigateway.Cors.DEFAULT_HEADERS, 'x-api-key'],
+        allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
       },
     });
     api.root

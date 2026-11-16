@@ -17,7 +17,7 @@ Not managed by CDK.
 | Group `timeradmin` | Cognito, pool `isa-users` | The timer's. |
 | SES identity `slacklineinternational.org` | SES | The sender of the pool, the Cognito trigger and the API, from aws-platform. |
 | GitHub label `errors:isa-users` | the monorepo's issues | Created once by hand; the error digest workflow finds its issues by it. |
-| SSM `isa-tools-trusted-service-api-key` | Parameter Store | isa-tools' API key, sent on its certificate and signing calls. |
+| SSM `isa-users-service-client-secret` | Parameter Store | Secret of isa-users' own `isa-users-service` client, which calls other ISA services. |
 | Each app's client secret | the app | Cognito generates it for the app's `{app}-service` client; handed to the app by hand. |
 
 Names other apps depend on: pool `eu-central-1_iGaYGKeyJ`, its client IDs, the `auth` domain and its token endpoint, the API's `/v1` endpoints and their scopes, the `images` URLs.

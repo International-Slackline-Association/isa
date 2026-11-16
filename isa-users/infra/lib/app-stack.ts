@@ -24,8 +24,8 @@ import {
   cognitoTriggerFunctionName,
   domains,
   imagesBucketName,
-  isaTools,
   stage,
+  serviceClientSecretParameter,
   sesIdentityArn,
   tableName,
   uploadsBucketName,
@@ -61,10 +61,6 @@ export class AppStack extends Stack {
       AUTH_DOMAIN: domains.auth,
       ACCOUNT_DOMAIN: domains.web,
       ACCOUNT_CLIENT_ID: userPool.accountClientId,
-      ISA_TOOLS_TRUSTED_SERVICE_API_KEY: ssm.StringParameter.valueForStringParameter(
-        this,
-        isaTools.trustedServiceApiKeyParameter,
-      ),
     };
     const functionProps = (name: string, entry: string): nodejs.NodejsFunctionProps => ({
       runtime: lambda.Runtime.NODEJS_24_X,
@@ -163,6 +159,7 @@ export class AppStack extends Stack {
         scopeDescription: route,
       })),
     });
+    const appClients: Record<string, cognito.CfnUserPoolClient> = {};
     for (const [app, scopes] of Object.entries(apps)) {
       const appClient = new cognito.CfnUserPoolClient(this, `AppClient-${app}`, {
         userPoolId: userPool.id,
@@ -178,6 +175,16 @@ export class AppStack extends Stack {
         enableTokenRevocation: true,
       });
       appClient.node.addDependency(scopeServer);
+      appClients[app] = appClient;
+    }
+    // isa-users calls isa-tools with its own client.
+    const serviceClientSecret = ssm.StringParameter.valueForStringParameter(
+      this,
+      serviceClientSecretParameter,
+    );
+    for (const fn of [apiFunction, cognitoTriggerFunction]) {
+      fn.addEnvironment('ISA_USERS_SERVICE_CLIENT_ID', appClients['isa-users'].ref);
+      fn.addEnvironment('ISA_USERS_SERVICE_CLIENT_SECRET', serviceClientSecret);
     }
 
 

@@ -1,6 +1,5 @@
 // pnpm run build && pnpm run invoke api GET /sheets/list/riggers -H origin:http://localhost
-// pnpm run invoke api POST /sign -H x-api-key:KEY -d '{"subject":"s","expiresInSeconds":60,"content":"0123456789"}'
-// pnpm run invoke api POST /v1/sign --client ID --scope isa-tools/documents.sign -d '…'   another app's call
+// pnpm run invoke api POST /v1/sign --client ID --scope isa-tools/documents.sign -d '{"subject":"s","expiresInSeconds":60,"content":"0123456789"}'
 import { createRequire } from 'node:module';
 import { parseArgs } from 'node:util';
 

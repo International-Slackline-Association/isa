@@ -2,7 +2,7 @@ import * as dateFns from 'date-fns';
 import { createSignedDocument, getSignedDocument } from '../../../core/documentVerification';
 import { logger } from '../../../core/logger';
 import { type Request, json, validate } from '../../http';
-import { requireAppScope, verifyTrustedServiceRequest } from '../auth';
+import { requireAppScope } from '../auth';
 import { signDocumentPostBodySchema } from './schema';
 
 const createSigned = async (request: Request) => {
@@ -17,11 +17,6 @@ const createSigned = async (request: Request) => {
 
   logger.info('Document signed', { app: request.app?.clientId, expiresAt });
   return json({ token, verificationUrl, expiresAt });
-};
-
-const sign = async (request: Request) => {
-  verifyTrustedServiceRequest(request);
-  return createSigned(request);
 };
 
 const signForApp = async (request: Request) => {
@@ -62,7 +57,6 @@ const verifySignedDocument = async (request: Request) => {
 };
 
 export const signRoutes = {
-  'POST /sign': sign,
   'POST /v1/sign': signForApp,
   'GET /sign/verify': verifySignedDocument,
 };

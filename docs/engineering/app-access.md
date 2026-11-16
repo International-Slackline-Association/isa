@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: "How apps reach ISA services"
-description: "How ISA apps, in the monorepo or outside it, call ISA services such as isa-users and isa-tools: each app's own client, one OAuth scope per endpoint, the one access list in isa-users, generic endpoints, the full user profile, users reading their own data, API keys and isa-tools' shared key."
+description: "How ISA apps, in the monorepo or outside it, call ISA services such as isa-users and isa-tools: each app's own client, one OAuth scope per endpoint, the one access list in isa-users, generic endpoints, the full user profile, users reading their own data, API keys."
 related: [app-access-steps.md]
 ---
 
@@ -15,7 +15,7 @@ The access list is one, in isa-users, across every service: the user pool is ISA
 
 isa-users' user endpoint returns the full profile: a narrower endpoint per purpose was considered and not taken.
 
-API keys were considered and rejected. isa-tools' shared trusted-service key predates this pattern and still serves isa-users; whether it moves over is not decided.
+API keys were considered and rejected.
 
 Everything does what its own thing is best at: a need such as image processing is done inside each project, however it wishes, not offered as a shared service. That slackmap and isa-users do the same resizing twice is accepted. Which side a new need falls on, a shared service or inside each project, is the maintainer's judgement; an agent asks.
 

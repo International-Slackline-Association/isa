@@ -1,5 +1,5 @@
 // pnpm run script <name> [args]   runs src/scripts/<name>.ts locally with the caller's AWS credentials and env
-// Needs ISA_USERS_TABLE, USERPOOL_ID, ISA_TOOLS_TRUSTED_SERVICE_API_KEY as the script requires, plus AWS_REGION.
+// Needs ISA_USERS_TABLE, USERPOOL_ID as the script requires, plus AWS_REGION.
 import { build } from 'esbuild';
 import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';

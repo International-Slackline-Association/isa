@@ -3,12 +3,10 @@ import { generateCertificatePDF } from '../../../core/certificates/generators/ce
 import { certificateSpreadsheet } from '../../../core/spreadsheets/certificates';
 import { CertificateType } from '../../../core/spreadsheets/types';
 import { type Request, json, validate } from '../../http';
-import { verifyTrustedServiceRequest } from '../auth';
+import { requireAppScope } from '../auth';
 import { generateCertificatePostBodySchema, listCertificatesQueryParamsSchema } from './schema';
 
 const listCertificates = async (request: Request) => {
-  verifyTrustedServiceRequest(request);
-
   const query = validate(request.query, listCertificatesQueryParamsSchema);
 
   const certs = await certificateSpreadsheet.getAllItems({
@@ -35,8 +33,6 @@ const listCertificates = async (request: Request) => {
 };
 
 const generateCertificate = async (request: Request) => {
-  verifyTrustedServiceRequest(request);
-
   const body = validate(request.body, generateCertificatePostBodySchema);
 
   const { pdfBytes } = await generateCertificatePDF({
@@ -56,6 +52,12 @@ const generateCertificate = async (request: Request) => {
 };
 
 export const certificateRoutes = {
-  'GET /sheets/certificate': listCertificates,
-  'POST /sheets/certificate/generate': generateCertificate,
+  'GET /v1/certificates': async (request: Request) => {
+    requireAppScope(request, 'certificates.list');
+    return listCertificates(request);
+  },
+  'POST /v1/certificates/generate': async (request: Request) => {
+    requireAppScope(request, 'certificates.generate');
+    return generateCertificate(request);
+  },
 };

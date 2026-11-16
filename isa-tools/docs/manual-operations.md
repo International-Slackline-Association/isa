@@ -14,8 +14,7 @@ Not managed by CDK.
 | Cloudflare CNAMEs `tools-api`, `verify`, `tools` | Cloudflare, slacklineinternational.org | `tools-api` → the custom domain's regional name; `verify` and `tools` → the CloudFront distribution of `IsaToolsApp`. |
 | GitHub label `errors:isa-tools` | the monorepo's issues | Created once by hand; the error digest workflow finds its issues by it. |
 | SSM `isa-tools-rsa-private-key` | Parameter Store | Signs every certificate and verify token; the public key is in [verificationPublicKey.ts](/isa-tools/server/src/core/documentVerification/verificationPublicKey.ts). Replacing it invalidates every issued document. |
-| SSM `isa-tools-trusted-service-api-key` | Parameter Store | Value of the API key callers send as `x-api-key`. |
 | SSM `isa-tools-google-credentials-json` | Parameter Store | Service account for the Google Sheets. |
 | Backup `isa-tools-prod-before-cdk-cutover` | DynamoDB backups | On-demand backup of the documents as they were before the move to CDK; the source table is deleted. |
 
-Names callers outside this repo depend on: the `tools-api` and `tools` domains, the API key value, the `/v1` endpoints and their scopes, the `verify` URLs in issued QR codes.
+Names callers outside this repo depend on: the `tools-api` and `tools` domains, the `/v1` endpoints and their scopes, the `verify` URLs in issued QR codes.

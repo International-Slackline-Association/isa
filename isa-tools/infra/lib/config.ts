@@ -26,9 +26,9 @@ export const userPool = {
 export const apiScopeServer = 'isa-tools';
 export const apiScopes = {
   'documents.sign': 'POST /v1/sign',
+  'certificates.list': 'GET /v1/certificates',
+  'certificates.generate': 'POST /v1/certificates/generate',
 } as const;
-
-export const trustedServiceApiKeyParameter = '/isa-tools-trusted-service-api-key';
 
 // The weekly error digest runs as a GitHub Actions workflow of the monorepo, signed in through the
 // account's GitHub OIDC provider (aws-platform, IsaShared).

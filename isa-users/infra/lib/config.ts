@@ -33,10 +33,6 @@ export const cognitoTriggerFunctionName = `${namespace}-cognito-trigger`;
 export const sesIdentityArn =
   'arn:aws:ses:eu-central-1:387132903656:identity/slacklineinternational.org';
 
-export const isaTools = {
-  trustedServiceApiKeyParameter: '/isa-tools-trusted-service-api-key',
-};
-
 // The weekly error digest runs as a GitHub Actions workflow of the monorepo, signed in through the
 // account's GitHub OIDC provider (aws-platform, IsaShared).
 export const errorDigest = {
@@ -53,7 +49,14 @@ export const apiScopes = {
 } as const;
 // Which app may call which endpoint, across every ISA service: full scope names. Another service's
 // scopes are defined in its own stack, which deploys first.
+// The secret of isa-users' own client, copied into SSM by hand.
+export const serviceClientSecretParameter = 'isa-users-service-client-secret';
 export const apps: Record<string, string[]> = {
   slackmap: ['isa-users/users.get'],
   sporthub: ['isa-tools/documents.sign'],
+  'isa-users': [
+    'isa-tools/certificates.list',
+    'isa-tools/certificates.generate',
+    'isa-tools/documents.sign',
+  ],
 };
