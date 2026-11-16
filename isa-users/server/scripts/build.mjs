@@ -13,6 +13,8 @@ for (const name of ['api', 'cognito']) {
     format: 'cjs',
     sourcemap: true,
     tsconfig: `${root}tsconfig.json`,
+    // A native module, installed for the Lambda's platform at bundling time.
+    external: ['sharp'],
     logLevel: 'warning',
   });
 }

@@ -1,27 +1,5 @@
 import { logger } from '../logger';
 
-interface ProcessImagePayload {
-  input: {
-    s3: {
-      bucket?: string;
-      key: string;
-    };
-  };
-  output: {
-    s3: {
-      bucket: string;
-      key: string;
-    };
-  };
-  outputFormat: 'jpeg' | 'png' | 'webp';
-  resize: {
-    width: number;
-    height: number;
-    fit: 'cover' | 'contain' | 'fill' | 'inside' | 'outside';
-  };
-  quality: number;
-  cacheControl?: string;
-}
 const baseUrl = 'https://tools-api.slacklineinternational.org/';
 
 const request = async (method: 'GET' | 'POST', path: string, payload?: unknown) => {
@@ -40,15 +18,6 @@ const request = async (method: 'GET' | 'POST', path: string, payload?: unknown) 
     throw new Error(`Request failed with status code ${response.status}`);
   }
   return response.json();
-};
-
-const processImage = async (payload: ProcessImagePayload) => {
-  return request('POST', 'image-processor/process', payload)
-    .then(() => true)
-    .catch((err) => {
-      logger.error('Error while processing image', { message: err.message });
-      return false;
-    });
 };
 
 const listCertificates = async (isaId: string, email: string) => {
@@ -106,7 +75,6 @@ const verifySignedDocument = async (token: string) => {
 };
 
 export const isaToolsApi = {
-  processImage,
   listCertificates,
   generateCertificate,
   signDocument,

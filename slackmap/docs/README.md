@@ -17,7 +17,6 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 - Working on the communities map or groups: [communities](communities.md)
 - Touching how shared links display, or the pages CloudFront sends to the API: [link previews](link-previews.md)
 - Answering a usage question: [usage analytics](usage-analytics.md)
-- What is open: [notes](notes.md)
 
 ## From higher scopes
 

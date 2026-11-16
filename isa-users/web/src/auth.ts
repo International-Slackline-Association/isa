@@ -4,7 +4,7 @@ import { Amplify } from 'aws-amplify';
 import { fetchAuthSession, getCurrentUser, signInWithRedirect, signOut } from 'aws-amplify/auth';
 import { Hub } from 'aws-amplify/utils';
 
-export const uploadsBucket = 'isa-tools-temporary-uploads-prod';
+export const uploadsBucket = 'isa-users-prod-uploads';
 
 export function configureAuth() {
   Amplify.configure({

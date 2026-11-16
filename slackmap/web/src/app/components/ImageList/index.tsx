@@ -36,7 +36,8 @@ interface Props {
   disableCoverPhoto?: boolean;
 }
 
-const allowedFileTypes = ['image/jpg', 'image/png', 'image/jpeg', 'image/heic', 'image/webp'];
+// No HEIC: without it in `accept`, iOS converts photos to JPEG; the server cannot read HEIC.
+const allowedFileTypes = ['image/jpg', 'image/png', 'image/jpeg', 'image/webp'];
 
 export const S3ImageList = (props: Props) => {
   const [isUploadingImage, setIsUploadingImage] = useState(false);

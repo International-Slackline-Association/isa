@@ -11,7 +11,6 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
-import * as fs from 'fs';
 import * as path from 'path';
 import { Duration, RemovalPolicy, Size, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -21,7 +20,6 @@ import {
   apiScopes,
   certificates,
   domains,
-  imageBucketNames,
   tableName,
   temporaryUploadsBucketName,
   trustedServiceApiKeyParameter,
@@ -31,9 +29,6 @@ import {
 
 const projectRoot = path.join(__dirname, '../..');
 const serverRoot = path.join(projectRoot, 'server');
-const sharpVersion: string = JSON.parse(
-  fs.readFileSync(path.join(serverRoot, 'package.json'), 'utf8'),
-).devDependencies.sharp;
 
 export class AppStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -84,38 +79,12 @@ export class AppStack extends Stack {
       bundling,
     });
 
-    // sharp ships a native binary per platform, so it is installed for the Lambda's linux-x64.
-    const imageProcessorFunction = new nodejs.NodejsFunction(this, 'ImageProcessorFunction', {
-      ...functionProps('ImageProcessorFunction'),
-      entry: path.join(serverRoot, 'src/functions/image-processor-api/handler.ts'),
-      timeout: Duration.seconds(29),
-      bundling: {
-        ...bundling,
-        externalModules: ['sharp'],
-        commandHooks: {
-          beforeBundling: () => [],
-          beforeInstall: () => [],
-          afterBundling: (_inputDir: string, outputDir: string) => [
-            `npm install --prefix "${outputDir}" --no-save --no-package-lock --os=linux --cpu=x64 --libc=glibc sharp@${sharpVersion}`,
-          ],
-        },
-      },
-    });
-
-    for (const fn of [apiFunction, imageProcessorFunction]) {
-      table.grantReadWriteData(fn);
-      temporaryUploads.grantReadWrite(fn);
-      fn.addToRolePolicy(
-        new iam.PolicyStatement({
-          actions: ['ssm:GetParameter', 'ssm:GetParameters'],
-          resources: [`arn:aws:ssm:${this.region}:${this.account}:parameter/isa-tools*`],
-        }),
-      );
-    }
-    imageProcessorFunction.addToRolePolicy(
+    table.grantReadWriteData(apiFunction);
+    temporaryUploads.grantReadWrite(apiFunction);
+    apiFunction.addToRolePolicy(
       new iam.PolicyStatement({
-        actions: ['s3:PutObject'],
-        resources: imageBucketNames.map((name) => `arn:aws:s3:::${name}/public/*`),
+        actions: ['ssm:GetParameter', 'ssm:GetParameters'],
+        resources: [`arn:aws:ssm:${this.region}:${this.account}:parameter/isa-tools*`],
       }),
     );
 
@@ -123,7 +92,6 @@ export class AppStack extends Stack {
       restApiName: 'isa-tools',
       cloudWatchRole: false,
       endpointConfiguration: { types: [apigateway.EndpointType.REGIONAL] },
-      binaryMediaTypes: ['image/jpeg', 'image/png', 'image/webp'],
       minCompressionSize: Size.bytes(1024),
       deployOptions: { stageName: 'prod' },
       defaultCorsPreflightOptions: {
@@ -156,21 +124,6 @@ export class AppStack extends Stack {
           authorizationScopes: [`${apiScopeServer}/${scope}`],
         });
     }
-    api.root
-      .addResource('image-processor')
-      .addResource('{proxy+}')
-      .addMethod('ANY', new apigateway.LambdaIntegration(imageProcessorFunction), {
-        apiKeyRequired: true,
-      });
-
-    const apiKey = api.addApiKey('TrustedServiceApiKey', {
-      apiKeyName: 'isa-tools-trusted-service',
-      value: trustedServiceApiKey,
-    });
-    api
-      .addUsagePlan('TrustedServiceUsagePlan', { apiStages: [{ stage: api.deploymentStage }] })
-      .addApiKey(apiKey);
-
     // The custom domain itself is managed by hand.
     new apigateway.CfnBasePathMapping(this, 'ApiDomainMapping', {
       domainName: domains.api,

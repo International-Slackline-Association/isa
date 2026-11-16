@@ -15,7 +15,7 @@ const { values, positionals } = parseArgs({
 });
 const [name, method, target] = positionals;
 if (!name || !method || !target) {
-  console.error('usage: invoke <api|image-processor-api> <METHOD> </path?query> [-H name:value] [-d body]');
+  console.error('usage: invoke api <METHOD> </path?query> [-H name:value] [-d body]');
   process.exit(1);
 }
 
@@ -37,7 +37,7 @@ const event = {
   resource: isAppResource ? url.pathname : '/{proxy+}',
   httpMethod: method.toUpperCase(),
   path: url.pathname,
-  pathParameters: isAppResource ? null : { proxy: url.pathname.replace(/^\/(image-processor\/)?/, '') },
+  pathParameters: isAppResource ? null : { proxy: url.pathname.slice(1) },
   requestContext: {
     authorizer: values.client
       ? { claims: { client_id: values.client, token_use: 'access', scope: values.scope ?? '' } }

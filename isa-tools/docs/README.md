@@ -1,7 +1,7 @@
 ---
 type: index
 title: "ISA tools"
-description: "Entry point for isa-tools: the tools API (certificates, signed-document verification, image processing, Google Sheets listings) and the verify web app, with its CDK infra."
+description: "Entry point for isa-tools: the tools API (certificates, signed-document verification, Google Sheets listings) and the verify web app, with its CDK infra."
 ---
 
 # ISA tools
@@ -13,7 +13,6 @@ The tools API at `tools-api.slacklineinternational.org` and the web app at `veri
 - Running locally or deploying: [operating](operating.md)
 - What is set up by hand and what other apps rely on: [manual operations](manual-operations.md)
 - Changing a certificate's wording, layout or signer: [certificate templates](certificate-templates.md)
-- What is open: [notes](notes.md)
 
 ## From higher scopes
 

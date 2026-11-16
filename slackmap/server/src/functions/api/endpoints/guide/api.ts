@@ -11,7 +11,7 @@ import {
   canDeleteFeature,
   validateMapFeatureEditor,
 } from '../../../../core/features/mapFeature/editors';
-import { updateFeatureImagesInS3 } from '../../../../core/features/mapFeature/image';
+import { updateFeatureImagesInS3 } from '../../../../core/features/mapFeature/imageUpload';
 import { GuideType } from '../../../../core/types';
 import { assignFromSourceToTarget } from '../../../../core/utils';
 import { logger } from '../../../../core/logger';

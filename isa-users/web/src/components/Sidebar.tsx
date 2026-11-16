@@ -80,7 +80,8 @@ export function Sidebar(props: Props) {
   );
 }
 
-const allowedFileTypes = ['image/jpg', 'image/png', 'image/jpeg', 'image/heic', 'image/webp'];
+// No HEIC: without it in `accept`, iOS converts photos to JPEG; the server cannot read HEIC.
+const allowedFileTypes = ['image/jpg', 'image/png', 'image/jpeg', 'image/webp'];
 
 function ProfileHeader({ user, refetchUser }: { user: User; refetchUser: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);

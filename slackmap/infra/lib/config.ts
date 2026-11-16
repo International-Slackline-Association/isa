@@ -20,6 +20,7 @@ export const tableName = `${namespace}-db`;
 // Set by the stream of the table in the data stack; changes only if the stream is recreated.
 export const tableStreamArn =
   'arn:aws:dynamodb:eu-central-1:387132903656:table/slackmap-prod-db/stream/2026-11-12T13:16:15.858';
+export const uploadsBucketName = `${namespace}-uploads`;
 export const imagesBucketName = `${namespace}-images`;
 export const applicationDataBucketName = `${namespace}-application-data`;
 
@@ -41,11 +42,6 @@ export const isaUsers = {
   // slackmap's own client for the API (slackmap-service).
   serviceClientId: '5ok76eocc9lbkp6go3f2179ej2',
   serviceClientSecretParameter: 'slackmap-isa-users-client-secret',
-};
-
-export const isaTools = {
-  temporaryUploadsBucketName: 'isa-tools-temporary-uploads-prod',
-  trustedServiceApiKeyParameter: '/isa-tools-trusted-service-api-key',
 };
 
 // The error digest runs as a GitHub Actions workflow of this repo, signed in through

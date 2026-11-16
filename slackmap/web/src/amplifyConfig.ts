@@ -28,7 +28,7 @@ export const amplifyConfig: ResourcesConfig = {
   },
   Storage: {
     S3: {
-      bucket: 'isa-tools-temporary-uploads-prod',
+      bucket: 'slackmap-prod-uploads',
       region: 'eu-central-1',
     },
   },

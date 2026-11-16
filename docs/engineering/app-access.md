@@ -15,6 +15,8 @@ The access list is one, in isa-users, across every service: the user pool is ISA
 
 isa-users' user endpoint returns the full profile: a narrower endpoint per purpose was considered and not taken.
 
-API keys were considered and rejected. isa-tools' shared trusted-service key predates this pattern and still serves isa-users and slackmap; whether they move over is not decided.
+API keys were considered and rejected. isa-tools' shared trusted-service key predates this pattern and still serves isa-users; whether it moves over is not decided.
+
+Everything does what its own thing is best at: a need such as image processing is done inside each project, however it wishes, not offered as a shared service. That slackmap and isa-users do the same resizing twice is accepted. Which side a new need falls on, a shared service or inside each project, is the maintainer's judgement; an agent asks.
 
 A signed-in user reading their own data through another app is not needed now; when it is, it stays whatever is simplest, since a user can only reach their own data anyway.

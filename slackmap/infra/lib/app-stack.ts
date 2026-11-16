@@ -14,6 +14,7 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
+import * as fs from 'fs';
 import * as path from 'path';
 import { Annotations, Duration, RemovalPolicy, Size, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -25,7 +26,7 @@ import {
   errorDigest,
   geonamesUsernameParameter,
   imagesBucketName,
-  isaTools,
+  uploadsBucketName,
   isaUsers,
   namespace,
   sesIdentityArn,
@@ -37,6 +38,9 @@ import {
 
 const projectRoot = path.join(__dirname, '../..');
 const serverRoot = path.join(projectRoot, 'server');
+const sharpVersion: string = JSON.parse(
+  fs.readFileSync(path.join(serverRoot, 'package.json'), 'utf8'),
+).devDependencies.sharp;
 
 export class AppStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -67,11 +71,8 @@ export class AppStack extends Stack {
       SLACKMAP_CLIENT_ID: isaUsers.slackmapClientId,
       SLACKMAP_APPLICATION_DATA_S3_BUCKET: applicationDataBucketName,
       SLACKMAP_IMAGES_S3_BUCKET: imagesBucketName,
+      SLACKMAP_UPLOADS_S3_BUCKET: uploadsBucketName,
       SLACKMAP_ADMIN_ISA_ID: slackmapAdminIsaId,
-      ISA_TOOLS_TRUSTED_SERVICE_API_KEY: ssm.StringParameter.valueForStringParameter(
-        this,
-        isaTools.trustedServiceApiKeyParameter,
-      ),
       ISA_USERS_API_URL: isaUsers.apiUrl,
       ISA_USERS_TOKEN_URL: isaUsers.tokenUrl,
       ISA_USERS_CLIENT_ID: isaUsers.serviceClientId,
@@ -84,7 +85,12 @@ export class AppStack extends Stack {
         geonamesUsernameParameter,
       ),
     };
-    const fn = (name: string, entry: string, timeout: Duration) =>
+    const fn = (
+      name: string,
+      entry: string,
+      timeout: Duration,
+      extraBundling: Partial<nodejs.BundlingOptions> = {},
+    ) =>
       new nodejs.NodejsFunction(this, name, {
         runtime: lambda.Runtime.NODEJS_24_X,
         handler: 'main',
@@ -99,6 +105,7 @@ export class AppStack extends Stack {
           target: 'node24',
           tsconfig: path.join(serverRoot, 'tsconfig.json'),
           externalModules: [],
+          ...extraBundling,
         },
         logGroup: new logs.LogGroup(this, `${name}Logs`, {
           retention: logs.RetentionDays.SIX_MONTHS,
@@ -106,7 +113,17 @@ export class AppStack extends Stack {
         }),
       });
 
-    const apiFunction = fn('ApiFunction', 'src/functions/api/handler.ts', Duration.seconds(10));
+    // sharp ships a native binary per platform, so it is installed for the Lambda's linux-x64.
+    const apiFunction = fn('ApiFunction', 'src/functions/api/handler.ts', Duration.seconds(29), {
+      externalModules: ['sharp'],
+      commandHooks: {
+        beforeBundling: () => [],
+        beforeInstall: () => [],
+        afterBundling: (_inputDir: string, outputDir: string) => [
+          `npm install --prefix "${outputDir}" --no-save --no-package-lock --os=linux --cpu=x64 --libc=glibc sharp@${sharpVersion}`,
+        ],
+      },
+    });
     const streamsFunction = fn(
       'StreamsFunction',
       'src/functions/ddb-streams/handler.ts',
@@ -148,8 +165,34 @@ export class AppStack extends Stack {
     });
     api.root.addResource('{proxy+}').addMethod('ANY', new apigateway.LambdaIntegration(apiFunction));
 
-    // Signed-in users upload pictures straight to isa-tools' temporary-uploads bucket; the API then
-    // has them resized into the images bucket.
+    // Signed-in users upload pictures straight to the uploads bucket; the API resizes them into the
+    // images bucket.
+    const uploadsBucket = new s3.Bucket(this, 'UploadsBucket', {
+      bucketName: uploadsBucketName,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      enforceSSL: true,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      // Uploads are resized right away; what is left is never read again.
+      lifecycleRules: [{ expiration: Duration.days(1) }],
+      cors: [
+        {
+          allowedOrigins: [...domains.web.map((domain) => `https://${domain}`), 'http://localhost:5173'],
+          // GET and DELETE: Amplify resumes and aborts multipart uploads of larger files.
+          allowedMethods: [
+            s3.HttpMethods.PUT,
+            s3.HttpMethods.POST,
+            s3.HttpMethods.GET,
+            s3.HttpMethods.HEAD,
+            s3.HttpMethods.DELETE,
+          ],
+          allowedHeaders: ['*'],
+          exposedHeaders: ['ETag'],
+          maxAge: 3000,
+        },
+      ],
+    });
+    uploadsBucket.grantRead(apiFunction);
     const uploadsIdentityPool = new cognito.CfnIdentityPool(this, 'UploadsIdentityPool', {
       identityPoolName: `${namespace.replace(/-/g, '_')}_uploads`,
       allowUnauthenticatedIdentities: false,
@@ -174,7 +217,7 @@ export class AppStack extends Stack {
           statements: [
             new iam.PolicyStatement({
               actions: ['s3:GetObject', 's3:PutObject', 's3:DeleteObject'],
-              resources: [`arn:aws:s3:::${isaTools.temporaryUploadsBucketName}/public/*`],
+              resources: [uploadsBucket.arnForObjects('public/*')],
             }),
           ],
         }),

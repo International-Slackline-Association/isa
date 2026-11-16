@@ -16,11 +16,7 @@ export const certificates = {
 
 export const tableName = 'isa-tools-documents';
 
-// isa-users and slackmap upload to this name directly from their web apps.
 export const temporaryUploadsBucketName = 'isa-tools-temporary-uploads-prod';
-
-// The image processor writes resized images under public/ of these.
-export const imageBucketNames = ['isa-users-prod-images', 'slackmap-prod-images'];
 
 // isa-users' pool, which issues other apps' access tokens.
 export const userPool = {

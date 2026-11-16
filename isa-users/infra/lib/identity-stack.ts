@@ -9,9 +9,9 @@ import {
   certificates,
   cognitoTriggerFunctionName,
   domains,
-  isaTools,
   namespace,
   sesIdentityArn,
+  uploadsBucketName,
 } from './config';
 
 // Only what was set when the pool was created: Cognito adds the other standard attributes itself,
@@ -376,8 +376,6 @@ export class IdentityStack extends Stack {
       userPoolId: pool.ref,
     }).applyRemovalPolicy(RemovalPolicy.RETAIN);
 
-    // Signed-in account users upload profile pictures straight to isa-tools' temporary-uploads
-    // bucket; the API then has them resized into the images bucket.
     const uploadsIdentityPool = new cognito.CfnIdentityPool(this, 'UploadsIdentityPool', {
       identityPoolName: `${namespace.replace(/-/g, '_')}_uploads`,
       allowUnauthenticatedIdentities: false,
@@ -385,7 +383,7 @@ export class IdentityStack extends Stack {
         { clientId: accountClient.ref, providerName: pool.attrProviderName },
       ],
     });
-    const uploadsBucketArn = `arn:aws:s3:::${isaTools.temporaryUploadsBucketName}`;
+    const uploadsBucketArn = `arn:aws:s3:::${uploadsBucketName}`;
     const uploadsRole = new iam.Role(this, 'UploadsRole', {
       assumedBy: new iam.FederatedPrincipal(
         'cognito-identity.amazonaws.com',

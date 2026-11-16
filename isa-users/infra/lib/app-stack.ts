@@ -11,6 +11,7 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
+import * as fs from 'fs';
 import * as path from 'path';
 import { Annotations, Duration, RemovalPolicy, Size, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -27,12 +28,16 @@ import {
   stage,
   sesIdentityArn,
   tableName,
+  uploadsBucketName,
   userPool,
   errorDigest,
 } from './config';
 
 const projectRoot = path.join(__dirname, '../..');
 const serverRoot = path.join(projectRoot, 'server');
+const sharpVersion: string = JSON.parse(
+  fs.readFileSync(path.join(serverRoot, 'package.json'), 'utf8'),
+).devDependencies.sharp;
 
 export class AppStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -51,6 +56,7 @@ export class AppStack extends Stack {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       ISA_USERS_TABLE: tableName,
       ISA_USERS_IMAGES_S3_BUCKET: imagesBucketName,
+      ISA_USERS_UPLOADS_S3_BUCKET: uploadsBucketName,
       USERPOOL_ID: userPool.id,
       AUTH_DOMAIN: domains.auth,
       ACCOUNT_DOMAIN: domains.web,
@@ -81,11 +87,22 @@ export class AppStack extends Stack {
       }),
     });
 
-    const apiFunction = new nodejs.NodejsFunction(
-      this,
-      'ApiFunction',
-      functionProps('ApiFunction', 'src/functions/api/handler.ts'),
-    );
+    const apiProps = functionProps('ApiFunction', 'src/functions/api/handler.ts');
+    // sharp ships a native binary per platform, so it is installed for the Lambda's linux-x64.
+    const apiFunction = new nodejs.NodejsFunction(this, 'ApiFunction', {
+      ...apiProps,
+      bundling: {
+        ...apiProps.bundling,
+        externalModules: ['sharp'],
+        commandHooks: {
+          beforeBundling: () => [],
+          beforeInstall: () => [],
+          afterBundling: (_inputDir: string, outputDir: string) => [
+            `npm install --prefix "${outputDir}" --no-save --no-package-lock --os=linux --cpu=x64 --libc=glibc sharp@${sharpVersion}`,
+          ],
+        },
+      },
+    });
     const cognitoTriggerFunction = new nodejs.NodejsFunction(this, 'CognitoTriggerFunction', {
       ...functionProps('CognitoTriggerFunction', 'src/functions/cognito/handler.ts'),
       functionName: cognitoTriggerFunctionName,
@@ -102,6 +119,33 @@ export class AppStack extends Stack {
       );
     }
     imagesBucket.grantReadWrite(apiFunction);
+
+    const uploadsBucket = new s3.Bucket(this, 'UploadsBucket', {
+      bucketName: uploadsBucketName,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      enforceSSL: true,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      // Uploads are resized right away; what is left is never read again.
+      lifecycleRules: [{ expiration: Duration.days(1) }],
+      cors: [
+        {
+          allowedOrigins: [`https://${domains.web}`, 'http://localhost:5173'],
+          // GET and DELETE: Amplify resumes and aborts multipart uploads of larger files.
+          allowedMethods: [
+            s3.HttpMethods.PUT,
+            s3.HttpMethods.POST,
+            s3.HttpMethods.GET,
+            s3.HttpMethods.HEAD,
+            s3.HttpMethods.DELETE,
+          ],
+          allowedHeaders: ['*'],
+          exposedHeaders: ['ETag'],
+          maxAge: 3000,
+        },
+      ],
+    });
+    uploadsBucket.grantRead(apiFunction);
     apiFunction.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ['cognito-idp:AdminUpdateUserAttributes', 'cognito-idp:AdminGetUser'],

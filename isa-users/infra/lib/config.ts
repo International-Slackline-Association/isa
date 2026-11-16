@@ -27,13 +27,13 @@ export const userPool = {
 
 export const tableName = `${namespace}-users`;
 export const imagesBucketName = `${namespace}-images`;
+export const uploadsBucketName = `${namespace}-uploads`;
 export const cognitoTriggerFunctionName = `${namespace}-cognito-trigger`;
 
 export const sesIdentityArn =
   'arn:aws:ses:eu-central-1:387132903656:identity/slacklineinternational.org';
 
 export const isaTools = {
-  temporaryUploadsBucketName: 'isa-tools-temporary-uploads-prod',
   trustedServiceApiKeyParameter: '/isa-tools-trusted-service-api-key',
 };
 
