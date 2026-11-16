@@ -25,7 +25,6 @@ const CreateGuidePage = lazy(() => import('./pages/Create/Guide').then((m) => ({
 const CreateLinePage = lazy(() => import('./pages/Create/Line').then((m) => ({ default: m.CreateLinePage })));
 const CreateSpotPage = lazy(() => import('./pages/Create/Spot').then((m) => ({ default: m.CreateSpotPage })));
 const GuideEditPage = lazy(() => import('./pages/Guide/GuideEditPage').then((m) => ({ default: m.GuideEditPage })));
-const LegacyDetailPage = lazy(() => import('./pages/LegacyDetailPage').then((m) => ({ default: m.LegacyDetailPage })));
 const LineEditPage = lazy(() => import('./pages/Line/LineEditPage').then((m) => ({ default: m.LineEditPage })));
 const SlacklineMapPage = lazy(() => import('./pages/SlacklineMap').then((m) => ({ default: m.SlacklineMapPage })));
 const TermsPage = lazy(() => import('./pages/Terms').then((m) => ({ default: m.TermsPage })));
@@ -104,7 +103,6 @@ export function App() {
                   </>
                 )}
                 <Route path="/terms" element={<TermsPage />} />
-                <Route path="/x/:legacyId" element={<LegacyDetailPage />} />
                 <Route path="*" element={<SlacklineMapPage />} />
               </Routes>
             </Suspense>

@@ -32,7 +32,7 @@ export const cdnAccessLogGroupName = `${namespace}-cdn-access`;
 
 export const dataAccess = {
   // Off: cookies are issued and logged but not required. On: data. and the API turn away requests without one.
-  enforced: false,
+  enforced: true,
   turnstileSecretParameter: 'slackmap-turnstile-secret',
   signingKeyParameter: 'slackmap-session-signing-key',
   originSecretParameter: 'slackmap-origin-secret',
