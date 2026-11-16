@@ -53,7 +53,7 @@ export const apiScopes = {
 export const serviceClientSecretParameter = 'isa-users-service-client-secret';
 export const apps: Record<string, string[]> = {
   slackmap: ['isa-users/users.get'],
-  sporthub: ['isa-tools/documents.sign'],
+  sporthub: ['isa-tools/documents.sign', 'isa-users/users.get'],
   'isa-users': [
     'isa-tools/certificates.list',
     'isa-tools/certificates.generate',
