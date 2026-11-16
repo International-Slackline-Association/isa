@@ -130,44 +130,36 @@ export const TermsPage = () => (
       </Section>
 
       <Section id="privacy" title="Privacy">
-        <P>SlackMap is free for people but not for automated copying, so when you open it we check that you use a real browser:</P>
         <ul>
           <li>
             <Typography variant="body2">
-              <b>Cloudflare Turnstile</b> runs the check. Cloudflare processes your IP address and browser
-              data to tell people from bots, under its{' '}
-              <Link href="https://www.cloudflare.com/turnstile-privacy-policy/">Turnstile privacy addendum</Link>.
+              <b>What we process:</b> technical data from your browser (IP address, browser type,
+              country, network), a cookie the map needs to work, your ISA ID if you are signed in, and
+              whether you accepted the contributor agreement. Our logs do not keep your IP address.
             </Typography>
           </li>
           <li>
             <Typography variant="body2">
-              <b>A session cookie</b> then lets your browser load the map data for 12 hours. It is needed
-              for the map to work and used for nothing else.
+              <b>Why:</b> to run SlackMap, keep it secure and protect its data from automated copying
+              (our legitimate interest).
             </Typography>
           </li>
           <li>
             <Typography variant="body2">
-              <b>Usage limits:</b> we count requests per session, and new sessions per network using a
-              one-way hash of your IP address that expires after two hours.
+              <b>Who helps us:</b> Amazon Web Services (hosting, Frankfurt, Germany) and Cloudflare (the
+              check that tells people from bots, under its{' '}
+              <Link href="https://www.cloudflare.com/turnstile-privacy-policy/">Turnstile privacy addendum</Link>).
             </Typography>
           </li>
           <li>
             <Typography variant="body2">
-              <b>Technical logs</b> record each request with the time, your browser type, country and
-              network, and your ISA ID if you are signed in; not your IP address. We keep them 6 months.
-            </Typography>
-          </li>
-          <li>
-            <Typography variant="body2">
-              <b>Contributor agreement:</b> when you accept it, we keep your ISA ID, the version and the
-              date.
+              <b>How long:</b> technical logs up to 6 months; the agreement record as long as your
+              contributions are on SlackMap.
             </Typography>
           </li>
         </ul>
         <P>
-          We use this to keep SlackMap secure and its data from automated copying (our legitimate
-          interest). Hosting is Amazon Web Services in Frankfurt, Germany. Questions or requests about
-          your data: <Link href={`mailto:${contact}`}>{contact}</Link>.
+          Questions or requests about your data: <Link href={`mailto:${contact}`}>{contact}</Link>.
         </P>
       </Section>
 

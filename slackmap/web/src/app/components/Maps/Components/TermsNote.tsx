@@ -16,8 +16,7 @@ export const MapTermsNote = () => (
   >
     © ISA ·{' '}
     <Link href="/terms" color="inherit">
-      Data use terms
-    </Link>{' '}
-    · no automated access
+      Terms
+    </Link>
   </Box>
 );
