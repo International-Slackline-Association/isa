@@ -22,6 +22,7 @@ interface Props {
 const links: { title: string; href: string; icon: IconName }[] = [
   { title: 'Profile', href: '/user/profile', icon: 'account' },
   { title: 'Certificates', href: '/user/certificates', icon: 'certificate' },
+  { title: 'Apps', href: '/user/apps', icon: 'apps' },
 ];
 
 export function Sidebar(props: Props) {
@@ -205,6 +206,15 @@ function ProfileHeader({ user, refetchUser }: { user: User; refetchUser: () => v
           <Icon name="copy" size={16} />
         </button>
       </div>
+      {user.createdDateTime && (
+        <div className="isa-id">
+          Member since{' '}
+          {new Date(user.createdDateTime).toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'long',
+          })}
+        </div>
+      )}
     </div>
   );
 }

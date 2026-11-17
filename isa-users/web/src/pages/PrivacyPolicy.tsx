@@ -36,6 +36,10 @@ export function PrivacyPolicy() {
           your name, email and ISA ID, and the PDFs you generate from them.
         </li>
         <li>
+          <b>ISA apps you use:</b> whether you use SlackMap, Slackline Sport Hub or SlackData, taken
+          from those apps' own records.
+        </li>
+        <li>
           <b>Technical logs:</b> when you use the app our servers record the request, the time,
           your ISA ID, your browser type and the website you came from. We do not log your IP
           address.
@@ -53,6 +57,7 @@ export function PrivacyPolicy() {
           competition and ranking app (contract with you).
         </li>
         <li>Phone number: so ISA can contact you about your certificates (contract with you).</li>
+        <li>ISA apps you use: to show you on the Apps page which apps you use (contract with you).</li>
         <li>
           To keep the service secure and fix errors, using the technical logs (our legitimate
           interest).
@@ -88,7 +93,9 @@ export function PrivacyPolicy() {
 
       <h2>How long we keep it</h2>
       <ul>
-        <li>Your account and profile: until you ask us to delete your account.</li>
+        <li>
+          Your account, profile and the ISA apps you use: until you ask us to delete your account.
+        </li>
         <li>
           Certificates: as long as ISA keeps its certificate records, so that a certificate can
           still be verified. A generated PDF is kept 90 days.
