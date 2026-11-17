@@ -6,7 +6,7 @@ description: "Entry point for isa-tools: the tools API (certificates, signed-doc
 
 # ISA tools
 
-The tools API at `tools-api.slacklineinternational.org` and the web app at `verify.slacklineinternational.org` and `tools.slacklineinternational.org`.
+The tools API at `tools-api.slacklineinternational.org` and the web app at `verify.slacklineinternational.org` and `tools.slacklineinternational.org`. The web app, on both hosts, does not use [isa-brand](/isa-brand/docs/README.md): its UI is special, embedded in an iframe.
 
 ## Read when
 

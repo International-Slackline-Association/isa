@@ -2,6 +2,8 @@ import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from 'react';
 
 import { uploadData } from 'aws-amplify/storage';
 
+import logoWhite from '../isa-brand/logos/isa-wide/isa-wide-white.svg';
+
 import { User, put } from '../api';
 import { navigate } from '../router';
 import { Icon, IconName } from './Icons';
@@ -56,7 +58,7 @@ export function Sidebar(props: Props) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img alt="ISA Logo" src="/images/logo-contrast.svg" width="100%" />
+            <img alt="International Slackline Association" src={logoWhite} width="100%" />
           </a>
           <div className="footer-links">
             <button className="small-link" onClick={props.onSignOut}>

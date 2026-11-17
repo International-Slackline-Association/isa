@@ -21,3 +21,7 @@ Account and authentication management for the ISA. The Cognito user pool is the 
 - [Why one monorepo](/docs/the-monorepo.md): the users and the pool are critical data
 - [Errors](/docs/engineering/errors.md): why errors arrive weekly as issues
 - [How apps reach ISA services](/docs/engineering/app-access.md): the access list in [config](/isa-users/infra/lib/config.ts) and the `/v1` endpoints are this pattern
+
+## Related scopes
+
+- [ISA brand](/isa-brand/docs/README.md): the web app's colors, fonts and logos come from there

@@ -7,7 +7,6 @@ const red = '#FC3E3E';
 const magenta = '#1DDECE';
 const purple = '#9039A5';
 const mustard = '#CD9D3E';
-const primaryText = '#3B3F42';
 
 export const appColors = {
   slacklinePoint: slackmapGreen,
@@ -21,5 +20,4 @@ export const appColors = {
   slackmapBlue,
   slackmapGreen,
   isaBlue,
-  primaryText,
 };

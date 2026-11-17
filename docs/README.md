@@ -6,7 +6,7 @@ description: Entry point for the ISA monorepo. The projects it holds, how softwa
 
 # ISA
 
-Monorepo of the International Slackline Association. Each project is a self-contained folder.
+Monorepo of the International Slackline Association. Each project is a self-contained folder; isa-brand is shared.
 
 ## Read when
 
@@ -17,6 +17,7 @@ Monorepo of the International Slackline Association. Each project is a self-cont
 ## Projects
 
 - [AWS platform](/aws-platform/docs/README.md)
+- [ISA brand](/isa-brand/docs/README.md)
 - [ISA tools](/isa-tools/docs/README.md)
 - [ISA users](/isa-users/docs/README.md)
 - [SlackMap](/slackmap/docs/README.md)

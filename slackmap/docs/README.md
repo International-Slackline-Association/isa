@@ -24,3 +24,7 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 - [Infrastructure rules](/docs/engineering/infrastructure.md): the CDK shape and names `infra/` follows
 - [Why one monorepo](/docs/the-monorepo.md): the map data is critical data
 - [Errors](/docs/engineering/errors.md): why errors arrive weekly as issues
+
+## Related scopes
+
+- [ISA brand](/isa-brand/docs/README.md): the web app's fonts, text and error colors and ISA logos are a copy from there; its main colors stay SlackMap's blue and green, its own product identity

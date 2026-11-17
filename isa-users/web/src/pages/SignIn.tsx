@@ -1,5 +1,7 @@
 import { FormEvent, useState } from 'react';
 
+import logoColor from '../isa-brand/logos/isa-wide/isa-wide-color.svg';
+
 import { post } from '../api';
 import { Icon } from '../components/Icons';
 import { Popup } from '../components/Popup';
@@ -7,7 +9,7 @@ import { Popup } from '../components/Popup';
 export function SignIn({ onSignIn }: { onSignIn: () => void }) {
   return (
     <main className="sign-in">
-      <img alt="ISA Logo" src="/images/logo-wide.svg" className="sign-in-logo" />
+      <img alt="International Slackline Association" src={logoColor} className="sign-in-logo" />
       <ul className="benefits">
         <li>
           <Icon name="check" />

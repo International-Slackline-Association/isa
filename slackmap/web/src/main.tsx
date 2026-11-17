@@ -9,6 +9,9 @@ import App from 'app';
 import { Amplify } from 'aws-amplify';
 import { store } from 'store';
 
+import './isa-brand/fonts.css';
+import './isa-brand/tokens.css';
+
 import { theme } from './styles/theme';
 
 const container = document.getElementById('root') as HTMLElement;

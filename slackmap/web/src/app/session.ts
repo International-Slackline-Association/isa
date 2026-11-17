@@ -59,7 +59,7 @@ const overlay = (message: string) => {
     justifyContent: 'center',
     padding: '16px',
     background: 'rgba(0,0,0,0.5)',
-    fontFamily: 'Lato, sans-serif',
+    fontFamily: 'var(--isa-font-family-body)',
   });
   const card = document.createElement('div');
   Object.assign(card.style, {

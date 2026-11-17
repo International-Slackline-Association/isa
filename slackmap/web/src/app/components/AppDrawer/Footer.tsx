@@ -3,6 +3,8 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import HelpCenterIcon from '@mui/icons-material/HelpCenter';
 import { Grid, IconButton, Link, Typography } from '@mui/material';
 
+import logoWhite from 'isa-brand/logos/isa-wide/isa-wide-white.svg';
+
 import { useInfoDialog } from '../Dialogs/useInfoDialog';
 import { FAQ } from './FAQ';
 
@@ -21,7 +23,7 @@ export const Footer = () => {
           href="https://www.slacklineinternational.org"
           target="_blank"
         >
-          <img alt="ISA Logo" src="/images/isa-logo-wide-contrast.svg" width="100%" />
+          <img alt="International Slackline Association" src={logoWhite} width="100%" />
         </Link>
       </Grid>
       <Grid size={6}>

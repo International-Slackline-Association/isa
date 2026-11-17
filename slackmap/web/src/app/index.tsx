@@ -69,7 +69,6 @@ export function App() {
       <GlobalStyles
         styles={{
           body: {
-            fontFamily: 'Lato',
             height: '100%',
             width: '100%',
           },

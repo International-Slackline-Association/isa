@@ -30,7 +30,7 @@ export const MaintenancePage = () => {
         sx={{ width: 260, maxWidth: '80%', mb: 5 }}
       />
 
-      <Typography variant="h4" sx={{ fontWeight: 800, color: appColors.primaryText, mb: 2 }}>
+      <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 2 }}>
         We&rsquo;ll be back soon
       </Typography>
 

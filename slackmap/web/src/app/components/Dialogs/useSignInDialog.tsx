@@ -6,6 +6,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 
 import { signInWithRedirect } from 'aws-amplify/auth';
+import logoColor from 'isa-brand/logos/isa-wide/isa-wide-color.svg';
 
 export const useSignInDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +34,7 @@ export const useSignInDialog = () => {
             textAlign: 'center',
           }}
         >
-          <img src="/images/isa-logo-wide.svg" alt="ISA Logo" width={'50%'} />
+          <img src={logoColor} alt="International Slackline Association" width={'50%'} />
           <Typography variant="body2">Login to your ISA Account</Typography>
           <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
             If you don`t have an account, you can create one in a few seconds.

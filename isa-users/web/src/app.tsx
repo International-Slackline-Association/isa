@@ -1,5 +1,7 @@
 import { ComponentType, useEffect, useState } from 'react';
 
+import logoWhite from './isa-brand/logos/isa-wide/isa-wide-white.svg';
+
 import { User, useFetch } from './api';
 import { useAuth } from './auth';
 import { Icon } from './components/Icons';
@@ -87,7 +89,7 @@ function Topbar({ onMenu }: { onMenu?: () => void }) {
   return (
     <header className="topbar">
       <a href="https://www.slacklineinternational.org" target="_blank" rel="noopener noreferrer">
-        <img alt="ISA Logo" src="/images/logo-contrast.svg" height="32" />
+        <img alt="International Slackline Association" src={logoWhite} height="32" />
       </a>
       {onMenu && (
         <button className="icon-button" onClick={onMenu} aria-label="Menu">
