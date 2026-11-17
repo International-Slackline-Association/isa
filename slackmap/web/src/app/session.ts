@@ -47,30 +47,53 @@ const loadTurnstile = () =>
     document.head.appendChild(script);
   });
 
-const container = () => {
-  const element = document.createElement('div');
-  Object.assign(element.style, {
+// A card in the middle of a dimmed screen, so the check is not missed over the map.
+const overlay = (message: string) => {
+  const backdrop = document.createElement('div');
+  Object.assign(backdrop.style, {
     position: 'fixed',
-    bottom: '24px',
-    left: '50%',
-    transform: 'translateX(-50%)',
+    inset: '0',
     zIndex: '2000',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '16px',
+    background: 'rgba(0,0,0,0.5)',
     fontFamily: 'Lato, sans-serif',
   });
-  document.body.appendChild(element);
-  return element;
+  const card = document.createElement('div');
+  Object.assign(card.style, {
+    background: 'white',
+    color: '#222',
+    padding: '24px',
+    borderRadius: '12px',
+    boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+    textAlign: 'center',
+    maxWidth: '360px',
+  });
+  const text = document.createElement('p');
+  Object.assign(text.style, { margin: '0 0 16px', fontSize: '17px', lineHeight: '1.4' });
+  text.textContent = message;
+  const slot = document.createElement('div');
+  card.append(text, slot);
+  backdrop.appendChild(card);
+  document.body.appendChild(backdrop);
+  return { backdrop, slot };
 };
 
 const getToken = async () => {
   if (import.meta.env.DEV) return '';
   const turnstile = await loadTurnstile();
-  const element = container();
+  const { backdrop, slot } = overlay('One quick check that you are human, then the map loads.');
+  // Hidden while Cloudflare decides on its own; shown only when the person has to click.
+  Object.assign(backdrop.style, { opacity: '0', pointerEvents: 'none' });
   try {
     return await new Promise<string>((resolve, reject) => {
-      const widgetId = turnstile.render(element, {
+      const widgetId = turnstile.render(slot, {
         sitekey: turnstileSiteKey,
-        // The widget stays invisible unless Cloudflare needs the person to click.
         appearance: 'interaction-only',
+        'before-interactive-callback': () =>
+          Object.assign(backdrop.style, { opacity: '1', pointerEvents: 'auto' }),
         callback: (token: string) => {
           turnstile.remove(widgetId);
           resolve(token);
@@ -79,7 +102,7 @@ const getToken = async () => {
       });
     });
   } finally {
-    element.remove();
+    backdrop.remove();
   }
 };
 
@@ -88,14 +111,7 @@ let failureShown = false;
 export const showSessionFailure = () => {
   if (failureShown) return;
   failureShown = true;
-  const element = container();
-  Object.assign(element.style, {
-    background: 'white',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-  });
-  element.textContent = "We couldn't verify your browser. Reload the page to try again.";
+  overlay("SlackMap couldn't start. Make sure cookies are allowed for slackmap.com, then reload the page.");
 };
 
 const startSession = async () => {

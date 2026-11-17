@@ -44,7 +44,10 @@ export const TermsPage = () => (
       </Section>
 
       <Section title="What needs our written permission">
-        <P>Without written permission from ISA you may not:</P>
+        <P>
+          Without written permission from ISA you may not do the following; to get it, see{' '}
+          <Link href="#partner-access">Partner access</Link>.
+        </P>
         <ul>
           <li>
             <Typography variant="body2">
@@ -87,10 +90,13 @@ export const TermsPage = () => (
         </P>
       </Section>
 
-      <Section title="Partner access">
+      <Section id="partner-access" title="Partner access">
         <P>
-          Want to use SlackMap data in your own project, federation or research? Write to{' '}
-          <Link href={`mailto:${contact}`}>{contact}</Link>. ISA grants partner licences case by case.
+          Building something with slackline data: an app, a federation or club map, a local guide,
+          research? Talk to us before you script anything. Write to{' '}
+          <Link href={`mailto:${contact}`}>{contact}</Link> with what you are building and which data you
+          need. ISA looks at every request case by case and is happy to grant access to projects that
+          serve the slackline community.
         </P>
       </Section>
 
