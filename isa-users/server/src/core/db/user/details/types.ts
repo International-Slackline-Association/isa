@@ -17,8 +17,6 @@ interface NonKeyAttrs {
   profilePictureS3Key?: string;
   createdDateTime?: string;
   verificationEmails?: { day: string; count: number };
-  // App client IDs, marked from the apps' own data.
-  appsUsed?: Set<string>;
 }
 
 export type DDBUserDetailItem = ParsedKeyAttrs & NonKeyAttrs;

@@ -8,8 +8,7 @@ import type { UpdateProfilePicturePostBody, UpdateUserPostBody } from './types';
 
 export const getUserDetails = async (request: Request) => {
   const user = await db.getUser(request.user!.isaId);
-  // A DynamoDB set does not survive JSON.
-  return user && { ...user, appsUsed: user.appsUsed ? [...user.appsUsed] : undefined };
+  return user;
 };
 
 export const updateUser = async (request: Request) => {

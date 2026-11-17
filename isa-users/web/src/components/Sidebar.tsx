@@ -22,7 +22,6 @@ interface Props {
 const links: { title: string; href: string; icon: IconName }[] = [
   { title: 'Profile', href: '/user/profile', icon: 'account' },
   { title: 'Certificates', href: '/user/certificates', icon: 'certificate' },
-  { title: 'Apps', href: '/user/apps', icon: 'apps' },
 ];
 
 export function Sidebar(props: Props) {

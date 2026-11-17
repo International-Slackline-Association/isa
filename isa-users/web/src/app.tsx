@@ -9,7 +9,6 @@ import { Sidebar } from './components/Sidebar';
 import { Spinner } from './components/Spinner';
 import { Toast } from './components/Toast';
 import { VerifyEmailBanner } from './components/VerifyEmailBanner';
-import { Apps } from './pages/Apps';
 import { Certificates } from './pages/Certificates';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Profile } from './pages/Profile';
@@ -20,7 +19,6 @@ import { navigate, usePath } from './router';
 const pages: Record<string, ComponentType<{ user: User; refetchUser: () => void }>> = {
   '/user/profile': Profile,
   '/user/certificates': Certificates,
-  '/user/apps': Apps,
 };
 
 const publicPages: Record<string, ComponentType> = {
