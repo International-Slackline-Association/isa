@@ -3,7 +3,13 @@ import { MapRef } from 'react-map-gl/mapbox';
 
 import { MapboxGeoJSONFeature } from 'mapbox-gl';
 
-import { centerMapToFeature, padMapTo, parseMapFeature } from '../mapUtils';
+import {
+  centerMapToFeature,
+  padMapTo,
+  parseMapFeature,
+  removeFeatureState,
+  setFeatureState,
+} from '../mapUtils';
 import { getSourceIdForType } from '../sources/utils';
 import { MapFeatureEntity } from '../types';
 
@@ -49,7 +55,8 @@ export const useSelectedFeature = (
 
     if (lastSelectedFeature && lastSelectedFeature.id !== selectedFeature?.id) {
       for (const source of getSourceIdForType(lastSelectedFeature.type)) {
-        map.removeFeatureState(
+        removeFeatureState(
+          map,
           {
             id: lastSelectedFeature.id,
             source,
@@ -61,7 +68,8 @@ export const useSelectedFeature = (
 
     if (selectedFeature) {
       for (const source of getSourceIdForType(selectedFeature.type)) {
-        map.setFeatureState(
+        setFeatureState(
+          map,
           {
             id: selectedFeature.id,
             source,

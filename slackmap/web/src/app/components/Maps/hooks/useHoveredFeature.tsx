@@ -3,7 +3,7 @@ import { MapRef } from 'react-map-gl/mapbox';
 
 import { MapboxGeoJSONFeature } from 'mapbox-gl';
 
-import { parseMapFeature } from '../mapUtils';
+import { parseMapFeature, removeFeatureState, setFeatureState } from '../mapUtils';
 import { getSourceIdForType } from '../sources/utils';
 import { MapFeatureEntity } from '../types';
 
@@ -28,7 +28,8 @@ export const useHoveredFeature = (mapRef: RefObject<MapRef | null>) => {
 
     if (lastHoveredFeature && lastHoveredFeature.id !== hoveredFeature?.id) {
       for (const source of getSourceIdForType(lastHoveredFeature.type)) {
-        map.removeFeatureState(
+        removeFeatureState(
+          map,
           {
             id: lastHoveredFeature.id,
             source,
@@ -41,7 +42,8 @@ export const useHoveredFeature = (mapRef: RefObject<MapRef | null>) => {
     if (hoveredFeature) {
       for (const source of getSourceIdForType(hoveredFeature.type)) {
         if (source) {
-          map.setFeatureState(
+          setFeatureState(
+            map,
             {
               id: hoveredFeature.id,
               source,

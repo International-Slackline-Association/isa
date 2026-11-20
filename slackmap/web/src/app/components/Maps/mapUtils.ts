@@ -209,3 +209,32 @@ const isFeatureLine = (feature: Feature): feature is Feature<LineString> => {
 const isFeaturePolygon = (feature: Feature): feature is Feature<Polygon> => {
   return getType(feature) === 'Polygon';
 };
+
+const isStyleRebuilding = (error: unknown) =>
+  error instanceof Error && error.message === 'Style is not done loading';
+
+// A style switch (zoom past 10, or another style picked) rebuilds the style and wipes all feature
+// state; Mapbox throws if feature state is touched meanwhile, so the change is dropped like the rest.
+export const removeFeatureState = (
+  map: MapRef,
+  target: { id: string; source: string },
+  key: string,
+) => {
+  try {
+    map.removeFeatureState(target, key);
+  } catch (error) {
+    if (!isStyleRebuilding(error)) throw error;
+  }
+};
+
+export const setFeatureState = (
+  map: MapRef,
+  target: { id: string; source: string },
+  state: Record<string, unknown>,
+) => {
+  try {
+    map.setFeatureState(target, state);
+  } catch (error) {
+    if (!isStyleRebuilding(error)) throw error;
+  }
+};
