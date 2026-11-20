@@ -103,7 +103,9 @@ export const createHandler = (
         // Body and query hold personal data, so they stay out of the log. A caller's mistake is a
         // warning, so only real failures reach the error digest.
         const data = { httpRequest: { path, method }, route: routeKey ?? null, stack };
-        if (/^(Unauthorized|Validation|NotFound|Expired|Invalid)\b|not found/i.test(message)) {
+        // An AWS SDK error is never the caller's mistake, whatever its message says.
+        const fromAws = typeof error === 'object' && error !== null && '$metadata' in error;
+        if (!fromAws && /^(Unauthorized|Validation|NotFound|Expired|Invalid)\b|not found/i.test(message)) {
           logger.warn(message, data);
         } else {
           logger.error(message, data);

@@ -16,7 +16,8 @@ ddb.middlewareStack.add(
     try {
       return await next(args);
     } catch (error) {
-      logger.error(`DynamoDB Error`, {
+      // A warning: the caller may expect the failure (a failed condition), and each Lambda logs what it does not handle as an error.
+      logger.warn(`DynamoDB Error`, {
         command: context.commandName || args.constructor.name,
         input: args.input,
         error: (error as any).message,

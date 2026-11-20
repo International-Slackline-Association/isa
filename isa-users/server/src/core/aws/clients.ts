@@ -19,7 +19,8 @@ ddb.middlewareStack.add(
       return await next(args);
     } catch (error) {
       // The command input holds the user item, so it stays out of the log.
-      logger.error(`DynamoDB Error`, {
+      // A warning: the caller may expect the failure (a failed condition), and each Lambda logs what it does not handle as an error.
+      logger.warn(`DynamoDB Error`, {
         command: context.commandName || args.constructor.name,
         error: (error as Error).message,
       });

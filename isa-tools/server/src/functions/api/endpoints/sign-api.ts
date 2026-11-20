@@ -50,6 +50,11 @@ const verifySignedDocument = async (request: Request) => {
         case 'Expired':
           errorMessage = 'The document has expired';
           break;
+        default:
+          logger.error('Document verification failed', {
+            message: error.message,
+            stack: error.stack,
+          });
       }
     }
     return json({ isVerified: false, content: errorMessage });

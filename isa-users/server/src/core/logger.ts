@@ -11,5 +11,6 @@ export const logger = {
     lambdaName = name;
   },
   info: (message: string, data?: Record<string, unknown>) => write('info', message, data),
+  warn: (message: string, data?: Record<string, unknown>) => write('warn', message, data),
   error: (message: string, data?: Record<string, unknown>) => write('error', message, data),
 };
