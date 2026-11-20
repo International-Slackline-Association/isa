@@ -19,6 +19,7 @@ import { MapLogo } from '../Components/Logo';
 import { MapTermsNote } from '../Components/TermsNote';
 import { MapActivityButton } from '../Components/MapActivityButton';
 import { MapImage } from '../Components/MapImage';
+import { MapDataLoadingIndicator } from '../Components/MapDataLoadingIndicator';
 import { MapLoadingPlaceholder } from '../Components/MapLoadingPlaceholder';
 import { MAPBOX_TOKEN, defaultMapSettings, defaultMapViewState } from '../constants';
 import { useActiveFeature } from '../hooks/useActiveFeature';
@@ -30,7 +31,7 @@ import { useMapStyle } from '../hooks/useMapStyle';
 import { useSelectedFeature } from '../hooks/useSelectedFeature';
 import { useZoomToUserLocationOnMapLoad } from '../hooks/useZoomToUserLocation';
 import { cursorInteractableLayerIds, isMouseHoverableLayer } from '../layers';
-import { SlacklineMapSources } from '../sources/slacklineMapSources';
+import { SlacklineMapSourceIds, SlacklineMapSources } from '../sources/slacklineMapSources';
 import { MapFeatureEntity } from '../types';
 import { SlacklineMapLegend } from './Legend';
 import { GeocoderControl } from './geocoderControl';
@@ -136,6 +137,11 @@ export const SlacklineMap = (props: Props) => {
       }}
     >
       {!isMapLoaded && <MapLoadingPlaceholder pad={Boolean(props.activeSlacklineFeature)} />}
+      <MapDataLoadingIndicator
+        mapRef={mapRef}
+        isMapLoaded={isMapLoaded}
+        sourceId={SlacklineMapSourceIds.linePoints}
+      />
       <MapLogo />
       <MapTermsNote />
       {isMapLoaded && !props.activeSlacklineFeature && <SlacklineMapLegend />}

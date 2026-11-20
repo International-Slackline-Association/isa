@@ -18,6 +18,7 @@ import type { FeatureCollection } from 'geojson';
 import { MapLogo } from '../Components/Logo';
 import { MapTermsNote } from '../Components/TermsNote';
 import { MapImage } from '../Components/MapImage';
+import { MapDataLoadingIndicator } from '../Components/MapDataLoadingIndicator';
 import { MapLoadingPlaceholder } from '../Components/MapLoadingPlaceholder';
 import { defaultMapSettings, defaultMapViewState } from '../constants';
 import { useActiveFeature } from '../hooks/useActiveFeature';
@@ -30,7 +31,7 @@ import { useZoomToUserLocationOnMapLoad } from '../hooks/useZoomToUserLocation';
 import { isMouseHoverableLayer } from '../layers';
 import { CountryLayerIds } from '../layers/countryLayers';
 import { SlacklineGroupsLayerIds } from '../layers/slacklineGroupsLayer';
-import { CommunityMapSources } from '../sources/commnunityMapSources';
+import { CommunityMapSourceIds, CommunityMapSources } from '../sources/commnunityMapSources';
 import { MapFeatureEntity } from '../types';
 import { CommunityMapLegend } from './Legend';
 
@@ -99,6 +100,11 @@ export const CommunityMap = (props: Props) => {
       }}
     >
       {!isMapLoaded && <MapLoadingPlaceholder pad={Boolean(props.activeCommunityFeature)} />}
+      <MapDataLoadingIndicator
+        mapRef={mapRef}
+        isMapLoaded={isMapLoaded}
+        sourceId={CommunityMapSourceIds.slacklineGroups}
+      />
       <MapLogo />
       <MapTermsNote />
       {isMapLoaded && <CommunityMapLegend />}
