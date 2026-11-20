@@ -23,7 +23,7 @@ export const TermsPage = () => (
       <Typography variant="h4" component="h1" gutterBottom>
         Terms of use and data use policy
       </Typography>
-      <Typography variant="caption">Effective 17 November 2026</Typography>
+      <Typography variant="caption">Effective 20 November 2026</Typography>
 
       <Section title="Who we are">
         <P>
@@ -176,6 +176,13 @@ export const TermsPage = () => (
           ISA runs SlackMap as a volunteer, non-profit service and provides it as it is. As far as the
           law allows, ISA is not liable for losses from using SlackMap or from it being unavailable;
           liability for intent and gross negligence remains.
+        </P>
+        <P>
+          <b>No safety-critical use.</b> A place without a line on the map may still have one. The
+          map data is not an official or complete source for anything, and must not be relied on
+          where an error could cause injury or damage, such as navigation, aviation or obstacle
+          avoidance. Whoever uses it does so at their own risk and is responsible to their own
+          users.
         </P>
       </Section>
 

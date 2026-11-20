@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: "Data access"
-description: "Why slackmap's map data and API sit behind a Cloudflare Turnstile browser check, a signed session cookie and per-session limits; what was rejected (AWS WAF, self-hosted proof-of-work, trap entries, encoding, rough coordinates); the terms and contributor agreement; the partner door left for later."
+description: "Why slackmap's map data and API sit behind a Cloudflare Turnstile browser check, a signed session cookie and per-session limits; what was rejected (AWS WAF, self-hosted proof-of-work, trap entries, encoding, rough coordinates); the terms and contributor agreement; the no-safety-critical-use clause; the partner door left for later."
 ---
 
 # Data access
@@ -16,4 +16,5 @@ The map data is valuable: free for actual humans, not for scripters. Scripts wer
 - **Rejected:** trap entries, because we cannot track them; encoding the file with a rotating key, because with the code public it adds little over the check.
 - **A free app, not a strict one.** No special handling for a Cloudflare outage; don't overengineer.
 - **Terms and contributor agreement are standard texts**, without a lawyer. The agreement covers past contributions too, because most of the data is already in.
-- **Partner access.** Nobody is approved today, and nothing is built for it. When someone is, they get an app client with a scope, the way apps reach isa-users: [how apps reach ISA services](/docs/engineering/app-access.md).
+- **No safety-critical use.** Aviation users already show highlines in their navigation displays as obstacles, without our permission. Until a partner signs a licence, this clause in the terms is the stopgap that covers ISA. It stays generic: what the data is used for is not our concern, it is not a source for anything. Only safety-critical use is named, with navigation and aviation as examples, because a warning counts where it addresses the risk; no list of individual cases.
+- **Partner access.** Partners are to pay for the data. Nobody is approved today, and nothing is built for it. When someone is, they get an app client with a scope, the way apps reach isa-users: [how apps reach ISA services](/docs/engineering/app-access.md).
