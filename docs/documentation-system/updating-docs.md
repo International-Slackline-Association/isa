@@ -26,9 +26,10 @@ Every change to a `docs/` folder starts in one of five ways. Nothing else starts
 Runs at the end of every change, before the pull request; nothing waits for the human to ask for it.
 
 1. Walk the change by scope, lowest folder first.
-2. For each scope, write what the human said in this session that the code will not show: what they decided, what they considered and rejected, what is not decided, what the next change must not foreclose. In their words, through [an explanation or policy](#an-explanation-or-policy).
+2. For each scope, write what the human said in this session that the code will not show: what they decided, what is not decided, what the next change must not foreclose. In their words, through [an explanation or policy](#an-explanation-or-policy).
 3. Where the change holds a decision the conversation did not explain ([how we build](/docs/engineering/how-we-build.md#what-an-agent-reminds-not-decides)), ask, one question at a time and anchored to the diff. "Nothing" is a complete answer: the scope needs no doc, and the absence says so. A mechanical change holds none: write nothing and say so in one line.
-4. A sentence in an existing doc that the change falsified is way 4.
+4. What they considered and rejected is never written unasked: list it to them and ask whether to record it; write only what they choose.
+5. A sentence in an existing doc that the change falsified is way 4.
 
 ## Before any doc
 
@@ -48,7 +49,7 @@ This is where the human does the thinking the code cannot show, and the conversa
 
 1. What the conversation gave decides whether the scope needs one: if a competent agent entered this folder with no docs, what would it get wrong? Nothing → no `docs/`. One sentence → the README. More → a sibling explanation.
 2. Ask what you cannot derive and the session did not give, one question at a time, each anchored to something you found in the code: "X depends on Y; I would have expected Z. Why?" Options are welcome; what goes into the doc is what they chose or corrected, never an option they did not. Stop when you can predict the human's decision in a new case, or when they say stop. Where the session already holds the answer, skip to 3, unless the why behind it is missing: ask for it.
-3. Write only what they said and answered, in their words, and what they rejected, as [the theory](the-theory.md#derivable-or-theory) describes. In the scope where it is fully true ([folder convention](folder-convention.md#placement)). If an answer contradicts existing explanation, replace it: they changed their mind; don't leave both.
+3. Write only what they said and answered, in their words, and only the rejections they chose to record ([end of a change](#at-the-end-of-a-change)), as [the theory](the-theory.md#derivable-or-theory) describes. In the scope where it is fully true ([folder convention](folder-convention.md#placement)). If an answer contradicts existing explanation, replace it: they changed their mind; don't leave both.
 4. Apply the [content rules](content-rules.md) to every claim. Delete every derivable one. An answer you could have found in the code was never a gap: say which README or description should have pointed you there.
 5. Read it as an agent would: could a reader predict what the human would decide in a new case here? If not, it is too vague: ask more. If they could predict it from the code alone, the doc is noise.
 

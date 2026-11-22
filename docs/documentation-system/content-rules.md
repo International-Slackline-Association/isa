@@ -57,7 +57,7 @@ A `reference` or `how-to` is the exception: rule 1 neither deletes it nor its cl
 | "This could grow into multi-tenant." | 9, don't foreclose it | in, as background |
 | "I haven't decided how billing works yet." | 2, stop and ask | in, as not decided |
 | "Nothing outside the billing gateway may read subscription state." | 7 | in, as a `policy`, its why in the explanation |
-| "We chose Postgres over SQLite because…" | 1: the choice is derivable, the rejection is not | the why and the rejected alternative in; the choice only as the clause that carries them |
+| "We chose Postgres over SQLite because…" | 1: the choice is derivable, the rejection is not | the why in, the choice only as the clause that carries it; the rejected alternative only if the human chose to record it |
 
 ## What the rules do not check
 

@@ -5,6 +5,7 @@ Monorepo of the [International Slackline Association](https://www.slacklineinter
 | Folder | What it is |
 |---|---|
 | [aws-platform](aws-platform/) | The ISA's AWS organization: accounts, access, guardrails, shared resources (CDK) |
+| [internals/data-backup](internals/data-backup/) | Encrypted backup of each app's essential data outside AWS, every 6 months |
 | [isa-tools](isa-tools/) | Tools API, certificate verification and the listing pages embedded on the ISA website |
 | [isa-users](isa-users/) | ISA accounts: the user pool ISA apps sign in with, the account web app and its API |
 | [slackmap](slackmap/) | The world slackline map at slackmap.com, its API and map data |
