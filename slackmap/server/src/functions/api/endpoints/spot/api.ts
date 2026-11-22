@@ -52,6 +52,7 @@ export const createSpot = async (req: Request) => {
 
   const processedGeoJson = processSpotGeoJson(geoJson, {
     spotId: spotId,
+    types: body.types,
     country: countryCode,
   });
 
@@ -64,6 +65,7 @@ export const createSpot = async (req: Request) => {
     geoJson: JSON.stringify(processedGeoJson),
     name: body.name,
     description: body.description,
+    types: body.types,
     accessInfo: body.accessInfo,
     contactInfo: body.contactInfo,
     restrictionLevel: body.restrictionLevel,
@@ -104,8 +106,14 @@ export const updateSpot = async (req: Request) => {
     maxImageNumber: 3,
   });
 
-  const processedGeoJson = processSpotGeoJson(geoJson, { spotId, country: spot.country });
-  const payload = { ...req.body, images: spotImages, geoJson: JSON.stringify(processedGeoJson) };
+  const types = body.types ?? spot.types;
+  const processedGeoJson = processSpotGeoJson(geoJson, { spotId, types, country: spot.country });
+  const payload = {
+    ...req.body,
+    types,
+    images: spotImages,
+    geoJson: JSON.stringify(processedGeoJson),
+  };
   const updatedSpot = assignFromSourceToTarget(payload, spot);
   updatedSpot.lastModifiedDateTime = new Date().toISOString();
   await db.putSpot(updatedSpot);

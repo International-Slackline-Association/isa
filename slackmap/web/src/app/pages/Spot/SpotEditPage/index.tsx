@@ -100,6 +100,7 @@ export function SpotEditPage() {
             initialValues={{
               accessInfo: spotDetails.accessInfo,
               description: spotDetails.description,
+              types: spotDetails.types,
               name: spotDetails.name,
               contactInfo: spotDetails.contactInfo,
               extraInfo: spotDetails.extraInfo,

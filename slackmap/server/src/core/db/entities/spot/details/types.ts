@@ -1,5 +1,5 @@
 import { DDBGenericItemTypes } from '../../../utils/types';
-import { SlacklineRestrictionLevel } from '../../../../types';
+import { SlacklineRestrictionLevel, SpotType } from '../../../../types';
 
 type PrimaryKeyAttrs = {
   spotId: string;
@@ -14,6 +14,7 @@ type NonKeyAttrs = {
   geoJson: string;
   name?: string;
   description?: string;
+  types?: SpotType[];
   accessInfo?: string;
   contactInfo?: string;
   restrictionLevel?: SlacklineRestrictionLevel;

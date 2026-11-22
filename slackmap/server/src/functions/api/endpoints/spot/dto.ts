@@ -13,6 +13,7 @@ export const getSpotDetailsResponse = (
     geoJson: JSON.parse(item.geoJson) as FeatureCollection,
     name: item.name,
     description: item.description,
+    types: item.types,
     createdDateTime: item.createdDateTime,
     lastModifiedDateTime: item.lastModifiedDateTime,
     creatorUserId: item.creatorUserId,

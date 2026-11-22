@@ -9,11 +9,12 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
 import IconButton from '@mui/material/IconButton';
-import { Stack } from '@mui/material';
+import { Chip, Stack } from '@mui/material';
 
 import { centerOfMass } from '@turf/turf';
 import { featureApi } from 'app/api/feature-api';
 import { GetSpotDetailsAPIResponse, spotApi } from 'app/api/spot-api';
+import { spotTypeOptions } from 'utils/spotTypes';
 import { FeatureContactField } from 'app/components/FeatureDetailFields/FeatureContactField';
 import { FeatureHistoryField } from 'app/components/FeatureDetailFields/FeatureHistoryField';
 import { FeatureMenuActions } from 'app/components/FeatureDetailFields/FeatureMenuActions';
@@ -89,6 +90,15 @@ export const SpotDetailCard = (props: Props) => {
               'dd MMM yyy',
             )}`}
           />
+          {!!spotDetails.types?.length && (
+            <Stack direction="row" spacing={1} sx={{ px: 2, pb: 2 }}>
+              {spotTypeOptions
+                .filter((o) => spotDetails.types?.includes(o.value))
+                .map((o) => (
+                  <Chip key={o.value} label={o.label} size="small" color="primary" />
+                ))}
+            </Stack>
+          )}
           <CardMedia
             component="img"
             height="194"

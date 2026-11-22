@@ -21,13 +21,13 @@ import {
   Typography,
 } from '@mui/material';
 
-import { SlacklineType } from '@server/core/types';
+import { SlacklineType, SpotType } from '@server/core/types';
 import { SlacklineFeatureIcon } from 'app/components/Icons/SlacklineFeatureIcon';
 import { useAppLocalStorage } from 'utils/hooks/useAppLocalStorage';
+import { spotTypeOptions } from 'utils/spotTypes';
 
 export type SelectedDisplayFeature = SlacklineMapFeatureType | 'all';
 export type SelectedMapStyle = 'default' | 'satellite' | 'outdoors' | 'streets';
-export type SelectedSlacklineType = SlacklineType | 'none';
 
 const features: {
   key: SelectedDisplayFeature;
@@ -56,14 +56,10 @@ const features: {
   },
 ];
 
-const filterMenuItems: {
-  key: SelectedSlacklineType;
+const lineTypeFilterItems: {
+  key: SlacklineType;
   label: string;
 }[] = [
-  {
-    key: 'none',
-    label: 'None',
-  },
   {
     key: 'highline',
     label: 'Highline',
@@ -98,7 +94,17 @@ export const useMapOptions = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDisplayFeature, setSelectedDisplayFeature] =
     useState<SelectedDisplayFeature>('all');
-  const [selectedSlacklineType, setSelectedSlacklineType] = useState<SelectedSlacklineType>('none');
+  const [selectedType, setSelectedType] = useState<SlacklineType | SpotType | 'none'>('none');
+
+  const typeFilter =
+    selectedDisplayFeature === 'line'
+      ? { label: 'Slackline Type', items: lineTypeFilterItems }
+      : selectedDisplayFeature === 'spot'
+        ? {
+            label: 'Spot Type',
+            items: spotTypeOptions.map((o) => ({ key: o.value, label: o.label })),
+          }
+        : undefined;
 
   const savedMapStyle = useAppLocalStorage('mapSettings.mapStyle', 'default');
 
@@ -183,24 +189,26 @@ export const useMapOptions = () => {
                   checked={selectedDisplayFeature === feature.key}
                   onClick={() => {
                     setSelectedDisplayFeature(feature.key as SlacklineMapFeatureType);
+                    setSelectedType('none');
                   }}
                 />
               ))}
             </Item>
             <Divider />
             <Item text={'Filter'}>
-              <FormControl size="small" sx={{ m: 1, minWidth: '15ch' }}>
-                <InputLabel id="slackline-type">Slackline Type</InputLabel>
+              <FormControl size="small" sx={{ m: 1, minWidth: '15ch' }} disabled={!typeFilter}>
+                <InputLabel id="feature-type">{typeFilter?.label ?? 'Type'}</InputLabel>
                 <Select
-                  labelId="slackline-type"
-                  value={selectedSlacklineType}
+                  labelId="feature-type"
+                  value={selectedType}
                   autoWidth
-                  label="Slackline Type"
+                  label={typeFilter?.label ?? 'Type'}
                   onChange={(event) => {
-                    setSelectedSlacklineType(event.target.value as SelectedSlacklineType);
+                    setSelectedType(event.target.value as SlacklineType | SpotType | 'none');
                   }}
                 >
-                  {filterMenuItems.map((item) => (
+                  <MenuItem value="none">None</MenuItem>
+                  {typeFilter?.items.map((item) => (
                     <MenuItem key={item.key} value={item.key}>
                       {item.label}
                     </MenuItem>
@@ -290,7 +298,14 @@ export const useMapOptions = () => {
   return {
     MapOptionsComponent,
     selectedDisplayFeature,
-    selectedSlacklineType,
+    selectedLineType:
+      selectedDisplayFeature === 'line' && selectedType !== 'none'
+        ? (selectedType as SlacklineType)
+        : undefined,
+    selectedSpotType:
+      selectedDisplayFeature === 'spot' && selectedType !== 'none'
+        ? (selectedType as SpotType)
+        : undefined,
     selectedMapStyle: savedMapStyle.value,
   };
 };

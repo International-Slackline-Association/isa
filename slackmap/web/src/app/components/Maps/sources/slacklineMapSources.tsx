@@ -2,7 +2,7 @@ import { useSessionReady } from 'app/session';
 import React, { useEffect } from 'react';
 import { Layer, Source } from 'react-map-gl/mapbox';
 
-import { SlacklineType } from '@server/core/types';
+import { SlacklineType, SpotType } from '@server/core/types';
 import { geoJsonURL } from 'app/api/constants';
 
 import { SelectedDisplayFeature } from '../SlacklineMap/useMapOptions';
@@ -33,6 +33,7 @@ export const SlacklineMapSources = (props: {
   filter?: {
     id?: string;
     lineType?: SlacklineType;
+    spotType?: SpotType;
     country?: string;
   };
 }) => {
@@ -41,6 +42,7 @@ export const SlacklineMapSources = (props: {
 
   const [idFilterExpr, setIdFilterExpr] = React.useState<any>();
   const [lineTypeFilterExpr, setLineTypeFilterExpr] = React.useState<any>();
+  const [spotTypeFilterExpr, setSpotTypeFilterExpr] = React.useState<any>();
   const [countryFilterExpr, setCountryFilterExpr] = React.useState<any>();
 
   const options = {
@@ -54,10 +56,19 @@ export const SlacklineMapSources = (props: {
     } else {
       setIdFilterExpr(undefined);
     }
-    if (filter?.lineType && options.lines) {
+    if (filter?.lineType) {
       setLineTypeFilterExpr(['==', ['get', 'lt'], filter.lineType.substring(0, 1)]);
     } else {
       setLineTypeFilterExpr(undefined);
+    }
+    if (filter?.spotType) {
+      setSpotTypeFilterExpr([
+        'in',
+        filter.spotType.substring(0, 1),
+        ['coalesce', ['get', 'st'], ''],
+      ]);
+    } else {
+      setSpotTypeFilterExpr(undefined);
     }
     if (filter?.country) {
       setCountryFilterExpr(['==', ['get', 'c'], filter.country]);
@@ -79,8 +90,10 @@ export const SlacklineMapSources = (props: {
         promoteId="id"
         filter={idFilterExpr}
       >
-        <Layer {...spotPolygonLayer({ visible: options.spots })} />
-        <Layer {...spotPolygonOutlineLayer({ visible: options.spots })} />
+        <Layer {...spotPolygonLayer({ visible: options.spots, filter: spotTypeFilterExpr })} />
+        <Layer
+          {...spotPolygonOutlineLayer({ visible: options.spots, filter: spotTypeFilterExpr })}
+        />
       </Source>
 
       <Source
@@ -165,7 +178,7 @@ export const SlacklineMapSources = (props: {
         <Layer
           {...spotPointLayer({
             visible: options.spots,
-            filter: countryFilterExpr,
+            filter: ['all', countryFilterExpr || true, spotTypeFilterExpr || true],
           })}
         />
       </Source>

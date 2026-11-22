@@ -50,7 +50,7 @@ export const spotPolygonOutlineLayer = (opts: CommonOpts): LineLayer => {
   return {
     ...lineLayer,
     id: SpotLayerIds.spotOutline,
-    filter: ['==', ['geometry-type'], 'Polygon'],
+    filter: ['all', ['==', ['geometry-type'], 'Polygon'], opts.filter ?? true],
     paint: {
       ...lineLayer.paint,
       'line-width': 2,

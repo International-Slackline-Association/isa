@@ -4,6 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button';
 import {
   Alert,
+  Chip,
   MenuItem,
   Stack,
   StandardTextFieldProps,
@@ -19,6 +20,8 @@ import { S3ImageList, S3PhotoMeta } from 'app/components/ImageList';
 import { useFormik } from 'formik';
 
 import { EditingTextFieldHeader, restrictionSelectOptions } from '../Line/LineEditCard';
+import { spotTypeOptions } from 'utils/spotTypes';
+
 import { SpotDetailsForm } from './types';
 
 interface Props {
@@ -92,6 +95,30 @@ export const SpotEditCard = (props: Props) => {
             <EditingTextFieldHeader>Details</EditingTextFieldHeader>
 
             <EditingTextField formik={formik} field={'name'} label={'Name of the spot'} />
+            <EditingTextFieldHeader subHeader="Pick all that apply.">
+              Spot type
+            </EditingTextFieldHeader>
+            <Stack direction="row" spacing={1}>
+              {spotTypeOptions.map((option) => {
+                const types = formik.values.types ?? [];
+                const selected = types.includes(option.value);
+                return (
+                  <Chip
+                    key={option.value}
+                    label={option.label}
+                    color={selected ? 'primary' : 'default'}
+                    variant={selected ? 'filled' : 'outlined'}
+                    onClick={() =>
+                      formik.setFieldValue(
+                        'types',
+                        selected ? types.filter((t) => t !== option.value) : [...types, option.value],
+                      )
+                    }
+                  />
+                );
+              })}
+            </Stack>
+
             <EditingTextField
               formik={formik}
               field={'description'}

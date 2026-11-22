@@ -20,6 +20,7 @@ type AllFieldNames = keyof (DDBLineDetailTypes['Entity'] &
 const pathNamesMapping: { [p in AllFieldNames]: string | null } = {
   name: 'name',
   type: 'type',
+  types: 'types',
   geoJson: 'coordinates',
   description: 'description',
   length: 'length',

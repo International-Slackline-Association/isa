@@ -50,7 +50,13 @@ export const SlacklineMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
   const [zoomLevel, setZoomLevel] = useState(props.initialViewState?.zoom);
 
-  const { MapOptionsComponent, selectedDisplayFeature, selectedSlacklineType, selectedMapStyle } =
+  const {
+    MapOptionsComponent,
+    selectedDisplayFeature,
+    selectedLineType,
+    selectedSpotType,
+    selectedMapStyle,
+  } =
     useMapOptions();
 
   const { mapStyle, projection } = useMapStyle(zoomLevel, {
@@ -183,7 +189,8 @@ export const SlacklineMap = (props: Props) => {
               props.activeSlacklineFeature?.type === 'country'
                 ? props.activeSlacklineFeature?.id
                 : undefined,
-            lineType: selectedSlacklineType !== 'none' ? selectedSlacklineType : undefined,
+            lineType: selectedLineType,
+            spotType: selectedSpotType,
           }}
         />
       </ReactMapGL>

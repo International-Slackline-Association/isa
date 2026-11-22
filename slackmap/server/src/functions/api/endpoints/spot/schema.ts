@@ -1,6 +1,13 @@
 import { s3ImageUploadZodSchema } from '../../utils';
 import { z } from 'zod';
 
+const spotTypes = ['highline', 'waterline', 'park'] as const;
+const spotTypesSchema = z
+  .array(z.enum(spotTypes))
+  .max(spotTypes.length)
+  .transform((types) => spotTypes.filter((t) => types.includes(t)))
+  .optional();
+
 export const createSpotSchema = z.object({
   geoJson: z.object({
     type: z.literal('FeatureCollection'),
@@ -8,6 +15,7 @@ export const createSpotSchema = z.object({
   }),
   name: z.string().max(128).optional(),
   description: z.string().max(1024).optional(),
+  types: spotTypesSchema,
   accessInfo: z.string().max(1024).optional(),
   contactInfo: z.string().max(1024).optional(),
   restrictionLevel: z.enum(['partial', 'full', 'none']).optional(),
@@ -25,6 +33,7 @@ export const updateSpotSchema = z
     }),
     name: z.string().max(128).optional(),
     description: z.string().max(1024).optional(),
+    types: spotTypesSchema,
     accessInfo: z.string().max(1024).optional(),
     contactInfo: z.string().max(1024).optional(),
     restrictionLevel: z.enum(['partial', 'full', 'none']).optional(),

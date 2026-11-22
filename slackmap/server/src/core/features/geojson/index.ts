@@ -4,7 +4,7 @@ import { featureCollection } from '@turf/turf';
 import { s3 } from '../../aws/clients';
 import { db } from '../../db';
 import { DDBGroupDetailTypes } from '../../db/entities/group/details/types';
-import { GuideType, SlacklineType } from '../../types';
+import { GuideType, SlacklineType, SpotType } from '../../types';
 import countriesJson from '../../../../data/countryInfoDict.json';
 import { Feature, FeatureCollection, Geometry, Point } from 'geojson';
 import zlib from 'zlib';
@@ -47,6 +47,7 @@ export const processSpotGeoJson = (
   geoJson: FeatureCollection,
   meta: {
     spotId: string;
+    types?: SpotType[];
     country: string;
   },
 ): FeatureCollection => {
@@ -57,6 +58,10 @@ export const processSpotGeoJson = (
     f.properties = f.properties || {};
     f.properties['id'] = meta.spotId;
     f.properties['ft'] = 's';
+    delete f.properties['st'];
+    if (meta.types?.length) {
+      f.properties['st'] = meta.types.map((t) => t.substring(0, 1)).join('');
+    }
     if (meta.country) {
       f.properties['c'] = meta.country;
     }
@@ -216,6 +221,7 @@ export const refreshSpotGeoJsonFiles = async (
     if (spot) {
       const geoJson = processSpotGeoJson(JSON.parse(spot.geoJson), {
         spotId: spot.spotId,
+        types: spot.types,
         country: spot.country,
       });
       mainGeoJSON.features.push(...geoJson.features);
@@ -231,6 +237,7 @@ export const refreshSpotGeoJsonFiles = async (
       if (spot) {
         const geoJson = processSpotGeoJson(JSON.parse(spot.geoJson), {
           spotId: spot.spotId,
+          types: spot.types,
           country: spot.country,
         });
         for (const feature of geoJson.features) {

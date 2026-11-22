@@ -9,6 +9,7 @@ export type SlacklineType =
   | 'rodeoline'
   | 'parkline'
   | 'other';
+export type SpotType = 'highline' | 'waterline' | 'park';
 export type SlacklineRestrictionLevel = 'partial' | 'full' | 'none';
 export type GuideType =
   | 'parkingLot'
