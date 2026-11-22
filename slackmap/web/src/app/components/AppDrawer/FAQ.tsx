@@ -74,6 +74,14 @@ const sections: { title: string; items: { q: string; a: React.ReactNode }[] }[] 
           </>
         ),
       },
+      {
+        q: 'Can I get a copy of what I added?',
+        a: (
+          <>
+            Yes, write to <Link href={`mailto:${contact}`}>{contact}</Link>.
+          </>
+        ),
+      },
     ],
   },
   {

@@ -31,9 +31,10 @@ export const ContributorAgreementDialog = () => {
       <DialogTitle>Your contributions to SlackMap</DialogTitle>
       <DialogContent>
         <Typography variant="body2" sx={{ marginBottom: 2 }}>
-          To keep the map free for slackliners and protect it from copying, you give ISA a permanent
-          licence to the lines, spots, guides, photos and texts you have added and will add. You keep
-          ownership, and you confirm they are yours to share.
+          SlackMap&apos;s data is free for slackliners, not for apps that copy it. So that ISA can stop
+          them, you let ISA use what you add (lines, spots, guides, photos, texts) and act against
+          copies. It stays yours: use it anywhere, delete it here anytime. Only add texts and photos you
+          made yourself or may share.
         </Typography>
         <FormControlLabel
           control={<Checkbox checked={checked} onChange={(e) => setChecked(e.target.checked)} />}
