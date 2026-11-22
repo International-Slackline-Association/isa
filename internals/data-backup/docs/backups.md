@@ -10,7 +10,7 @@ description: "Steps for an app owner to encrypt their essential data folder with
 
 1. Put your app's essential data in one folder.
 2. Get [encrypt.sh](/internals/data-backup/encrypt.sh) and [isa-backup.crt](/internals/data-backup/isa-backup.crt) side by side, outside the data folder (clone the repo or download both). Needs bash and openssl, already on macOS and Linux.
-3. Run `encrypt.sh <app-name> <folder>`. It writes `isa-backup-<app-name>-<date>.tar.gz.p7m` with a checksum manifest inside.
+3. Run `encrypt.sh <app-name> <folder>`. It writes `isa-backup-<app-name>-<date>.p7m.tar` with a checksum manifest inside.
 4. Send that file to the ISA, or upload it to the ISA Google Drive backup folder if you have access.
 
 ## Store it (key holder)
@@ -19,7 +19,7 @@ description: "Steps for an app owner to encrypt their essential data folder with
 
 ## Restore one (key holder)
 
-1. Run [decrypt.sh](/internals/data-backup/decrypt.sh) `<file> <private-key>`. It unpacks into a folder named like the file and checks every file against the manifest.
+1. Run [decrypt.sh](/internals/data-backup/decrypt.sh) `<file> <private-key>`. It unpacks into a folder named like the file, data under `data/`, and checks every file against the manifest.
 
 ## New key
 

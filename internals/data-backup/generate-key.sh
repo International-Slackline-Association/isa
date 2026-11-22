@@ -8,7 +8,7 @@ crt="$out/isa-backup.crt"
 
 mkdir -p "$out"
 openssl req -x509 -newkey rsa:4096 -nodes -days 36500 \
-  -subj "/CN=ISA data backup" -keyout "$key" -out "$crt" 2>/dev/null
+  -subj "/CN=ISA data backup" -keyout "$key" -out "$crt"
 chmod 600 "$key"
 
 echo "private key: $key   (never into the repo, AWS or Drive)"
