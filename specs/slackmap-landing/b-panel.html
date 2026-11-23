@@ -81,124 +81,164 @@
   .callout { position: absolute; background: #fffbe6; border: 1px solid #e8d27a; color: #6b5700; font-size: 9.5px; border-radius: 6px; padding: 3px 6px; max-width: 180px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
   .feat .img { height: 70px; border-radius: 6px; background: repeating-linear-gradient(45deg,#eee 0 6px,#f6f6f6 6px 12px); margin: 6px 0; }
   .feat .ghost { height: 7px; background: #eee; border-radius: 3px; margin: 5px 0; }
+
+  .lrow { display: flex; gap: 8px; align-items: center; padding: 6px 4px; border-bottom: 1px solid #f0f0f0; font-size: 10.5px; border-radius: 6px; }
+  .lrow.sel { background: #e8f1fa; }
+  .lrow .bar2 { width: 4px; align-self: stretch; border-radius: 2px; flex: none; }
+  .lrow .tx { flex: 1; min-width: 0; }
+  .lrow b { display: block; font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lrow .meta { color: var(--muted); font-size: 9.5px; }
+  .lrow .num { font-size: 10px; font-weight: 700; color: #444; white-space: nowrap; }
+  .sort { font-size: 9.5px; color: var(--blue-d); border: 1px solid #d6e3f0; border-radius: 10px; padding: 1px 7px; }
+  .flag { width: 20px; height: 14px; border-radius: 2px; flex: none; background: linear-gradient(#d52b1e 0 100%); position: relative; }
+  .flag.ch::after { content: "+"; color: #fff; font-weight: 900; font-size: 11px; position: absolute; inset: -2px 0 0 0; text-align: center; }
+  .flag.fr { background: linear-gradient(90deg,#0055a4 0 33%,#fff 33% 66%,#ef4135 66%); }
+  .flag.it { background: linear-gradient(90deg,#009246 0 33%,#fff 33% 66%,#ce2b37 66%); }
+  .flag.at { background: linear-gradient(#ed2939 0 33%,#fff 33% 66%,#ed2939 66%); }
+  .flag.de { background: linear-gradient(#000 0 33%,#dd0000 33% 66%,#ffce00 66%); }
+  .cnt { display: flex; gap: 8px; font-size: 9.5px; color: var(--muted); }
+  .cnt i { font-style: normal; display: inline-flex; align-items: center; gap: 3px; }
+  .rcard { background: #fff; box-shadow: -1px 0 6px rgba(0,0,0,.12); padding: 10px 12px; overflow: hidden; }
+  .foot { position: absolute; left: 12px; right: 12px; bottom: 8px; border-top: 1px solid #eee; padding-top: 5px; display: flex; justify-content: space-between; font-size: 9.5px; color: var(--muted); }
+  .foot a { color: var(--blue); text-decoration: none; }
+  .foot { background: #fff; z-index: 2; padding-bottom: 2px; }
+  .tabs div, .cnt i { white-space: nowrap; }
+  .desk .chips { max-width: 66%; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>B, refined: the map panel</h1>
-  <p class="lead">The sidebar becomes a panel with two tabs, <b>Activity</b> and <b>Communities</b>, both following the part of the map you're looking at. No Explore tab. Selecting a line, spot or guide shows its card in the same panel; "‹ Back" returns to the tab. The first set of options is in <a href="wireframes.html">wireframes.html</a>.</p>
+  <h1>B, round 2: what's on the map</h1>
+  <p class="lead">The panel lists <b>what's on the map right now</b>: the lines, spots and guides in view, or the countries when zoomed out. That's what browsers come for, and it doesn't depend on how often people submit. Activity moves to a small link. <b>Rigged now is pinned on top, worldwide</b>, to advertise the live feature. Details open on the <b>right</b>, as today. Communities stays a tab. Earlier rounds: <a href="wireframes.html">three directions</a>.</p>
 </header>
 
-<!-- ============ DESKTOP ============ -->
 <section>
   <h2>Desktop</h2>
   <div class="row">
 
-    <!-- Activity -->
+    <!-- D1 zoomed in -->
     <figure>
       <div class="desk"><div class="bar"><i></i><i></i><i></i></div><div class="vp">
-        <div class="abs" style="left:31%;right:0;top:0;bottom:0">
+        <div class="abs" style="left:29%;right:0;top:0;bottom:0">
           <div class="map"></div>
-          <svg class="f" viewBox="0 0 520 430"><g stroke="#FC3E3E" stroke-width="3"><line x1="80" y1="190" x2="130" y2="210"/><line x1="330" y1="150" x2="380" y2="170"/><line x1="200" y1="300" x2="250" y2="280"/><line x1="410" y1="330" x2="450" y2="355"/></g><rect x="150" y="120" width="34" height="22" fill="#42C842" opacity=".6"/><path d="M380 250 l30 10 l-10 25 z" fill="#FFA726" opacity=".7"/><line class="pulse" x1="270" y1="220" x2="330" y2="240" stroke="#FF8A00" stroke-width="13" stroke-linecap="round"/><line x1="270" y1="220" x2="330" y2="240" stroke="#FC3E3E" stroke-width="3"/><circle cx="105" cy="200" r="11" fill="none" stroke="#4187C5" stroke-width="2.5"/></svg>
+          <svg class="f" viewBox="0 0 540 430"><g stroke="#FC3E3E" stroke-width="3"><line x1="80" y1="190" x2="130" y2="210"/><line x1="330" y1="150" x2="380" y2="170"/><line x1="200" y1="300" x2="250" y2="280"/><line x1="410" y1="330" x2="450" y2="355"/><line x1="120" y1="350" x2="160" y2="330"/></g><rect x="150" y="120" width="34" height="22" fill="#42C842" opacity=".6"/><path d="M380 250 l30 10 l-10 25 z" fill="#FFA726" opacity=".7"/><line class="pulse" x1="270" y1="220" x2="330" y2="240" stroke="#FF8A00" stroke-width="13" stroke-linecap="round"/><line x1="270" y1="220" x2="330" y2="240" stroke="#FC3E3E" stroke-width="3"/><line x1="330" y1="150" x2="380" y2="170" stroke="#4187C5" stroke-width="9" opacity=".35" stroke-linecap="round"/></svg>
           <div class="abs chips" style="left:3%;top:3%"><span class="chip on">All</span><span class="chip"><i class="dot" style="background:var(--red)"></i>Lines</span><span class="chip"><i class="dot" style="background:var(--green)"></i>Spots</span><span class="chip"><i class="dot" style="background:var(--orange)"></i>Guides</span><span class="chip"><i class="dot" style="background:var(--live)"></i>Rigged now</span><span class="chip">Type ▾</span></div>
           <div class="abs" style="right:2.5%;top:3%;display:flex;gap:6px;align-items:center"><div class="btn pri">＋ Add</div><div class="avatar">CS</div></div>
           <div class="abs" style="right:2.5%;bottom:3%;display:flex;flex-direction:column;gap:5px"><div class="icon">🗺</div><div class="icon">◎</div><div class="icon">＋</div><div class="icon">－</div></div>
-          <div class="callout" style="left:8%;top:52%">Hovering an activity row rings its feature on the map (already works today).</div>
+          <div class="callout" style="left:52%;top:23%">Hovering a row highlights its line.</div>
         </div>
-        <div class="abs" style="left:0;top:0;bottom:0;width:31%;background:#fff;box-shadow:1px 0 6px rgba(0,0,0,.12);padding:10px 12px;overflow:hidden">
+        <div class="abs" style="left:0;top:0;bottom:0;width:29%;background:#fff;box-shadow:1px 0 6px rgba(0,0,0,.12);padding:10px 12px;overflow:hidden">
           <div style="display:flex;justify-content:space-between;align-items:center"><div class="logo"><i></i>SlackMap</div><span class="tag">by ISA</span></div>
           <div class="search" style="margin-top:9px;box-shadow:none;background:#f3f5f7;height:30px">⌕ Search places…</div>
-          <div class="tabs" style="margin-top:8px"><div class="on">Activity</div><div>Communities</div></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:7px">
-            <div class="sm"><b>Latest in Switzerland</b></div>
-            <div class="scope"><div class="on">Here</div><div>World</div></div>
-          </div>
-          <div class="sec">Rigged now</div>
-          <div class="list">
-            <div class="it"><div class="ic" style="background:var(--live)">⟋</div><div class="tx"><b>Twin Peaks Highline <span class="live">LIVE</span></b><span>until Sat</span></div><div class="when">2 h</div></div>
-          </div>
-          <div class="sec">Changes</div>
-          <div class="list">
-            <div class="it"><div class="ic" style="background:var(--red)">⟋</div><div class="tx"><b>Anna K. added a line</b><span>Lauterbrunnen</span></div><div class="when">3 d</div></div>
-            <div class="it"><div class="ic" style="background:var(--green)">⬠</div><div class="tx"><b>Marco updated a spot's access</b><span>Gorge du Seyon</span></div><div class="when">5 d</div></div>
-            <div class="it"><div class="ic" style="background:var(--orange)">⚑</div><div class="tx"><b>Lea added an access guide</b><span>Gantrisch</span></div><div class="when">1 w</div></div>
-            <div class="it"><div class="ic" style="background:var(--red)">⟋</div><div class="tx"><b>Tom updated a line's photos</b><span>Oeschinen</span></div><div class="when">2 w</div></div>
-          </div>
-          <div class="tiny" style="color:var(--blue);margin-top:5px">Show more</div>
-          <div class="abs tiny muted" style="left:12px;right:12px;bottom:8px;border-top:1px solid #eee;padding-top:5px">FAQ · Contact · Open source · Terms · © ISA</div>
+          <div class="tabs" style="margin-top:8px"><div class="on">On the map</div><div>Communities</div></div>
+          <div class="cnt" style="margin-top:7px"><i><span class="dot" style="background:var(--red)"></span>214 lines</i><i><span class="dot" style="background:var(--green)"></span>38 spots</i><i><span class="dot" style="background:var(--orange)"></span>6 guides</i></div>
+          <div class="sec"><span>Rigged now · worldwide</span><span style="text-transform:none;font-weight:400">3</span></div>
+          <div class="lrow"><div class="bar2" style="background:var(--live)"></div><div class="tx"><b>Twin Peaks Highline <span class="live">LIVE</span></b><span class="meta">Switzerland · until Sat</span></div><div class="num">85 m</div></div><div class="lrow"><div class="bar2" style="background:var(--live)"></div><div class="tx"><b>Verdon Canyon <span class="live">LIVE</span></b><span class="meta">France · until today</span></div><div class="num">210 m</div></div>
+          <div class="sec"><span>Lines</span><span class="sort" style="text-transform:none;font-weight:600">Longest ▾</span></div>
+          <div class="lrow sel"><div class="bar2" style="background:var(--red)"></div><div class="tx"><b>Mürren Gap</b><span class="meta">Highline · 300 m high</span></div><div class="num">412 m</div></div>
+          <div class="lrow"><div class="bar2" style="background:var(--red)"></div><div class="tx"><b>Lauterbrunnen Wall</b><span class="meta">Highline · 250 m high</span></div><div class="num">160 m</div></div>
+          <div class="lrow"><div class="bar2" style="background:var(--red)"></div><div class="tx"><b>Thunersee Waterline</b><span class="meta">Waterline</span></div><div class="num">120 m</div></div>
+          <div class="lrow" style="border:none"><div class="bar2" style="background:var(--red)"></div><div class="tx"><b>No name</b><span class="meta">Longline</span></div><div class="num">95 m</div></div>
+          <div class="foot"><a>Recent changes ›</a><span>FAQ · Contact · Terms</span></div>
         </div>
       </div></div>
-      <figcaption><b>Activity tab (default).</b> Recent changes where you're looking, newest first; rigs that are up right now are pinned on top. The heading says where the list comes from ("Latest in Switzerland"); "World" switches to the global list you have today.</figcaption>
+      <figcaption><b>Zoomed in: the lines here.</b> "Rigged now" is pinned on top and worldwide, whatever the map shows: it is the feature to advertise. Then lines sorted by length (or height, or name). The chips above the map filter this list too: tap "Spots" and the list becomes spots. Scrolls; spots and guides follow the lines.</figcaption>
     </figure>
 
-    <!-- Communities -->
+    <!-- D2 zoomed out -->
     <figure>
       <div class="desk"><div class="bar"><i></i><i></i><i></i></div><div class="vp">
-        <div class="abs" style="left:31%;right:0;top:0;bottom:0">
-          <div class="map dim"></div>
-          <svg class="f" viewBox="0 0 520 430"><g stroke="#FC3E3E" stroke-width="3" opacity=".25"><line x1="80" y1="190" x2="130" y2="210"/><line x1="330" y1="150" x2="380" y2="170"/><line x1="200" y1="300" x2="250" y2="280"/></g>
-            <g><circle cx="150" cy="150" r="10" fill="#9039A5" stroke="#fff" stroke-width="2"/><circle cx="300" cy="200" r="10" fill="#CD9D3E" stroke="#fff" stroke-width="2"/><circle cx="360" cy="300" r="10" fill="#9039A5" stroke="#fff" stroke-width="2"/><circle cx="220" cy="320" r="10" fill="#9039A5" stroke="#fff" stroke-width="2"/><circle cx="300" cy="200" r="16" fill="none" stroke="#4187C5" stroke-width="2.5"/></g></svg>
-          <div class="abs chips" style="left:3%;top:3%"><span class="chip"><i class="dot" style="background:var(--mustard)"></i>ISA members &amp; partners</span><span class="chip"><i class="dot" style="background:var(--purple)"></i>Slackline groups</span></div>
-          <div class="abs" style="right:2.5%;top:3%;display:flex;gap:6px;align-items:center"><div class="btn pri">＋ Add</div><div class="avatar">CS</div></div>
-          <div class="abs" style="right:2.5%;bottom:3%;display:flex;flex-direction:column;gap:5px"><div class="icon">🗺</div><div class="icon">◎</div><div class="icon">＋</div><div class="icon">－</div></div>
-          <div class="callout" style="left:5%;top:14%">On this tab the map shows groups; lines fade back. Chips switch to the two group kinds.</div>
-        </div>
-        <div class="abs" style="left:0;top:0;bottom:0;width:31%;background:#fff;box-shadow:1px 0 6px rgba(0,0,0,.12);padding:10px 12px;overflow:hidden">
-          <div style="display:flex;justify-content:space-between;align-items:center"><div class="logo"><i></i>SlackMap</div><span class="tag">by ISA</span></div>
-          <div class="search" style="margin-top:9px;box-shadow:none;background:#f3f5f7;height:30px">⌕ Search places…</div>
-          <div class="tabs" style="margin-top:8px"><div>Activity</div><div class="on">Communities</div></div>
-          <div class="sm" style="margin-top:7px"><b>Communities in Switzerland</b></div>
-          <div class="sec">ISA members &amp; partners</div>
-          <div class="list">
-            <div class="it"><div class="ic" style="background:var(--mustard)">S</div><div class="tx"><b>Swiss Slackline Association</b><span>National member</span></div><div class="soc"><i>ig</i><i>www</i></div></div>
-          </div>
-          <div class="sec">Slackline groups <span style="text-transform:none;font-weight:400">3 in view</span></div>
-          <div class="list">
-            <div class="it"><div class="ic" style="background:var(--purple)">B</div><div class="tx"><b>Slackline Bern</b><span>Bern</span></div><div class="soc"><i>tg</i><i>wa</i></div></div>
-            <div class="it"><div class="ic" style="background:var(--purple)">Z</div><div class="tx"><b>Highline Zürich</b><span>Zürich</span></div><div class="soc"><i>tg</i><i>ig</i></div></div>
-            <div class="it"><div class="ic" style="background:var(--purple)">L</div><div class="tx"><b>Lausanne Slack</b><span>Lausanne</span></div><div class="soc"><i>fb</i></div></div>
-          </div>
-          <div class="btn out" style="margin-top:9px;width:100%">＋ Add your group</div>
-          <div class="tiny" style="margin-top:5px;color:var(--blue)">Why list your group? ›</div>
-          <div class="abs tiny muted" style="left:12px;right:12px;bottom:8px;border-top:1px solid #eee;padding-top:5px">FAQ · Contact · Open source · Terms · © ISA</div>
-        </div>
-      </div></div>
-      <figcaption><b>Communities tab.</b> Replaces the separate Community Map page. ISA members first, then local groups, each with its chat links one tap away (Telegram, WhatsApp, Instagram…). Tapping a row opens the group card, as today. The manifest text stays behind "Why?".</figcaption>
-    </figure>
-
-    <!-- Feature selected -->
-    <figure>
-      <div class="desk"><div class="bar"><i></i><i></i><i></i></div><div class="vp">
-        <div class="abs" style="left:31%;right:0;top:0;bottom:0">
-          <div class="map"></div>
-          <svg class="f" viewBox="0 0 520 430"><g stroke="#FC3E3E" stroke-width="3" opacity=".5"><line x1="80" y1="190" x2="130" y2="210"/><line x1="330" y1="150" x2="380" y2="170"/></g><line x1="200" y1="240" x2="300" y2="270" stroke="#FC3E3E" stroke-width="6"/><circle cx="200" cy="240" r="5" fill="#FC3E3E" stroke="#fff" stroke-width="2"/><circle cx="300" cy="270" r="5" fill="#FC3E3E" stroke="#fff" stroke-width="2"/></svg>
+        <div class="abs" style="left:29%;right:0;top:0;bottom:0">
+          <div class="map" style="background:radial-gradient(circle at 40% 45%, #e3ecdf 0 30%, transparent 31%),repeating-linear-gradient(32deg,#eef1eb 0 22px,#f3f5f0 22px 44px)"></div>
+          <svg class="f" viewBox="0 0 540 430"><g fill="#FC3E3E"><circle cx="200" cy="200" r="4"/><circle cx="210" cy="210" r="4"/><circle cx="190" cy="215" r="4"/><circle cx="300" cy="180" r="4"/><circle cx="310" cy="250" r="4"/><circle cx="120" cy="260" r="4"/><circle cx="380" cy="150" r="4"/><circle cx="260" cy="300" r="4"/></g><g fill="#1DDECE" stroke="#fff" stroke-width="2"><circle cx="205" cy="205" r="9"/><circle cx="120" cy="250" r="9"/><circle cx="310" cy="300" r="9"/><circle cx="380" cy="140" r="9"/><circle cx="300" cy="170" r="9"/></g></svg>
           <div class="abs chips" style="left:3%;top:3%"><span class="chip on">All</span><span class="chip"><i class="dot" style="background:var(--red)"></i>Lines</span><span class="chip"><i class="dot" style="background:var(--green)"></i>Spots</span><span class="chip"><i class="dot" style="background:var(--orange)"></i>Guides</span><span class="chip"><i class="dot" style="background:var(--live)"></i>Rigged now</span></div>
           <div class="abs" style="right:2.5%;top:3%;display:flex;gap:6px;align-items:center"><div class="btn pri">＋ Add</div><div class="avatar">CS</div></div>
         </div>
-        <div class="abs feat" style="left:0;top:0;bottom:0;width:31%;background:#fff;box-shadow:1px 0 6px rgba(0,0,0,.12);padding:10px 12px;overflow:hidden">
-          <div class="sm" style="color:var(--blue);display:flex;justify-content:space-between"><span>‹ Back to Activity</span><span class="muted">⋮</span></div>
-          <div style="display:flex;gap:8px;align-items:center;margin-top:8px"><div class="ic" style="width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:700;font-size:11px">L</div><div><b style="font-size:12px">Twin Peaks Highline</b><div class="tiny muted">Last updated 4 Aug 2026</div></div></div>
+        <div class="abs" style="left:0;top:0;bottom:0;width:29%;background:#fff;box-shadow:1px 0 6px rgba(0,0,0,.12);padding:10px 12px;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="logo"><i></i>SlackMap</div><span class="tag">by ISA</span></div>
+          <div class="search" style="margin-top:9px;box-shadow:none;background:#f3f5f7;height:30px">⌕ Search places…</div>
+          <div class="tabs" style="margin-top:8px"><div class="on">On the map</div><div>Communities</div></div>
+          <div class="cnt" style="margin-top:7px"><i><span class="dot" style="background:var(--red)"></span>1 840 lines</i><i><span class="dot" style="background:var(--green)"></span>410 spots</i><i>in 5 countries</i></div>
+          <div class="sec"><span>Rigged now · worldwide</span><span style="text-transform:none;font-weight:400">3</span></div><div class="lrow"><div class="bar2" style="background:var(--live)"></div><div class="tx"><b>Twin Peaks Highline <span class="live">LIVE</span></b><span class="meta">Switzerland · until Sat</span></div><div class="num">85 m</div></div><div class="lrow" style="display:none"><div class="bar2" style="background:var(--live)"></div><div class="tx"><b>Verdon Canyon <span class="live">LIVE</span></b><span class="meta">France · until today</span></div><div class="num">210 m</div></div><div class="sec">Countries</div>
+          <div class="lrow"><div class="flag fr"></div><div class="tx"><b>France</b><span class="meta">620 lines · 140 spots · 12 guides</span></div><div class="num">›</div></div>
+          <div class="lrow"><div class="flag de"></div><div class="tx"><b>Germany</b><span class="meta">510 lines · 98 spots</span></div><div class="num">›</div></div>
+          <div class="lrow sel"><div class="flag ch"></div><div class="tx"><b>Switzerland</b><span class="meta">390 lines · 88 spots · 6 guides</span></div><div class="num">›</div></div>
+          <div class="lrow"><div class="flag it"></div><div class="tx"><b>Italy</b><span class="meta">210 lines · 60 spots</span></div><div class="num">›</div></div>
+          <div class="lrow" style="border:none"><div class="flag at"></div><div class="tx"><b>Austria</b><span class="meta">110 lines · 24 spots</span></div><div class="num">›</div></div>
+          <div class="tiny muted" style="margin-top:6px">Zoom in or pick a country to list its lines.</div>
+          <div class="foot"><a>Recent changes ›</a><span>FAQ · Contact · Terms</span></div>
+        </div>
+      </div></div>
+      <figcaption><b>Zoomed out: the countries here.</b> "Rigged now" stays pinned on top. When too many lines are in view to list, the panel lists countries with their counts. Picking one flies there and opens today's country card on the right.</figcaption>
+    </figure>
+
+    <!-- D3 selected, details right -->
+    <figure>
+      <div class="desk"><div class="bar"><i></i><i></i><i></i></div><div class="vp">
+        <div class="abs" style="left:29%;right:33%;top:0;bottom:0">
+          <div class="map"></div>
+          <svg class="f" viewBox="0 0 290 430"><g stroke="#FC3E3E" stroke-width="3" opacity=".5"><line x1="30" y1="190" x2="70" y2="210"/><line x1="200" y1="320" x2="240" y2="345"/></g><line x1="90" y1="200" x2="200" y2="240" stroke="#FC3E3E" stroke-width="6"/><circle cx="90" cy="200" r="5" fill="#FC3E3E" stroke="#fff" stroke-width="2"/><circle cx="200" cy="240" r="5" fill="#FC3E3E" stroke="#fff" stroke-width="2"/></svg>
+          <div class="abs chips" style="left:4%;top:3%"><span class="chip on">All</span><span class="chip"><i class="dot" style="background:var(--red)"></i>Lines</span><span class="chip"><i class="dot" style="background:var(--green)"></i>Spots</span></div>
+        </div>
+        <div class="abs" style="left:0;top:0;bottom:0;width:29%;background:#fff;box-shadow:1px 0 6px rgba(0,0,0,.12);padding:10px 12px;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="logo"><i></i>SlackMap</div><span class="tag">by ISA</span></div>
+          <div class="search" style="margin-top:9px;box-shadow:none;background:#f3f5f7;height:30px">⌕ Search places…</div>
+          <div class="tabs" style="margin-top:8px"><div class="on">On the map</div><div>Communities</div></div>
+          <div class="sec"><span>Lines</span><span class="sort" style="text-transform:none;font-weight:600">Longest ▾</span></div>
+          <div class="lrow sel"><div class="bar2" style="background:var(--red)"></div><div class="tx"><b>Mürren Gap</b><span class="meta">Highline · 300 m high</span></div><div class="num">412 m</div></div>
+          <div class="lrow"><div class="bar2" style="background:var(--red)"></div><div class="tx"><b>Lauterbrunnen Wall</b><span class="meta">Highline</span></div><div class="num">160 m</div></div>
+          <div class="lrow"><div class="bar2" style="background:var(--red)"></div><div class="tx"><b>Thunersee Waterline</b><span class="meta">Waterline</span></div><div class="num">120 m</div></div>
+          <div class="foot"><a>Recent changes ›</a><span>FAQ</span></div>
+        </div>
+        <div class="abs rcard feat" style="right:0;top:0;bottom:0;width:33%">
+          <div style="display:flex;gap:8px;align-items:center"><div style="width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:700;font-size:11px">L</div><div style="flex:1"><b style="font-size:12px">Mürren Gap</b><div class="tiny muted">Last updated 4 Aug 2026</div></div><span class="muted sm">✕ ⋮</span></div>
           <div class="img"></div>
           <div class="btn pri" style="width:100%">Report rigged</div>
           <div class="hr"></div>
           <div class="sm"><b>Specs</b> <span style="color:var(--green)">Measured ✓</span></div>
-          <div class="tiny muted">Highline · 85 m · 120 m high</div>
+          <div class="tiny muted">Highline · 412 m · 300 m high</div>
           <div class="hr"></div>
           <div class="sm"><b>Description</b></div><div class="ghost"></div><div class="ghost" style="width:80%"></div>
           <div class="hr"></div>
           <div class="sm"><b>Anchors</b></div><div class="ghost"></div>
         </div>
       </div></div>
-      <figcaption><b>A line selected.</b> The existing detail card, moved from the right side into the panel. The map keeps its full width; on desktop the card no longer covers a third of the map on the right.</figcaption>
+      <figcaption><b>A line selected: details on the right, as today.</b> The list stays on the left with the row highlighted, so people can step through lines one by one. On smaller laptops the left panel can collapse to a thin strip while a card is open.</figcaption>
+    </figure>
+
+    <!-- D4 communities -->
+    <figure>
+      <div class="desk"><div class="bar"><i></i><i></i><i></i></div><div class="vp">
+        <div class="abs" style="left:29%;right:0;top:0;bottom:0">
+          <div class="map dim"></div>
+          <svg class="f" viewBox="0 0 540 430"><g stroke="#FC3E3E" stroke-width="3" opacity=".25"><line x1="80" y1="190" x2="130" y2="210"/><line x1="330" y1="150" x2="380" y2="170"/></g><g><circle cx="150" cy="150" r="10" fill="#9039A5" stroke="#fff" stroke-width="2"/><circle cx="300" cy="200" r="10" fill="#CD9D3E" stroke="#fff" stroke-width="2"/><circle cx="360" cy="300" r="10" fill="#9039A5" stroke="#fff" stroke-width="2"/><circle cx="220" cy="320" r="10" fill="#9039A5" stroke="#fff" stroke-width="2"/></g></svg>
+          <div class="abs chips" style="left:3%;top:3%"><span class="chip"><i class="dot" style="background:var(--mustard)"></i>ISA members &amp; partners</span><span class="chip"><i class="dot" style="background:var(--purple)"></i>Slackline groups</span></div>
+          <div class="abs" style="right:2.5%;top:3%;display:flex;gap:6px;align-items:center"><div class="btn pri">＋ Add</div><div class="avatar">CS</div></div>
+        </div>
+        <div class="abs" style="left:0;top:0;bottom:0;width:29%;background:#fff;box-shadow:1px 0 6px rgba(0,0,0,.12);padding:10px 12px;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="logo"><i></i>SlackMap</div><span class="tag">by ISA</span></div>
+          <div class="search" style="margin-top:9px;box-shadow:none;background:#f3f5f7;height:30px">⌕ Search places…</div>
+          <div class="tabs" style="margin-top:8px"><div>On the map</div><div class="on">Communities</div></div>
+          <div class="sec">ISA members &amp; partners</div>
+          <div class="list"><div class="it"><div class="ic" style="background:var(--mustard)">S</div><div class="tx"><b>Swiss Slackline Association</b><span>National member</span></div><div class="soc"><i>ig</i><i>www</i></div></div></div>
+          <div class="sec">Slackline groups <span style="text-transform:none;font-weight:400">3 here</span></div>
+          <div class="list">
+            <div class="it"><div class="ic" style="background:var(--purple)">B</div><div class="tx"><b>Slackline Bern</b><span>Bern</span></div><div class="soc"><i>tg</i><i>wa</i></div></div>
+            <div class="it"><div class="ic" style="background:var(--purple)">Z</div><div class="tx"><b>Highline Zürich</b><span>Zürich</span></div><div class="soc"><i>tg</i><i>ig</i></div></div>
+            <div class="it"><div class="ic" style="background:var(--purple)">L</div><div class="tx"><b>Lausanne Slack</b><span>Lausanne</span></div><div class="soc"><i>fb</i></div></div>
+          </div>
+          <div class="btn out" style="margin-top:9px;width:100%">＋ Add your group</div>
+          <div class="foot"><a>Recent changes ›</a><span>FAQ · Contact · Terms</span></div>
+        </div>
+      </div></div>
+      <figcaption><b>Communities tab.</b> Unchanged from round 1: groups in view with their chat links; a group's card opens on the right.</figcaption>
     </figure>
   </div>
 </section>
 
-<!-- ============ PHONE ============ -->
 <section>
   <h2>Phone</h2>
-  <p class="lead">The panel becomes a bottom sheet with three heights: peek (one line), half, full. The map stays in charge; the sheet is pulled up only by people who want more.</p>
   <div class="row">
     <figure>
       <div class="phone"><div class="vp">
@@ -210,83 +250,55 @@
         <div class="abs btn pri" style="right:10px;bottom:84px;width:44px;height:44px;border-radius:50%;font-size:20px;padding:0">＋</div>
         <div class="abs card" style="left:0;right:0;bottom:0;height:70px;border-radius:14px 14px 0 0;padding:7px 12px">
           <div class="grab"></div>
-          <div style="display:flex;justify-content:space-between;align-items:center" class="sm"><span><b>Activity</b> · <span class="muted">Communities</span></span><span class="tiny muted">1 rigged · 4 new here</span></div>
+          <div class="cnt" style="justify-content:center"><i><span class="dot" style="background:var(--red)"></span>214 lines</i><i><span class="dot" style="background:var(--green)"></span>38 spots</i><i><span class="dot" style="background:var(--live)"></span>3 rigged worldwide</i></div>
         </div>
       </div></div>
-      <figcaption><b>Peek.</b> What most people see: the map, plus one line saying there's something here.</figcaption>
+      <figcaption><b>Peek.</b> The legend's job, with real numbers for what's in view, plus the worldwide rigged count. Pull up for the list.</figcaption>
     </figure>
 
     <figure>
       <div class="phone"><div class="vp">
         <div class="map"></div>
-        <svg class="f" viewBox="0 0 270 570"><g stroke="#FC3E3E" stroke-width="3"><line x1="40" y1="160" x2="90" y2="180"/><line x1="170" y1="130" x2="220" y2="150"/></g><rect x="150" y="190" width="30" height="20" fill="#42C842" opacity=".6"/><line class="pulse" x1="100" y1="220" x2="150" y2="235" stroke="#FF8A00" stroke-width="12" stroke-linecap="round"/><line x1="100" y1="220" x2="150" y2="235" stroke="#FC3E3E" stroke-width="3"/></svg>
+        <svg class="f" viewBox="0 0 270 570"><g stroke="#FC3E3E" stroke-width="3"><line x1="40" y1="160" x2="90" y2="180"/><line x1="170" y1="130" x2="220" y2="150"/></g><line class="pulse" x1="100" y1="200" x2="150" y2="215" stroke="#FF8A00" stroke-width="12" stroke-linecap="round"/><line x1="100" y1="200" x2="150" y2="215" stroke="#FC3E3E" stroke-width="3"/></svg>
         <div class="abs" style="left:8px;right:8px;top:10px;display:flex;gap:6px;align-items:center"><div class="search" style="flex:1"><span class="logo"><i></i></span>Search places…</div><div class="avatar">CS</div></div>
         <div class="abs chips" style="left:8px;right:0;top:50px"><span class="chip on">All</span><span class="chip"><i class="dot" style="background:var(--red)"></i>Lines</span><span class="chip"><i class="dot" style="background:var(--green)"></i>Spots</span><span class="chip"><i class="dot" style="background:var(--orange)"></i>Guides</span></div>
-        <div class="abs card" style="left:0;right:0;bottom:0;height:300px;border-radius:14px 14px 0 0;padding:7px 12px">
+        <div class="abs card" style="left:0;right:0;bottom:0;height:310px;border-radius:14px 14px 0 0;padding:7px 12px">
           <div class="grab"></div>
-          <div class="tabs"><div class="on">Activity</div><div>Communities</div></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><div class="sm"><b>Latest in Switzerland</b></div><div class="scope"><div class="on">Here</div><div>World</div></div></div>
-          <div class="sec">Rigged now</div>
-          <div class="list"><div class="it"><div class="ic" style="background:var(--live)">⟋</div><div class="tx"><b>Twin Peaks Highline <span class="live">LIVE</span></b><span>until Sat</span></div><div class="when">2 h</div></div></div>
-          <div class="sec">Changes</div>
-          <div class="list">
-            <div class="it"><div class="ic" style="background:var(--red)">⟋</div><div class="tx"><b>Anna K. added a line</b><span>Lauterbrunnen</span></div><div class="when">3 d</div></div>
-            <div class="it"><div class="ic" style="background:var(--green)">⬠</div><div class="tx"><b>Marco updated a spot's access</b><span>Gorge du Seyon</span></div><div class="when">5 d</div></div>
-            <div class="it"><div class="ic" style="background:var(--orange)">⚑</div><div class="tx"><b>Lea added an access guide</b><span>Gantrisch</span></div><div class="when">1 w</div></div>
-          </div>
+          <div class="tabs"><div class="on">On the map</div><div>Communities</div></div>
+          <div class="sec"><span>Rigged now · worldwide</span><span style="text-transform:none;font-weight:400">3</span></div>
+          <div class="lrow"><div class="bar2" style="background:var(--live)"></div><div class="tx"><b>Twin Peaks Highline <span class="live">LIVE</span></b><span class="meta">Switzerland · until Sat</span></div><div class="num">85 m</div></div><div class="lrow"><div class="bar2" style="background:var(--live)"></div><div class="tx"><b>Verdon Canyon <span class="live">LIVE</span></b><span class="meta">France · until today</span></div><div class="num">210 m</div></div>
+          <div class="sec"><span>Lines · 214</span><span class="sort" style="text-transform:none;font-weight:600">Longest ▾</span></div>
+          <div class="lrow"><div class="bar2" style="background:var(--red)"></div><div class="tx"><b>Mürren Gap</b><span class="meta">Highline · 300 m high</span></div><div class="num">412 m</div></div>
+          <div class="lrow"><div class="bar2" style="background:var(--red)"></div><div class="tx"><b>Lauterbrunnen Wall</b><span class="meta">Highline</span></div><div class="num">160 m</div></div>
+          <div class="lrow"><div class="bar2" style="background:var(--red)"></div><div class="tx"><b>Thunersee Waterline</b><span class="meta">Waterline</span></div><div class="num">120 m</div></div>
         </div>
       </div></div>
-      <figcaption><b>Half: Activity.</b> Same content as desktop. Tapping a row flies the map to the feature and opens its card in the sheet.</figcaption>
-    </figure>
-
-    <figure>
-      <div class="phone"><div class="vp">
-        <div class="map dim"></div>
-        <svg class="f" viewBox="0 0 270 570"><g><circle cx="80" cy="150" r="9" fill="#9039A5" stroke="#fff" stroke-width="2"/><circle cx="170" cy="190" r="9" fill="#CD9D3E" stroke="#fff" stroke-width="2"/><circle cx="210" cy="120" r="9" fill="#9039A5" stroke="#fff" stroke-width="2"/></g></svg>
-        <div class="abs" style="left:8px;right:8px;top:10px;display:flex;gap:6px;align-items:center"><div class="search" style="flex:1"><span class="logo"><i></i></span>Search places…</div><div class="avatar">CS</div></div>
-        <div class="abs chips" style="left:8px;right:0;top:50px"><span class="chip"><i class="dot" style="background:var(--mustard)"></i>ISA members</span><span class="chip"><i class="dot" style="background:var(--purple)"></i>Groups</span></div>
-        <div class="abs card" style="left:0;right:0;bottom:0;height:300px;border-radius:14px 14px 0 0;padding:7px 12px">
-          <div class="grab"></div>
-          <div class="tabs"><div>Activity</div><div class="on">Communities</div></div>
-          <div class="sm" style="margin-top:6px"><b>Communities in Switzerland</b></div>
-          <div class="sec">ISA members &amp; partners</div>
-          <div class="list"><div class="it"><div class="ic" style="background:var(--mustard)">S</div><div class="tx"><b>Swiss Slackline Association</b><span>National member</span></div><div class="soc"><i>ig</i><i>www</i></div></div></div>
-          <div class="sec">Slackline groups</div>
-          <div class="list">
-            <div class="it"><div class="ic" style="background:var(--purple)">B</div><div class="tx"><b>Slackline Bern</b><span>Bern</span></div><div class="soc"><i>tg</i><i>wa</i></div></div>
-            <div class="it"><div class="ic" style="background:var(--purple)">Z</div><div class="tx"><b>Highline Zürich</b><span>Zürich</span></div><div class="soc"><i>tg</i><i>ig</i></div></div>
-          </div>
-          <div class="btn out" style="margin-top:8px;width:100%">＋ Add your group</div>
-        </div>
-      </div></div>
-      <figcaption><b>Half: Communities.</b> The map switches to groups. "Find people to slackline with near me" in two taps.</figcaption>
+      <figcaption><b>Half.</b> The list. Tapping a row opens the line's card full-screen, as the card does on phones today.</figcaption>
     </figure>
   </div>
 </section>
 
-<!-- ============ DATA ============ -->
 <section>
-  <h2>How hard is "latest in view"?</h2>
-  <p class="lead">Small. Every change is already indexed per country (<code>GET /country/:code/changelogs</code> exists), and the browser already knows which countries are on screen and where every feature is (each feature in the map file carries its country and position).</p>
+  <h2>What the list needs</h2>
   <table>
-    <tr><th>Approach</th><th>How</th><th>Backend change</th><th>Result</th></tr>
-    <tr><td><b>⭐ Countries in view</b></td><td>Read the country codes of the features on screen; fetch each country's latest changes with the existing endpoint (cached); merge by date. With more than ~3 countries on screen, use the global list.</td><td>None</td><td>"Latest in Switzerland", or "Latest in Switzerland, France". Accurate, works in quiet areas too.</td></tr>
-    <tr><td>Strictly the rectangle</td><td>The above, then drop changes whose feature is outside the screen (positions from the map file).</td><td>None</td><td>Truer to "in view", but often empty when zoomed in on a quiet valley. Could be a toggle.</td></tr>
-    <tr><td>Global, filtered</td><td>Take the latest 100 worldwide changes and keep the ones on screen.</td><td>None</td><td>Empty almost everywhere except busy countries. Not recommended.</td></tr>
-    <tr><td>Geographic index</td><td>Store each change under a map tile key in a new table index; query by tiles in view.</td><td>New index and a backfill</td><td>Exact at any zoom, but a new moving part for little gain.</td></tr>
+    <tr><th>Need</th><th>Today</th><th>Change</th></tr>
+    <tr><td>Which lines, spots, guides are in view; their type, length, country</td><td>In the map files already</td><td>None: read what the map renders</td></tr>
+    <tr><td><b>Names</b> (and height for lines)</td><td>Not in the map files; only in each feature's details</td><td>Add a short name (and height) to each feature in the map files, written by the existing stream handler. Roughly +100–150 KB on the lines file before compression. Also unlocks search by name later.</td></tr>
+    <tr><td>Countries in view with counts</td><td>The country points file and per-country counts the country card already uses</td><td>None</td></tr>
+    <tr><td>Groups in view</td><td>Groups' map file (positions) + per-country communities endpoint (names, links)</td><td>None</td></tr>
+    <tr><td>Recent changes</td><td>Today's activity card</td><td>Moves to a link at the bottom; opens on the right as today</td></tr>
   </table>
-  <p class="lead" style="margin-top:10px">Communities works the same way: the existing <code>GET /communities/country/:code</code> returns the members and groups per country, and the groups' map file already has their positions for "3 in view".</p>
 </section>
 
 <section>
   <div class="note">
     <h3>Open questions for you</h3>
     <ul>
-      <li><b>Default tab:</b> Activity, as drawn, or remember the last one?</li>
-      <li><b>Scope label:</b> "Latest in Switzerland" (country-based, never empty) or strictly what's on screen?</li>
-      <li><b>Community Map page:</b> retire it once the tab exists (its links redirect to the tab)?</li>
-      <li><b>Contributors:</b> today's activity card also ranks top contributors. Keep it under Activity ("Top contributors here"), or drop it from the panel?</li>
-      <li><b>Search:</b> places only for now (as drawn); searching lines and spots by name is a later step.</li>
+      <li><b>Default sort for lines:</b> longest, highest, or name?</li>
+      <li><b>Unnamed lines</b> (many have none): show "Highline, 95 m" as the title, or sort them last?</li>
+      <li><b>Zoom level where the list switches to countries:</b> by count (e.g. more than 300 lines in view) or by zoom level?</li>
+      <li><b>Small laptops:</b> left panel and right card both open leave ~40% for the map. Collapse the left panel while a card is open?</li>
+      <li><b>Community Map page:</b> retire it once the tab exists?</li>
     </ul>
   </div>
 </section>
