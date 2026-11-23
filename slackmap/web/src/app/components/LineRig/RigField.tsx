@@ -149,8 +149,8 @@ export const RigField = (props: Props) => {
       const result = await reportRig(props.lineId, until);
       setCode(manageCodeFor(props.lineId, result));
       setDoneUntil(result.until);
+      // The card reloads on onChanged and would drop this step, so it reloads when the step is closed.
       setStep('done');
-      props.onChanged();
     } catch (error) {
       fail(error);
     }
@@ -277,7 +277,14 @@ export const RigField = (props: Props) => {
             The manage link is saved in this browser. Whoever has it can extend or take down this rig.
           </Typography>
         </Stack>
-        <Button onClick={() => setStep(undefined)}>Done</Button>
+        <Button
+          onClick={() => {
+            setStep(undefined);
+            props.onChanged();
+          }}
+        >
+          Done
+        </Button>
       </Panel>
     );
   }

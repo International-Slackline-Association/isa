@@ -17,8 +17,18 @@ CQIDAQAB
 export type Pass = { pass: string; signature: string };
 
 const storageKey = 'app.rigPasses';
-// Fetched ahead, so getting passes and reporting a rig are not one moment.
-const keepStored = 2;
+// Fetched once a month, the month's whole allowance in one go: a refill after every use would put a
+// signed-in call right after each activation, and the two would be one moment again.
+const keepStored = 5;
+const fetchedMonthKey = 'app.rigPassesMonth';
+const thisMonth = () => new Date().toISOString().slice(0, 7);
+const fetchedThisMonth = () => {
+  try {
+    return localStorage.getItem(fetchedMonthKey) === thisMonth();
+  } catch {
+    return false;
+  }
+};
 
 export const toBase64Url = (data: Uint8Array) =>
   btoa(String.fromCharCode(...data))
@@ -45,7 +55,6 @@ export const takePass = () => {
   return first as Pass | undefined;
 };
 export const returnPass = (pass: Pass) => writePasses([pass, ...readPasses()]);
-export const hasPass = () => readPasses().length > 0;
 
 const publicKey = async () => {
   const der = Uint8Array.from(atob(passPublicKey.replace(/-----[^-]+-----|\s/g, '')), (c) => c.charCodeAt(0));
@@ -58,7 +67,7 @@ let refilling: Promise<void> | undefined;
 export const refillPasses = () =>
   (refilling ??= (async () => {
     const missing = keepStored - readPasses().length;
-    if (missing <= 0) return;
+    if (missing <= 0 || fetchedThisMonth()) return;
     const token = await fetchAuthSession().then((s) => s.tokens?.idToken?.toString());
     if (!token) return;
 
@@ -79,6 +88,10 @@ export const refillPasses = () =>
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ blindedPasses: blinded.map((b) => toBase64Url(b.blindedMsg)) }),
     });
+    // Marked even when refused (the month's allowance used on another device), so it is not retried on every load.
+    try {
+      localStorage.setItem(fetchedMonthKey, thisMonth());
+    } catch {}
     if (!response.ok) return;
     const { signatures } = (await response.json()) as { signatures: string[] };
 
