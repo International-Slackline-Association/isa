@@ -5,8 +5,12 @@ import { fetchAuthSession } from 'aws-amplify/auth';
 
 import { Pass, returnPass, takePass, toBase64Url } from './passes';
 
-// The activation's activatedAt is kept with the code, so a code from an earlier activation on the same line is recognized as dead.
+// The activation's activatedAt is kept with the code, so a code from an earlier activation on the same line or spot is recognized as dead.
 type StoredLink = { code: string; activatedAt?: number };
+
+export type ActivationTarget = { type: 'line' | 'spot'; id: string };
+// A line keeps its bare id, the key it had before spots could be activated, so stored links stay valid.
+const storageKeyOf = (target: ActivationTarget) => (target.type === 'line' ? target.id : `spot:${target.id}`);
 const linksKey = 'app.activationManageLinks';
 
 const readLinks = (): Record<string, StoredLink> => {
@@ -21,32 +25,32 @@ const writeLinks = (links: Record<string, StoredLink>) => {
     localStorage.setItem(linksKey, JSON.stringify(links));
   } catch {}
 };
-const storeLink = (lineId: string, link: StoredLink) => writeLinks({ ...readLinks(), [lineId]: link });
-const forgetManageCode = (lineId: string) => {
-  const { [lineId]: _, ...rest } = readLinks();
+const storeLink = (target: ActivationTarget, link: StoredLink) => writeLinks({ ...readLinks(), [storageKeyOf(target)]: link });
+const forgetManageCode = (target: ActivationTarget) => {
+  const { [storageKeyOf(target)]: _, ...rest } = readLinks();
   writeLinks(rest);
 };
 
-export const manageCodeFor = (lineId: string, activation?: { activatedAt: number }) => {
-  const link = readLinks()[lineId];
+export const manageCodeFor = (target: ActivationTarget, activation?: { activatedAt: number }) => {
+  const link = readLinks()[storageKeyOf(target)];
   if (!link) return undefined;
   if (!activation || (link.activatedAt !== undefined && link.activatedAt !== activation.activatedAt)) {
-    forgetManageCode(lineId);
+    forgetManageCode(target);
     return undefined;
   }
   // A shared link is bound to the activation it was opened on.
-  if (link.activatedAt === undefined) storeLink(lineId, { ...link, activatedAt: activation.activatedAt });
+  if (link.activatedAt === undefined) storeLink(target, { ...link, activatedAt: activation.activatedAt });
   return link.code;
 };
 
 // After '#', so the code never reaches a server or its logs.
-export const manageLinkOf = (lineId: string, code: string) =>
-  `${window.location.origin}/line/${lineId}#manage=${code}`;
+export const manageLinkOf = (target: ActivationTarget, code: string) =>
+  `${window.location.origin}/${target.type}/${target.id}#manage=${code}`;
 
-export const consumeManageLinkFromUrl = (lineId: string) => {
+export const consumeManageLinkFromUrl = (target: ActivationTarget) => {
   const code = new URLSearchParams(window.location.hash.slice(1)).get('manage');
   if (!code) return;
-  storeLink(lineId, { code });
+  storeLink(target, { code });
   history.replaceState(history.state, '', window.location.pathname + window.location.search);
 };
 
@@ -56,11 +60,11 @@ const sha256Hex = async (text: string) =>
     .join('');
 
 // Only the named activation sends the login; every other call must not carry who is signed in.
-const send = async (method: string, lineId: string, body: unknown, opts: { named?: boolean }) => {
+const send = async (method: string, target: ActivationTarget, body: unknown, opts: { named?: boolean }) => {
   const token = opts.named ? await fetchAuthSession().then((s) => s.tokens?.idToken?.toString()) : undefined;
   if (opts.named && !token) throw new Error('Sign in to activate with your name');
   const request = () =>
-    fetch(`${apiBaseUrl}/line/${encodeURIComponent(lineId)}/activation${opts.named ? '/named' : ''}`, {
+    fetch(`${apiBaseUrl}/${target.type}/${encodeURIComponent(target.id)}/activation${opts.named ? '/named' : ''}`, {
       method,
       credentials: 'include',
       headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
@@ -77,8 +81,8 @@ const send = async (method: string, lineId: string, body: unknown, opts: { named
   return data;
 };
 
-const call = (method: string, lineId: string, body: unknown, opts: { named?: boolean } = {}) => {
-  const result = send(method, lineId, body, opts);
+const call = (method: string, target: ActivationTarget, body: unknown, opts: { named?: boolean } = {}) => {
+  const result = send(method, target, body, opts);
   reloadMapDataAfterWrite('features', result);
   return result;
 };
@@ -86,40 +90,40 @@ const call = (method: string, lineId: string, body: unknown, opts: { named?: boo
 export class NoPassError extends Error {}
 
 // Only a pass fetched earlier: fetching one around an activation would make the two one moment.
-export const activateAnonymously = async (lineId: string, until: number, from?: number) => {
+export const activateAnonymously = async (target: ActivationTarget, until: number, from?: number) => {
   const pass: Pass | undefined = takePass();
   if (!pass) throw new NoPassError();
   const code = toBase64Url(crypto.getRandomValues(new Uint8Array(16)));
   try {
-    const result = (await call('POST', lineId, { from, until, ...pass, linkHash: await sha256Hex(code) })) as {
+    const result = (await call('POST', target, { from, until, ...pass, linkHash: await sha256Hex(code) })) as {
       from: number;
       until: number;
       activatedAt: number;
     };
-    storeLink(lineId, { code, activatedAt: result.activatedAt });
+    storeLink(target, { code, activatedAt: result.activatedAt });
     return result;
   } catch (error) {
-    // Refused before it was spent (line already active, a bad date): the pass is still good.
+    // Refused before it was spent (already active, a bad date): the pass is still good.
     if (!/pass (was |already )?used|Invalid pass/i.test((error as Error).message)) returnPass(pass);
     throw error;
   }
 };
 
-export const activateWithName = async (lineId: string, until: number, from?: number) => {
+export const activateWithName = async (target: ActivationTarget, until: number, from?: number) => {
   const code = toBase64Url(crypto.getRandomValues(new Uint8Array(16)));
-  const result = (await call('POST', lineId, { from, until, linkHash: await sha256Hex(code) }, { named: true })) as {
+  const result = (await call('POST', target, { from, until, linkHash: await sha256Hex(code) }, { named: true })) as {
     from: number;
     until: number;
     activatedAt: number;
   };
-  storeLink(lineId, { code, activatedAt: result.activatedAt });
+  storeLink(target, { code, activatedAt: result.activatedAt });
   return result;
 };
 
-export const extendActivation = (lineId: string, code: string, until: number) =>
-  call('PUT', lineId, { until, code }) as Promise<{ until: number }>;
+export const extendActivation = (target: ActivationTarget, code: string, until: number) =>
+  call('PUT', target, { until, code }) as Promise<{ until: number }>;
 
-export const deactivate = async (lineId: string, code: string) => {
-  await call('DELETE', lineId, { code });
-  forgetManageCode(lineId);
+export const deactivate = async (target: ActivationTarget, code: string) => {
+  await call('DELETE', target, { code });
+  forgetManageCode(target);
 };

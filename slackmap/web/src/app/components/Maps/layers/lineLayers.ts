@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import type { Map as MapboxMap } from 'mapbox-gl';
 import { appColors } from 'styles/theme/colors';
 
+import { SpotLayerIds } from './spotLayers';
+
 import {
   CircleLayer,
   LineLayer,
@@ -124,22 +126,23 @@ export const useActivePointPulse = (map: MapboxMap | undefined) => {
   useEffect(() => {
     if (!map) return;
     let frame = 0;
+    const halos = [LineLayerIds.linePointActiveHalo, SpotLayerIds.spotPointActiveHalo];
+    const markers = [LineLayerIds.linePointActive, SpotLayerIds.spotPointActive];
     const tick = (time: number) => {
       const t = (time % 1600) / 1600;
-      // Mid style change the halo layer is gone, and a paint change on it throws.
-      if (map.getLayer(LineLayerIds.linePointActiveHalo)) {
-        map.setPaintProperty(LineLayerIds.linePointActiveHalo, 'circle-radius', 8 + t * 18);
-        map.setPaintProperty(LineLayerIds.linePointActiveHalo, 'circle-opacity', 0.45 * (1 - t));
+      // Mid style change a halo layer is gone, and a paint change on it throws.
+      for (const halo of halos.filter((id) => map.getLayer(id))) {
+        map.setPaintProperty(halo, 'circle-radius', 8 + t * 18);
+        map.setPaintProperty(halo, 'circle-opacity', 0.45 * (1 - t));
       }
       frame = requestAnimationFrame(tick);
     };
     // Every paint change redraws the map and keeps it from going idle, so the pulse runs only while a
     // live marker is on screen; the rest of the time the map rests.
     const check = () => {
+      const present = markers.filter((id) => map.getLayer(id));
       const onScreen =
-        map.isStyleLoaded() &&
-        Boolean(map.getLayer(LineLayerIds.linePointActive)) &&
-        map.queryRenderedFeatures({ layers: [LineLayerIds.linePointActive] }).length > 0;
+        map.isStyleLoaded() && present.length > 0 && map.queryRenderedFeatures({ layers: present }).length > 0;
       if (onScreen && !frame) frame = requestAnimationFrame(tick);
       if (!onScreen && frame) {
         cancelAnimationFrame(frame);

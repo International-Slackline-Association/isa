@@ -6,8 +6,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Avatar, AvatarGroup, Box, Button, ButtonBase, Collapse, Stack, Typography } from '@mui/material';
 
 import { activityApi } from 'app/api/activity-api';
-import { getActiveLinePoints, useMapDataVersion } from 'app/api/geojson-data';
+import { getActivePoints, useMapDataVersion } from 'app/api/geojson-data';
 import { lineApi } from 'app/api/line-api';
+import { spotApi } from 'app/api/spot-api';
 import { ChangelogActionIcon } from 'app/components/FeatureDetailFields/FeatureHistoryField';
 import { formatUntil } from 'app/components/LineActivation/activationTimes';
 import { appActions } from 'app/slices/app';
@@ -17,7 +18,7 @@ import { ui } from 'styles/theme/ui';
 
 import { PanelRow, SectionTitle, flagUrl } from './PanelRow';
 
-type ActiveLine = Awaited<ReturnType<typeof getActiveLinePoints>>[number];
+type ActiveFeature = Awaited<ReturnType<typeof getActivePoints>>[number];
 
 const useHighlight = () => {
   const dispatch = useDispatch();
@@ -25,29 +26,32 @@ const useHighlight = () => {
     dispatch(appActions.updateHighlightedFeature(id && type ? { id, type } : undefined));
 };
 
-const ActiveLineRow = (props: { line: ActiveLine; onOpen: () => void }) => {
-  const { data } = lineApi.useGetLineDetailsQuery(props.line.id);
+const ActiveRow = (props: { feature: ActiveFeature; onOpen: () => void }) => {
+  const isSpot = props.feature.type === 'spot';
+  const line = lineApi.useGetLineDetailsQuery(props.feature.id, { skip: isSpot });
+  const spot = spotApi.useGetSpotDetailsQuery(props.feature.id, { skip: !isSpot });
+  const data = isSpot ? spot.data : line.data;
   const highlight = useHighlight();
   return (
     <PanelRow
       accent={ui.live}
       title={data ? data.name || 'No name' : '…'}
-      subtitle={`until ${formatUntil(props.line.activeUntil)}`}
-      flag={props.line.country}
-      trailing={props.line.length}
+      subtitle={`${isSpot ? 'Spot, until' : 'until'} ${formatUntil(props.feature.activeUntil)}`}
+      flag={props.feature.country}
+      trailing={isSpot ? undefined : props.feature.length}
       onClick={props.onOpen}
-      onHover={(on) => highlight(on ? props.line.id : undefined, 'line')}
+      onHover={(on) => highlight(on ? props.feature.id : undefined, props.feature.type)}
     />
   );
 };
 
 export const ActiveNowSection = (props: { onNavigate?: () => void }) => {
   const navigate = useNavigate();
-  const [lines, setLines] = useState<ActiveLine[]>();
+  const [features, setFeatures] = useState<ActiveFeature[]>();
   const dataVersion = useMapDataVersion('features');
 
   useEffect(() => {
-    const load = () => getActiveLinePoints().then(setLines);
+    const load = () => getActivePoints().then(setFeatures);
     load();
     const timer = setInterval(load, 60_000);
     return () => clearInterval(timer);
@@ -55,18 +59,18 @@ export const ActiveNowSection = (props: { onNavigate?: () => void }) => {
 
   return (
     <Box>
-      <SectionTitle title="Active now" count={lines?.length} />
-      {lines?.length === 0 && (
+      <SectionTitle title="Active now" count={features?.length} />
+      {features?.length === 0 && (
         <Typography variant="body2" sx={{ color: 'text.secondary', py: 1 }}>
-          No line is active right now. Rigging one? Open it on the map and tap Activate.
+          Nothing is active right now. Rigging? Open the line or spot on the map and tap Activate.
         </Typography>
       )}
-      {lines?.map((line) => (
-        <ActiveLineRow
-          key={line.id}
-          line={line}
+      {features?.map((feature) => (
+        <ActiveRow
+          key={`${feature.type}:${feature.id}`}
+          feature={feature}
           onOpen={() => {
-            navigate(`/line/${line.id}`);
+            navigate(`/${feature.type}/${feature.id}`);
             props.onNavigate?.();
           }}
         />

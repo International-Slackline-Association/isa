@@ -21,8 +21,7 @@ export const processLineGeoJson = (
     type?: SlacklineType;
     length?: number;
     country: string;
-    // Only for the map files; the line item's stored geoJson never carries it.
-    activation?: { from: number; until: number; activatedAt: number };
+    activation?: MapActivation;
   },
 ): FeatureCollection => {
   const features: Feature[] = [];
@@ -39,18 +38,24 @@ export const processLineGeoJson = (
     if (meta.country) {
       f.properties['c'] = meta.country;
     }
-    // The hourly job rewrites the files when one starts.
-    if (meta.activation && meta.activation.from <= Date.now() / 1000) {
-      f.properties['au'] = meta.activation.until;
-      f.properties['aa'] = meta.activation.activatedAt;
-    } else {
-      delete f.properties['au'];
-      delete f.properties['aa'];
-    }
+    setActivationProperties(f.properties, meta.activation);
     features.push(f);
   }
 
   return { type: 'FeatureCollection', features };
+};
+
+type MapActivation = { from: number; until: number; activatedAt: number };
+
+// Only for the map files; a feature's stored geoJson never carries it. The hourly job rewrites the files when one starts.
+const setActivationProperties = (properties: Record<string, any>, activation?: MapActivation) => {
+  if (activation && activation.from <= Date.now() / 1000) {
+    properties['au'] = activation.until;
+    properties['aa'] = activation.activatedAt;
+  } else {
+    delete properties['au'];
+    delete properties['aa'];
+  }
 };
 
 export const processSpotGeoJson = (
@@ -59,6 +64,7 @@ export const processSpotGeoJson = (
     spotId: string;
     types?: SpotType[];
     country: string;
+    activation?: MapActivation;
   },
 ): FeatureCollection => {
   const features: Feature[] = [];
@@ -75,6 +81,7 @@ export const processSpotGeoJson = (
     if (meta.country) {
       f.properties['c'] = meta.country;
     }
+    setActivationProperties(f.properties, meta.activation);
     features.push(f);
   }
   return { type: 'FeatureCollection', features };
@@ -173,7 +180,7 @@ export const refreshLineGeoJsonFiles = async (
   if (opts.lineIdToUpdate) {
     const [line, activation] = await Promise.all([
       db.getLineDetails(opts.lineIdToUpdate),
-      db.getLineActivation(opts.lineIdToUpdate),
+      db.getActivation('line', opts.lineIdToUpdate),
     ]);
     mainGeoJSON = await getFromS3('geojson/lines/all.geojson');
     mainGeoJSON.features = mainGeoJSON.features.filter(
@@ -196,7 +203,7 @@ export const refreshLineGeoJsonFiles = async (
       features: [],
     };
     updatedLines = await db.getAllLines();
-    const activations = new Map((await db.getAllLineActivations()).map((a) => [a.lineId, a]));
+    const activations = new Map((await db.getAllActivations('line')).map((a) => [a.featureId, a]));
     for (const line of updatedLines) {
       if (line) {
         const geoJson = processLineGeoJson(JSON.parse(line.geoJson), {
@@ -229,7 +236,10 @@ export const refreshSpotGeoJsonFiles = async (
   let updatedSpots: Awaited<ReturnType<typeof db.getAllSpots>> | undefined;
 
   if (opts.spotIdToUpdate) {
-    const spot = await db.getSpotDetails(opts.spotIdToUpdate);
+    const [spot, activation] = await Promise.all([
+      db.getSpotDetails(opts.spotIdToUpdate),
+      db.getActivation('spot', opts.spotIdToUpdate),
+    ]);
     mainGeoJSON = await getFromS3('geojson/spots/all.geojson');
     mainGeoJSON.features = mainGeoJSON.features.filter(
       (f) => f.properties?.id !== opts.spotIdToUpdate,
@@ -239,6 +249,7 @@ export const refreshSpotGeoJsonFiles = async (
         spotId: spot.spotId,
         types: spot.types,
         country: spot.country,
+        activation: activation ?? undefined,
       });
       mainGeoJSON.features.push(...geoJson.features);
       updatedSpots = [spot];
@@ -249,12 +260,14 @@ export const refreshSpotGeoJsonFiles = async (
       features: [],
     };
     updatedSpots = await db.getAllSpots();
+    const activations = new Map((await db.getAllActivations('spot')).map((a) => [a.featureId, a]));
     for (const spot of updatedSpots) {
       if (spot) {
         const geoJson = processSpotGeoJson(JSON.parse(spot.geoJson), {
           spotId: spot.spotId,
           types: spot.types,
           country: spot.country,
+          activation: activations.get(spot.spotId),
         });
         for (const feature of geoJson.features) {
           mainGeoJSON.features.push(feature);

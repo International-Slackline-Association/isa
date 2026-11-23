@@ -10,7 +10,7 @@ const stages = {
     // Set by the stream of the table in the data stack; changes only if the stream is recreated.
     tableStreamArn:
       'arn:aws:dynamodb:eu-central-1:387132903656:table/slackmap-prod-db/stream/2026-11-12T13:16:15.858',
-    passes: { signingKeyParameter: 'slackmap-pass-signing-key', perMonth: 5 },
+    passes: { signingKeyParameter: 'slackmap-pass-signing-key', perMonth: 10 },
   },
   test: {
     domain: 'test.slackmap.com',

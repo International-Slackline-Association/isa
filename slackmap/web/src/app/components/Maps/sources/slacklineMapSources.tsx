@@ -25,7 +25,15 @@ import {
   useActivePointPulse,
 } from '../layers/lineLayers';
 import { ElevatedLines } from './ElevatedLines';
-import { spotPointLayer, spotPolygonLayer, spotPolygonOutlineLayer } from '../layers/spotLayers';
+import {
+  activeSpotFillLayer,
+  activeSpotOutlineLayer,
+  activeSpotPointHaloLayer,
+  activeSpotPointLayer,
+  spotPointLayer,
+  spotPolygonLayer,
+  spotPolygonOutlineLayer,
+} from '../layers/spotLayers';
 
 export const SlacklineMapSourceIds = {
   spots: 'spots',
@@ -69,7 +77,7 @@ export const SlacklineMapSources = (props: {
 
   const options = {
     lines: displayFeature === 'line' || displayFeature === 'all' || displayFeature === 'active',
-    spots: displayFeature === 'spot' || displayFeature === 'all',
+    spots: displayFeature === 'spot' || displayFeature === 'all' || displayFeature === 'active',
     guides: displayFeature === 'guide' || displayFeature === 'all',
   };
   useEffect(() => {
@@ -103,6 +111,11 @@ export const SlacklineMapSources = (props: {
     displayFeature === 'active'
       ? ['all', activeFilterExpr, lineTypeFilterExpr || true]
       : lineTypeFilterExpr;
+  const spotFilterExpr =
+    displayFeature === 'active'
+      ? ['all', activeFilterExpr, spotTypeFilterExpr || true]
+      : spotTypeFilterExpr;
+  const activeSpotFilterExpr = ['all', activeFilterExpr, spotTypeFilterExpr || true];
 
   // The data needs the session cookie; the map draws without it until the browser check is done.
   if (!sessionReady) return null;
@@ -117,10 +130,12 @@ export const SlacklineMapSources = (props: {
         promoteId="id"
         filter={idFilterExpr}
       >
-        <Layer {...spotPolygonLayer({ visible: options.spots, filter: spotTypeFilterExpr })} />
+        <Layer {...spotPolygonLayer({ visible: options.spots, filter: spotFilterExpr })} />
         <Layer
-          {...spotPolygonOutlineLayer({ visible: options.spots, filter: spotTypeFilterExpr })}
+          {...spotPolygonOutlineLayer({ visible: options.spots, filter: spotFilterExpr })}
         />
+        <Layer {...activeSpotFillLayer({ visible: options.spots, filter: activeSpotFilterExpr })} />
+        <Layer {...activeSpotOutlineLayer({ visible: options.spots, filter: activeSpotFilterExpr })} />
       </Source>
 
       <Source
@@ -229,9 +244,21 @@ export const SlacklineMapSources = (props: {
         promoteId="id"
       >
         <Layer
+          {...activeSpotPointHaloLayer({
+            visible: options.spots,
+            filter: ['all', activeSpotFilterExpr, countryFilterExpr || true],
+          })}
+        />
+        <Layer
           {...spotPointLayer({
             visible: options.spots,
-            filter: ['all', countryFilterExpr || true, spotTypeFilterExpr || true],
+            filter: ['all', countryFilterExpr || true, spotFilterExpr || true],
+          })}
+        />
+        <Layer
+          {...activeSpotPointLayer({
+            visible: options.spots,
+            filter: ['all', activeSpotFilterExpr, countryFilterExpr || true],
           })}
         />
       </Source>

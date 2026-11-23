@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 
 import { featureCollection } from '@turf/turf';
-import { Feature, FeatureCollection } from 'geojson';
+import { Feature, FeatureCollection, Point } from 'geojson';
 
 import { ensureSession, showSessionFailure } from 'app/session';
 
@@ -154,16 +154,20 @@ export const getSlacklinePointFeaturesOfCountry = async (code: string) => {
   return cache.slacklinePointFeaturesOfCountry[code];
 };
 
-export const getActiveLinePoints = async () => {
+const isActivatable = (ft: unknown) => ft === 'l' || ft === 's';
+
+export const getActivePoints = async () => {
   const allPointsGeoJson = await getAllSlacklinePointsGeoJson();
   const nowSeconds = Date.now() / 1000;
   return allPointsGeoJson.features
-    .filter((f) => f.properties?.ft === 'l' && f.properties?.au > nowSeconds)
+    .filter((f) => isActivatable(f.properties?.ft) && f.properties?.au > nowSeconds)
     .map((f) => ({
       id: f.properties!.id as string,
+      type: (f.properties!.ft === 's' ? 'spot' : 'line') as 'line' | 'spot',
       activeUntil: f.properties!.au as number,
       length: f.properties!.l as string | undefined,
       country: f.properties!.c as string | undefined,
+      center: (f.geometry as Point).coordinates,
     }))
     .sort((a, b) => a.activeUntil - b.activeUntil);
 };
@@ -174,7 +178,7 @@ export const getSlacklineMapStats = async () => {
   const countryCount = await getCountrySlacklinePointsGeoJson();
   const nowSeconds = Date.now() / 1000;
   const activeCount = allPointsGeoJson.features.filter(
-    (feature) => feature.properties?.ft === 'l' && feature.properties?.au > nowSeconds,
+    (feature) => isActivatable(feature.properties?.ft) && feature.properties?.au > nowSeconds,
   ).length;
   return {
     ...featureStats,

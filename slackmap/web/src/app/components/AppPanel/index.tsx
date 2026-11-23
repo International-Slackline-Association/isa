@@ -19,7 +19,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { getActiveLinePoints, useMapDataVersion } from 'app/api/geojson-data';
+import { getActivePoints, useMapDataVersion } from 'app/api/geojson-data';
 import { useInfoDialog } from 'app/components/Dialogs/useInfoDialog';
 import { useSessionReady } from 'app/session';
 import { panelTheme } from 'styles/theme/panelTheme';
@@ -54,7 +54,7 @@ const useActiveCount = () => {
   const [count, setCount] = useState(0);
   useEffect(() => {
     if (!sessionReady) return;
-    const load = () => getActiveLinePoints().then((lines) => setCount(lines.length));
+    const load = () => getActivePoints().then((features) => setCount(features.length));
     load();
     const timer = setInterval(load, 60_000);
     return () => clearInterval(timer);

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { db } from '../../../../core/db';
-import { LineActivation } from '../../../../core/db/entities/line/activation';
+import { ActivatableFeatureType, FeatureActivation } from '../../../../core/db/entities/activation';
 import { addActivatedChangelog } from '../../../../core/features/mapFeature/changelog';
 import {
   activatedAtHour,
@@ -55,62 +55,68 @@ const issuePasses = async (req: Request) => {
   return { signatures: signatures.map((s) => Buffer.from(s).toString('base64url')), used, limit: passesPerMonth };
 };
 
-const ensureLineCanBeActivated = async (lineId: string, now: Date) => {
-  const line = await db.getLineDetails(lineId);
-  if (!line) throw new Error(`NotFound: Line ${lineId} not found`);
-  const existing = await db.getLineActivation(lineId);
+const featureDetails = (featureType: ActivatableFeatureType, featureId: string) =>
+  featureType === 'line' ? db.getLineDetails(featureId) : db.getSpotDetails(featureId);
+
+const ensureCanBeActivated = async (featureType: ActivatableFeatureType, featureId: string, now: Date) => {
+  const feature = await featureDetails(featureType, featureId);
+  if (!feature) throw new Error(`NotFound: ${featureType} ${featureId} not found`);
+  const existing = await db.getActivation(featureType, featureId);
   if (existing && existing.until > now.getTime() / 1000) {
-    throw new Error('Validation: This line is already active');
+    throw new Error(`Validation: This ${featureType} is already active`);
   }
-  return line;
+  return feature;
 };
 
-const saveActivation = async (activation: LineActivation, afterSpentPass: boolean) => {
-  await db.putLineActivation(activation, nowSeconds()).catch((error) => {
+const saveActivation = async (activation: FeatureActivation, afterSpentPass: boolean) => {
+  await db.putActivation(activation, nowSeconds()).catch((error) => {
     if (!isConditionFailed(error)) throw error;
     throw new Error(
       afterSpentPass
-        ? 'Validation: This line was activated a moment ago; your pass was used'
-        : 'Validation: This line was activated a moment ago',
+        ? `Validation: This ${activation.featureType} was activated a moment ago; your pass was used`
+        : `Validation: This ${activation.featureType} was activated a moment ago`,
     );
   });
 };
 
 // No login is read here: a valid, unspent pass is all that says a member sent it.
-const activateAnonymously = async (req: Request<{ id: string }>) => {
-  const lineId = req.params.id;
+const activateAnonymously = (featureType: ActivatableFeatureType) => async (req: Request<{ id: string }>) => {
+  const featureId = req.params.id;
   const body = validateApiPayload(req.body, activateSchema);
   const now = new Date();
   const from = activationStart(body.from, now);
   validateActivationEnd(from, body.until, now);
   if (!(await isPassValid(body.pass, body.signature))) throw new Error('Forbidden: Invalid pass');
-  const line = await ensureLineCanBeActivated(lineId, now);
+  const feature = await ensureCanBeActivated(featureType, featureId, now);
 
   await db.spendPass(hashOf(body.pass)).catch((error) => {
     if (isConditionFailed(error)) throw new Error('Forbidden: Pass already used');
     throw error;
   });
-  const activation = { lineId, from, until: body.until, activatedAt: activatedAtHour(now), linkHash: body.linkHash };
+  const activation = { featureType, featureId, from, until: body.until, activatedAt: activatedAtHour(now), linkHash: body.linkHash };
   await saveActivation(activation, true);
   // Never fails the activation once it is saved: the manage link would be lost. The hourly job writes it again.
   if (from <= now.getTime() / 1000) {
-    await addActivatedChangelog(line, undefined, new Date(from * 1000)).catch(() => logger.warn('history entry failed', { lineId }));
+    await addActivatedChangelog(feature, undefined, new Date(from * 1000)).catch(() =>
+      logger.warn('history entry failed', { featureType, featureId }),
+    );
   }
-  logger.info('line activated', { lineId, from, until: activation.until });
+  logger.info('activated', { featureType, featureId, from, until: activation.until });
   return { from, until: activation.until, activatedAt: activation.activatedAt };
 };
 
-const activateWithName = async (req: Request<{ id: string }>) => {
+const activateWithName = (featureType: ActivatableFeatureType) => async (req: Request<{ id: string }>) => {
   const { isaId } = verifyRequestClaims(req);
-  const lineId = req.params.id;
+  const featureId = req.params.id;
   const body = validateApiPayload(req.body, activateNamedSchema);
   const now = new Date();
   const from = activationStart(body.from, now);
   validateActivationEnd(from, body.until, now);
-  const line = await ensureLineCanBeActivated(lineId, now);
+  const feature = await ensureCanBeActivated(featureType, featureId, now);
 
   const activation = {
-    lineId,
+    featureType,
+    featureId,
     from,
     until: body.until,
     activatedAt: activatedAtHour(now),
@@ -120,9 +126,11 @@ const activateWithName = async (req: Request<{ id: string }>) => {
   await saveActivation(activation, false);
   // Dated at the start, the same entry the hourly job writes; a later start is written by that job.
   if (from <= now.getTime() / 1000) {
-    await addActivatedChangelog(line, isaId, new Date(from * 1000)).catch(() => logger.warn('history entry failed', { lineId }));
+    await addActivatedChangelog(feature, isaId, new Date(from * 1000)).catch(() =>
+      logger.warn('history entry failed', { featureType, featureId }),
+    );
   }
-  logger.info('line activated with name', { lineId, from, until: activation.until, userId: isaId });
+  logger.info('activated with name', { featureType, featureId, from, until: activation.until, userId: isaId });
   return { from, until: activation.until, activatedAt: activation.activatedAt };
 };
 
@@ -131,33 +139,37 @@ const wrongLink = (error: unknown) => {
   throw error;
 };
 
-const extendActivation = async (req: Request<{ id: string }>) => {
-  const lineId = req.params.id;
+const extendActivation = (featureType: ActivatableFeatureType) => async (req: Request<{ id: string }>) => {
+  const featureId = req.params.id;
   const body = validateApiPayload(req.body, extendSchema);
-  const current = await db.getLineActivation(lineId);
+  const current = await db.getActivation(featureType, featureId);
   if (!current) throw new Error('Forbidden: This link does not manage a current activation');
   if (body.until <= current.until) throw new Error('Validation: An extension must end after the current end');
   validateActivationEnd(current.from, body.until, new Date());
-  await db.extendLineActivation(lineId, hashOf(body.code), body.until, nowSeconds()).catch(wrongLink);
-  logger.info('activation extended', { lineId, until: body.until });
+  await db.extendActivation(featureType, featureId, hashOf(body.code), body.until, nowSeconds()).catch(wrongLink);
+  logger.info('activation extended', { featureType, featureId, until: body.until });
   return { until: body.until };
 };
 
-const deactivate = async (req: Request<{ id: string }>) => {
-  const lineId = req.params.id;
+const deactivate = (featureType: ActivatableFeatureType) => async (req: Request<{ id: string }>) => {
+  const featureId = req.params.id;
   const body = validateApiPayload(req.body, deactivateSchema);
-  await db.endLineActivation(lineId, hashOf(body.code), nowSeconds()).catch(wrongLink);
-  logger.info('line deactivated', { lineId });
+  await db.endActivation(featureType, featureId, hashOf(body.code), nowSeconds()).catch(wrongLink);
+  logger.info('deactivated', { featureType, featureId });
   return {};
 };
 
 export const signedInActivationRoutes: Record<string, Route> = {
   'POST /passes': jsonRoute(issuePasses),
-  'POST /line/:id/activation/named': jsonRoute(activateWithName),
+  'POST /line/:id/activation/named': jsonRoute(activateWithName('line')),
+  'POST /spot/:id/activation/named': jsonRoute(activateWithName('spot')),
 };
 
 export const activationRoutes: Record<string, Route> = {
-  'POST /line/:id/activation': jsonRoute(activateAnonymously),
-  'PUT /line/:id/activation': jsonRoute(extendActivation),
-  'DELETE /line/:id/activation': jsonRoute(deactivate),
+  'POST /line/:id/activation': jsonRoute(activateAnonymously('line')),
+  'PUT /line/:id/activation': jsonRoute(extendActivation('line')),
+  'DELETE /line/:id/activation': jsonRoute(deactivate('line')),
+  'POST /spot/:id/activation': jsonRoute(activateAnonymously('spot')),
+  'PUT /spot/:id/activation': jsonRoute(extendActivation('spot')),
+  'DELETE /spot/:id/activation': jsonRoute(deactivate('spot')),
 };

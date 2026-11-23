@@ -2,7 +2,7 @@ import { countryChangelogCollection } from './collections/featureChangelogCollec
 import { groupDetailsDB } from './entities/group/details';
 import { guideDetailsDB } from './entities/guide/details';
 import { lineDetailsDB } from './entities/line/details';
-import { lineActivationDB } from './entities/line/activation';
+import { activationDB } from './entities/activation';
 import { passDB } from './entities/pass';
 import { mapFeatureChangelogDB } from './entities/mapFeature/changelog';
 import { mapFeatureDB } from './entities/mapFeature/editor';
@@ -14,7 +14,7 @@ export const db = {
   ...groupDetailsDB,
   ...guideDetailsDB,
   ...lineDetailsDB,
-  ...lineActivationDB,
+  ...activationDB,
   ...passDB,
   ...mapFeatureChangelogDB,
   ...mapFeatureDB,

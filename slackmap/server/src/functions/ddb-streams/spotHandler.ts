@@ -39,6 +39,7 @@ export const processSpotDetailsOperation = async (
   if (eventName === 'REMOVE' && oldSpot) {
     await db.deleteAllFeatureEditors(oldSpot.spotId, 'spot');
     await db.deleteAllFeatureChangelogs(oldSpot.spotId, 'spot');
+    await db.deleteActivation('spot', oldSpot.spotId);
     await deleteAllFeatureImages(oldSpot.spotId);
     await refreshSpotGeoJsonFiles({ spotIdToUpdate: oldSpot.spotId });
   }

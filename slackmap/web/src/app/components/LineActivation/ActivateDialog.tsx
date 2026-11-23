@@ -12,7 +12,7 @@ export type ActivationMode = 'anonymous' | 'named';
 
 interface Props {
   open: boolean;
-  lineName: string;
+  featureName: string;
   anonymousUnavailable?: string;
   onClose: () => void;
   onChoose: (mode: ActivationMode) => void;
@@ -144,7 +144,7 @@ export const ActivateDialog = (props: Props) => {
       open={props.open}
       onClose={props.onClose}
       width={440}
-      title={explaining ? 'How does this work?' : `Activate ${props.lineName}`}
+      title={explaining ? 'How does this work?' : `Activate ${props.featureName}`}
       description={!explaining && 'Show it as rigged now, for whoever needs to know. You stay out of it.'}
     >
       {explaining ? (
@@ -163,7 +163,7 @@ export const ActivateDialog = (props: Props) => {
             <Choice
               drawing={<NamedDrawing />}
               title="With my name"
-              line="Your name shows on the line"
+              line="Your name shows on it"
               onClick={() => props.onChoose('named')}
             />
           </Stack>

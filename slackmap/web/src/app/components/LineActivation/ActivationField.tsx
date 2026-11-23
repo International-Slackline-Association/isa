@@ -29,6 +29,7 @@ import {
   extendActivation,
   manageCodeFor,
   manageLinkOf,
+  ActivationTarget,
 } from './activationApi';
 import {
   calendarFile,
@@ -47,8 +48,8 @@ import { hasPass, passQuota, refillSettled } from './passes';
 
 
 interface Props {
-  lineId: string;
-  lineName: string;
+  target: ActivationTarget;
+  featureName: string;
   activation?: { from: number; until: number; activatedAt: number; activatedBy?: string };
   onChanged: () => void;
 }
@@ -169,16 +170,20 @@ export const ActivationField = (props: Props) => {
   const [busy, setBusy] = useState(false);
   const [doneUntil, setDoneUntil] = useState<number>();
   const [doneFrom, setDoneFrom] = useState<number>();
+  const [extendUntil, setExtendUntil] = useState<number>();
 
   useEffect(() => {
-    consumeManageLinkFromUrl(props.lineId);
-    setCode(manageCodeFor(props.lineId, props.activation));
-  }, [props.lineId, props.activation?.activatedAt]);
+    consumeManageLinkFromUrl(props.target);
+    setCode(manageCodeFor(props.target, props.activation));
+  }, [props.target.type, props.target.id, props.activation?.activatedAt]);
 
-  useEffect(() => setStep(undefined), [props.lineId]);
+  useEffect(() => {
+    setStep(undefined);
+    setExtendUntil(undefined);
+  }, [props.target.type, props.target.id]);
 
   const activation = props.activation;
-  const manageLink = code ? manageLinkOf(props.lineId, code) : undefined;
+  const manageLink = code ? manageLinkOf(props.target, code) : undefined;
 
   const fail = (error: unknown) => {
     const message =
@@ -221,9 +226,9 @@ export const ActivationField = (props: Props) => {
       if (!until) return;
       const result =
         mode === 'named'
-          ? await activateWithName(props.lineId, until, from)
-          : await activateAnonymously(props.lineId, until, from);
-      setCode(manageCodeFor(props.lineId, result));
+          ? await activateWithName(props.target, until, from)
+          : await activateAnonymously(props.target, until, from);
+      setCode(manageCodeFor(props.target, result));
       setDoneFrom(result.from);
       setDoneUntil(result.until);
       // The card reloads on onChanged and would drop this step, so it reloads when the step is closed.
@@ -233,8 +238,9 @@ export const ActivationField = (props: Props) => {
   const onExtend = (newUntil: number) =>
     run(async () => {
       if (!code) return;
-      await extendActivation(props.lineId, code, newUntil);
+      await extendActivation(props.target, code, newUntil);
       setStep(undefined);
+      setExtendUntil(undefined);
       dispatch(showSuccessNotification(`Extended until ${formatUntil(newUntil)}`));
       props.onChanged();
     });
@@ -242,7 +248,7 @@ export const ActivationField = (props: Props) => {
   const onDeactivate = () =>
     run(async () => {
       if (!code) return;
-      await deactivate(props.lineId, code);
+      await deactivate(props.target, code);
       setCode(undefined);
       setStep(undefined);
       dispatch(showSuccessNotification('Deactivated'));
@@ -253,7 +259,7 @@ export const ActivationField = (props: Props) => {
     if (!manageLink) return;
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'SlackMap manage link', text: `Manage ${props.lineName} on SlackMap`, url: manageLink });
+        await navigator.share({ title: 'SlackMap manage link', text: `Manage ${props.featureName} on SlackMap`, url: manageLink });
         return;
       }
       await navigator.clipboard.writeText(manageLink);
@@ -263,7 +269,7 @@ export const ActivationField = (props: Props) => {
 
   const onCalendar = (forUntil: number) => {
     if (!manageLink) return;
-    const url = URL.createObjectURL(calendarFile(props.lineName, forUntil, manageLink));
+    const url = URL.createObjectURL(calendarFile(props.featureName, forUntil, manageLink));
     const a = document.createElement('a');
     a.href = url;
     a.download = 'slackmap-activation-reminder.ics';
@@ -274,7 +280,7 @@ export const ActivationField = (props: Props) => {
   const dialog = (
     <ActivateDialog
       open={dialogOpen}
-      lineName={props.lineName}
+      featureName={props.featureName}
       anonymousUnavailable={hasPass() ? undefined : noPassReason()}
       onClose={() => setDialogOpen(false)}
       onChoose={onChoose}
@@ -403,10 +409,37 @@ export const ActivationField = (props: Props) => {
       {code && step === 'extend' && (
         <>
           <Typography variant="subtitle1">Extend until?</Typography>
-          <UntilChips from={scheduled ? activation.from : undefined} after={activation.until} onPick={onExtend} />
-          <Button variant="outlined" sx={{ bgcolor: '#fff' }} onClick={() => setStep(undefined)}>
-            Cancel
-          </Button>
+          <UntilChips
+            from={scheduled ? activation.from : undefined}
+            after={activation.until}
+            value={extendUntil}
+            onPick={setExtendUntil}
+          />
+          <Typography variant="body2" color="text.secondary">
+            {extendUntil ? `Gone from the map after ${formatUntil(extendUntil)}.` : 'Pick a later day.'}
+          </Typography>
+          <Stack direction="row" spacing={1}>
+            <Button
+              fullWidth
+              variant="outlined"
+              sx={{ bgcolor: '#fff' }}
+              onClick={() => {
+                setStep(undefined);
+                setExtendUntil(undefined);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              color="live"
+              disabled={busy || !extendUntil}
+              onClick={() => extendUntil && onExtend(extendUntil)}
+            >
+              Extend
+            </Button>
+          </Stack>
         </>
       )}
       {code && step === 'confirmDeactivate' && (

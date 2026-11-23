@@ -98,11 +98,11 @@ const sections: { title: string; items: { q: string; a: React.ReactNode }[] }[] 
         ),
       },
       {
-        q: 'How does activating a line anonymously work?',
+        q: 'How does activating a line or spot anonymously work?',
         a: (
           <>
             While you are signed in, your browser quietly gets a few anonymous passes. An anonymous activation uses
-            one of them and never your account, so SlackMap only learns that a member activated the line, never who.
+            one of them and never your account, so SlackMap only learns that a member activated it, never who.
             You get a manage link to extend or deactivate it, and you can share it with your crew. You can also
             activate with your name instead. SlackMap is open source and uses industry-standard methods: anyone can
             check how it works on{' '}

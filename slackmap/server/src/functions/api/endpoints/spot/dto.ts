@@ -1,5 +1,6 @@
 import { DDBSpotDetailTypes } from '../../../../core/db/entities/spot/details/types';
 import { FeatureCollection } from 'geojson';
+import { PublicActivation } from '../../../../core/features/activation';
 
 export const getSpotDetailsResponse = (
   item: DDBSpotDetailTypes['Entity'],
@@ -7,6 +8,7 @@ export const getSpotDetailsResponse = (
     canDelete: boolean;
     canEdit: boolean;
   },
+  activation?: PublicActivation,
 ) => {
   return {
     id: item.spotId,
@@ -24,5 +26,6 @@ export const getSpotDetailsResponse = (
     restrictionInfo: item.restrictionInfo,
     images: item.images,
     editorPermissions,
+    activation,
   };
 };

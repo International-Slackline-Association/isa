@@ -13,6 +13,7 @@ import { FeatureMediaField } from 'app/components/FeatureDetailFields/MediaField
 import { OutdatedInfoField } from 'app/components/FeatureDetailFields/OutdatedInfoField';
 import { FeatureDetailRestrictionField } from 'app/components/FeatureDetailFields/RestrictionField';
 import { ActivationField } from 'app/components/LineActivation/ActivationField';
+import { ActiveSpotNote } from 'app/components/LineActivation/ActiveSpotNote';
 import { format } from 'date-fns';
 import { appColors } from 'styles/theme/colors';
 import { imageUrlFromS3Key } from 'utils';
@@ -54,7 +55,7 @@ export const LineDetailCard = (props: Props) => {
       tags={
         lineDetails && (
           <>
-            {lineDetails.activation && <FeatureTag label="Active" color="live" />}
+            {lineDetails.activation && lineDetails.activation.from <= Date.now() / 1000 && <FeatureTag label="Active" color="live" />}
             <FeatureTag label={capitalize(lineDetails.type) || 'Line'} dot={appColors.lineStrokeColor} />
             <FeatureTag
               label={`Updated ${format(new Date(lineDetails.lastModifiedDateTime ?? lineDetails.createdDateTime), 'MMM yyyy')}`}
@@ -83,11 +84,12 @@ export const LineDetailCard = (props: Props) => {
             ]}
           />
           <ActivationField
-            lineId={props.lineId}
-            lineName={lineDetails.name || 'this line'}
+            target={{ type: 'line', id: props.lineId }}
+            featureName={lineDetails.name || 'this line'}
             activation={lineDetails.activation}
             onChanged={refetch}
           />
+          <ActiveSpotNote lineGeoJson={lineDetails.geoJson} />
           <FeatureDetailRestrictionField level={lineDetails.restrictionLevel} restrictionInfo={lineDetails.restrictionInfo} />
           <OutdatedInfoField
             updatedDate={new Date(lineDetails.lastModifiedDateTime ?? lineDetails.createdDateTime)?.toISOString()}

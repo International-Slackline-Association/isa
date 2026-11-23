@@ -15,14 +15,15 @@ logger.setLambdaName('cronJob');
 // write happens then. A two-hour window covers a run that was late or missed.
 const refreshStartedActivations = async () => {
   const nowSeconds = Date.now() / 1000;
-  const started = (await db.getAllLineActivations()).filter(
-    (a) => a.from > nowSeconds - 2 * 3600 && a.from <= nowSeconds && a.until > nowSeconds,
-  );
+  const all = [...(await db.getAllActivations('line')), ...(await db.getAllActivations('spot'))];
+  const started = all.filter((a) => a.from > nowSeconds - 2 * 3600 && a.from <= nowSeconds && a.until > nowSeconds);
   for (const activation of started) {
-    await refreshLineGeoJsonFiles({ lineIdToUpdate: activation.lineId });
-    const line = await db.getLineDetails(activation.lineId);
+    const { featureType, featureId } = activation;
+    if (featureType === 'line') await refreshLineGeoJsonFiles({ lineIdToUpdate: featureId });
+    else await refreshSpotGeoJsonFiles({ spotIdToUpdate: featureId });
+    const feature = featureType === 'line' ? await db.getLineDetails(featureId) : await db.getSpotDetails(featureId);
     // Dated at the start, so a second run in the window rewrites the same entry.
-    if (line) await addActivatedChangelog(line, activation.activatedBy, new Date(activation.from * 1000));
+    if (feature) await addActivatedChangelog(feature, activation.activatedBy, new Date(activation.from * 1000));
   }
   logger.info('Started activations refreshed', { count: started.length });
 };

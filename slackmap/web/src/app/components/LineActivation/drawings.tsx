@@ -304,7 +304,7 @@ export const slides: {
     drawing: <LiveSlide />,
     text: (
       <>
-        Activating says: <b>this line is rigged</b>, from now or a day you pick, until the day you pick.
+        Activating says: <b>this line or spot is rigged</b>, from now or a day you pick, until the day you pick.
       </>
     ),
   },
@@ -331,7 +331,7 @@ export const slides: {
     drawing: <NamedSlide />,
     text: (
       <>
-        <b>With my name:</b> your name shows on the line while it’s active.
+        <b>With my name:</b> your name shows on it while it’s active.
       </>
     ),
   },

@@ -2,6 +2,9 @@ import { GetParameterCommand } from '@aws-sdk/client-ssm';
 import { RSABSSA } from '@cloudflare/blindrsa-ts';
 import { KeyObject, constants, createHash, createPrivateKey, createPublicKey, privateDecrypt, publicEncrypt } from 'node:crypto';
 import { ssm } from '../../aws/clients';
+import { db } from '../../db';
+import { ActivatableFeatureType } from '../../db/entities/activation';
+import { getUserDetails } from '../isaUser';
 
 // RFC 9474.
 const suite = RSABSSA.SHA384.PSS.Randomized();
@@ -75,3 +78,12 @@ export const validateActivationEnd = (from: number, until: number, now: Date) =>
     throw new Error(`Validation: an activation lasts at most ${maxActivationDays} days`);
   }
 };
+
+// Never the link hash.
+export const publicActivationOf = async (featureType: ActivatableFeatureType, featureId: string) => {
+  const activation = await db.getActivation(featureType, featureId);
+  if (!activation || activation.until <= Date.now() / 1000) return undefined;
+  const activatedBy = activation.activatedBy ? (await getUserDetails(activation.activatedBy))?.fullname : undefined;
+  return { from: activation.from, until: activation.until, activatedAt: activation.activatedAt, activatedBy };
+};
+export type PublicActivation = Awaited<ReturnType<typeof publicActivationOf>>;

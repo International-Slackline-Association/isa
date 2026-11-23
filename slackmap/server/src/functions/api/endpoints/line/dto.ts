@@ -1,5 +1,5 @@
 import { DDBLineDetailTypes } from '../../../../core/db/entities/line/details/types';
-import { LineActivation } from '../../../../core/db/entities/line/activation';
+import { PublicActivation } from '../../../../core/features/activation';
 import { FeatureCollection } from 'geojson';
 
 export const getLineDetailsResponse = (
@@ -8,10 +8,8 @@ export const getLineDetailsResponse = (
     canDelete: boolean;
     canEdit: boolean;
   },
-  activation?: LineActivation | null,
-  activatedByName?: string,
+  activation?: PublicActivation,
 ) => {
-  const isActive = activation && activation.until > Date.now() / 1000;
   return {
     id: item.lineId,
     geoJson: JSON.parse(item.geoJson) as FeatureCollection,
@@ -34,9 +32,6 @@ export const getLineDetailsResponse = (
     anchorImages: item.anchorImages,
     images: item.images,
     editorPermissions,
-    // Never the link hash.
-    activation: isActive
-      ? { from: activation.from, until: activation.until, activatedAt: activation.activatedAt, activatedBy: activatedByName }
-      : undefined,
+    activation,
   };
 };

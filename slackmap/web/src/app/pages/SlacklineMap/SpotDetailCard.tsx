@@ -7,6 +7,7 @@ import { featureApi } from 'app/api/feature-api';
 import { FeatureCard, FeatureTag } from 'app/components/FeatureCard';
 import { GetSpotDetailsAPIResponse, spotApi } from 'app/api/spot-api';
 import { spotTypeOptions } from 'utils/spotTypes';
+import { ActivationField } from 'app/components/LineActivation/ActivationField';
 import { FeatureContactField } from 'app/components/FeatureDetailFields/FeatureContactField';
 import { FeatureHistoryField } from 'app/components/FeatureDetailFields/FeatureHistoryField';
 import { FeatureMenuActions } from 'app/components/FeatureDetailFields/FeatureMenuActions';
@@ -56,6 +57,7 @@ export const SpotDetailCard = (props: Props) => {
         spotDetails && (
           <>
             <FeatureTag label="Spot" dot={appColors.spotFillColor} />
+            {spotDetails.activation && spotDetails.activation.from <= Date.now() / 1000 && <FeatureTag label="Active" color="live" />}
             {spotTypeOptions
               .filter((o) => spotDetails.types?.includes(o.value))
               .map((o) => (
@@ -80,6 +82,12 @@ export const SpotDetailCard = (props: Props) => {
     >
       {spotDetails && (
         <>
+          <ActivationField
+            target={{ type: 'spot', id: props.spotId }}
+            featureName={spotDetails.name || 'this spot'}
+            activation={spotDetails.activation}
+            onChanged={refetch}
+          />
           <FeatureDetailRestrictionField level={spotDetails.restrictionLevel} restrictionInfo={spotDetails.restrictionInfo} />
           <OutdatedInfoField
             updatedDate={new Date(spotDetails.lastModifiedDateTime ?? spotDetails.createdDateTime)?.toISOString()}
