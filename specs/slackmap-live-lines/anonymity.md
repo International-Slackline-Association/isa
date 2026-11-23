@@ -19,47 +19,50 @@ Backups (35-day PITR, monthly kept a year, 6-monthly Drive archives) can't be cl
 
 ## Two things the user holds
 
-| Thing | Proves | Made when |
-|---|---|---|
-| **Pass** (blind-signed) | "a real member created this rigger", not which | fetched ahead, automatically, while signed in; spent once |
-| **Anonymous rigger passkey** | "I'm the rigger who owns this rig", from any of the user's devices | the first report; ISA keeps only its public key |
-
-Neither carries identity. The user never sees the pass; the passkey shows up as a Face ID prompt and an entry "SlackMap anonymous rigger" in their password manager.
+| Thing | Proves | Made when | User sees |
+|---|---|---|---|
+| **Pass** (blind-signed) | "a real member reported this", not which | fetched ahead, automatically, while signed in; one per rig | nothing |
+| **Manage link** | "I may change this rig" | when reporting; ISA keeps only a hash of its code | a link they can share |
 
 ## How the pass works
 
 1. **Signed in**, the browser makes random passes, blinds them (seals each) and sends them with the login.
-2. ISA checks the member is under the yearly limit and signs them **without seeing them**. ISA stores only "member X took N passes this year", no time.
+2. ISA checks the member is under the monthly limit and signs them **without seeing them**. ISA stores only "member X took N passes this month", no time.
 3. The browser unseals them: valid signatures on passes ISA never saw.
-4. **Creating the anonymous rigger**, without login, the browser sends one pass with the new passkey's public key. ISA checks the signature and that the pass is unused.
+4. **Reporting**, without login, the browser sends one pass. ISA checks the signature and that the pass is unused.
 
-ISA holds "member X took 2" and "pass #a91f… created rigger R", and no maths connects them.
+ISA holds "member X took 5" and "pass #a91f… was spent on line L", and no maths connects them.
 
 Standard: Privacy Pass (RFC 9576 architecture, 9578 issuance) with RSA blind signatures (RFC 9474). Simplest deployment: ISA is both issuer and verifier. Cloudflare publishes TypeScript implementations (`@cloudflare/privacypass-ts`, `@cloudflare/blindrsa-ts`), to verify before choosing.
+
+## How the link works
+
+- `slackmap.com/line/{id}#manage={code}`: a 128-bit random code after `#`. Browsers never send what follows `#` to the server, so the code never appears in CloudFront or Lambda logs, or in a Referer header.
+- The browser sends the code in the request body only when extending or taking down. ISA compares its hash and never stores the code.
+- The hash is erased when the rig ends, so the link dies with it.
+- Whoever holds the link can manage that one rig. Sharing it is how the rigger moves to another device or hands over to a crew member.
 
 ## Where identity could still leak
 
 | Leak | Close it by |
 |---|---|
-| **Timing**: pass at 14:02, rigger created at 14:03 | Passes fetched ahead and automatically on any sign-in; pass counts stored without time. A first-ever user who signs in and creates a rigger right away is linkable only by someone watching live, not afterwards. |
-| **The browser-check session cookie** (Turnstile, [data access](/slackmap/docs/data-access.md)) sent with both ISA-signed-in and rigger requests | Rigger API doesn't accept or log that cookie, or the anonymous context gets its own browser-check session. To settle in the deep dive. |
-| **The rigger links its own rigs** | Only while rigs are active: a rig forgets its rigger when it ends, and a rigger is deleted after 12 months without an active rig ([G14, G15](decisions.md#decided-by-can)). Backups still hold these links for their retention time. |
-| **IP** of the issuing and reporting requests match | Rig endpoint never logs or stores IPs; Turnstile called without `remoteip`. Optionally Oblivious HTTP ([D8](decisions.md#d8-how-hard-do-we-hide-the-ip)). |
-| **Login token or cookie** sent with the report | Rig calls go through a client that carries nothing from sign-in. |
+| **Timing**: pass at 14:02, rig at 14:03 | Passes fetched ahead and automatically on any sign-in; pass counts stored without time. |
+| **IP** of signed-in and rig requests match | Rig endpoints never log or store IPs; Turnstile called without `remoteip`. Optionally Oblivious HTTP ([D6](decisions.md#d6-how-hard-do-we-hide-the-ip)). |
+| **Login token** sent with a rig request | Rig requests go through a client that carries no ISA login. |
+| **The browser-check session cookie** ([data access](/slackmap/docs/data-access.md)) sent with both signed-in and rig requests | Rig endpoints don't log or store it with the rig, or rig requests get their own browser-check session. To settle in the deep dive. |
 | **Rate-limit keys** derived from IP | Hash with a secret rotated daily. |
-| **Lambda / CloudFront logs** | No body, headers, IP on this endpoint. |
-| **Line changelog / editors** | Rig fields never write an editor record or a changelog entry with a user id. Line edits and rig updates are separate paths. |
-| **"Is this my rig?"** | Asked only from the anonymous context with a rigger session; the public card shows no rigger id. |
-| **Passkey user name** | A fixed label ("SlackMap anonymous rigger") and a random user id; never the ISA email. |
+| **Lambda / CloudFront logs** | No body, headers or IP logged on rig endpoints. |
+| **Line changelog / editors** | Rig fields never write an editor record or a changelog entry with a user id. Line edits and rig changes are separate paths. |
+| **Where the user shares the link** | Their choice (their own chat, a friend). Outside ISA. |
 
 ## Abuse without identity
 
 | Abuse | Answer |
 |---|---|
-| Spam / fake rigs | a rigger costs a pass; passes capped per member; active rigs capped per rigger; Turnstile on top |
-| Taking down others' rigs | impossible: needs their passkey |
-| Stale "rigged" | required expiry; reminder on the owner's phone |
-| A fake rig blocks the line until expiry | max 14 days; whether others can flag it is for later |
+| Spam / fake rigs | each rig costs a pass; passes capped per member; Turnstile on top |
+| Taking down others' rigs | needs their link |
+| A shared link gets passed further | worst case: that one rig is extended or taken down |
+| Stale "rigged" | required expiry; reminder on the owner's calendar |
 
 ## Licence
 
@@ -69,4 +72,3 @@ The report carries "terms version X accepted"; it needs no identity. "A line is 
 
 - Truly anonymous data is not personal data under Swiss and EU data protection law.
 - ISA has no duty to keep logs (not a telecom provider). Not storing is lawful; deleting after an authority asked is not.
-- The real liability is aviation, not anonymity: [D1](decisions.md#d1-what-is-v1-for).

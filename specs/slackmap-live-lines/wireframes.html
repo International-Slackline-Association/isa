@@ -236,14 +236,13 @@
           <div class="rig live new">
             <div class="top"><span class="badge">RIGGED</span> until Sat 29 Nov, 20:00</div>
             <div class="sub">Reported 2 h ago</div>
-            <div class="link new" style="font-size:10.5px;margin-top:6px;display:inline-block">Is this yours? Manage</div>
           </div>
           <div class="field"><div class="fi">⚠</div><div class="fb"><b>Restrictions</b><div>None known</div></div></div>
           <div class="field"><div class="fi">↔</div><div class="fb"><b>Specs</b> <span class="ok">Measured ✓</span><div>Type: Highline · Length: 85m · Height: 120m</div></div></div>
           <div class="field"><div class="fi">✎</div><div class="fb"><b>Description</b><div class="ghost"></div></div></div>
         </div>
       </div></div>
-      <figcaption><b>Rigged, seen by anyone else.</b> No buttons; "Manage" asks for the rigger passkey (Face ID), so the rigger on a new device gets in. Never shows who.</figcaption>
+      <figcaption><b>Rigged, seen by anyone without the link.</b> No buttons. Never shows who.</figcaption>
     </figure>
 
     <figure>
@@ -254,14 +253,15 @@
           <div class="img">cover image</div>
           <div class="rig live new">
             <div class="top"><span class="badge">RIGGED</span> until Sat 29 Nov, 20:00</div>
-            <div class="sub">Reported by you · 2 h ago</div>
+            <div class="sub">Reported 2 h ago · you have the manage link</div>
             <div class="btns"><div class="btn">Extend</div><div class="btn live">Taken down</div></div>
+            <div class="link" style="font-size:10.5px;margin-top:8px;display:inline-block">🔗 Share manage link</div>
           </div>
           <div class="field"><div class="fi">⚠</div><div class="fb"><b>Restrictions</b><div>None known</div></div></div>
           <div class="field"><div class="fi">↔</div><div class="fb"><b>Specs</b> <span class="ok">Measured ✓</span><div>Type: Highline · Length: 85m · Height: 120m</div></div></div>
         </div>
       </div></div>
-      <figcaption><b>Rigged, seen by its rigger.</b> On any device signed in to the anonymous rigger (Face ID once per device).</figcaption>
+      <figcaption><b>Rigged, on a device holding the manage link.</b> The reporter's browser, or any device or crew member the link was shared with. No sign-in.</figcaption>
     </figure>
 
     <figure>
@@ -287,7 +287,7 @@
 <!-- ============ 3. REPORTING ============ -->
 <section>
   <h2>3. Reporting a rig</h2>
-  <p>Three steps the first time, two after. Everything technical (pass, rig key, sending without the login) is invisible.</p>
+  <p>Three steps the first time, two after. The pass and sending without the login are invisible; the manage link is the one thing the user may touch.</p>
   <div class="row">
     <figure>
       <div class="phone"><div class="screen">
@@ -298,7 +298,7 @@
           <ul class="tight">
             <li><b>SlackMap cannot know it was you.</b> Not "won't tell": the report reaches us without your account.</li>
             <li>We only learn that <i>a</i> SlackMap member sent it, through an anonymous pass your phone got in advance.</li>
-            <li>Your phone saves an anonymous rigger passkey. Only you can extend or take down your rigs, from any of your devices, with Face ID.</li>
+            <li>You get a <b>manage link</b>. Whoever has it can extend or take down this rig: keep it, or share it with your other devices or your crew.</li>
             <li>People nearby may still guess who rigs here. We can't protect against that.</li>
           </ul>
           <div class="link" style="font-size:11px">How this works (open standard, Privacy Pass)</div>
@@ -333,11 +333,12 @@
           <div>It's on the map now. Others see when it was reported, never who.</div>
           <div class="btns" style="margin-top:12px"><div class="btn pri">📅 Add reminder to calendar</div></div>
           <div style="font-size:10.5px;color:var(--muted);margin-top:6px">A calendar event 1 day before it expires, on your phone only. SlackMap sends nothing.</div>
-          <div style="font-size:10.5px;color:var(--muted);margin-top:8px">Only you can change it, from any device with your rigger passkey.</div>
+          <div class="btns" style="margin-top:10px"><div class="btn">🔗 Share manage link</div></div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:6px">Send it to your laptop or your crew. Whoever has it can extend or take down this rig. It's saved in this browser already.</div>
           <div class="actions"><span>Done</span></div>
         </div>
       </div></div>
-      <figcaption><b>Done.</b> The calendar button downloads a calendar event (.ics) for the day before expiry; it opens the line card.</figcaption>
+      <figcaption><b>Done.</b> The calendar button downloads a calendar event (.ics) for the day before expiry; the event holds the manage link. "Share manage link" opens the phone's share sheet (or copy / QR on desktop).</figcaption>
     </figure>
 
     <figure>
@@ -366,6 +367,7 @@
       <li><b>"Rigged now" in the layer dialog:</b> worth it in v1?</li>
       <li><b>Where "my rigs" live:</b> today you find your rig by opening its line. A small "Your rigs" list in the drawer would help with several; skipped here for simplicity.</li>
       <li><b>Wording:</b> "Report rigged" / "Taken down" / "RIGGED": your call; these are placeholders.</li>
+      <li><b>Manage link:</b> share button on the done dialog and on the card, as drawn, or only one of them?</li>
       <li><b>Explainer tone:</b> the four bullets in section 3 are the anonymity promise. They must stay true to <a href="anonymity.md">anonymity.md</a>.</li>
     </ul>
   </div>
