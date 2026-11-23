@@ -186,10 +186,16 @@ export class AppStack extends Stack {
         dataAccess.signingKeyParameter,
       ),
       SESSION_PUBLIC_KEY: sessionPublicKey,
-      PASS_SIGNING_KEY: ssm.StringParameter.valueForStringParameter(this, passSigningKeyParameter),
+      PASS_SIGNING_KEY_PARAMETER: passSigningKeyParameter,
       SESSION_KEY_PAIR_ID: sessionPublicKeyResource.publicKeyId,
     };
     for (const [name, value] of Object.entries(apiEnvironment)) apiFunction.addEnvironment(name, value);
+    apiFunction.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['ssm:GetParameter'],
+        resources: [`arn:aws:ssm:${this.region}:${this.account}:parameter/${passSigningKeyParameter}`],
+      }),
+    );
 
     for (const f of [apiFunction, streamsFunction, cronFunction]) {
       table.grantReadWriteData(f);

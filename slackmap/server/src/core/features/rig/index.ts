@@ -1,5 +1,7 @@
+import { GetParameterCommand } from '@aws-sdk/client-ssm';
 import { RSABSSA } from '@cloudflare/blindrsa-ts';
 import { createHash, createPrivateKey, createPublicKey } from 'node:crypto';
+import { ssm } from '../../aws/clients';
 
 // RFC 9474.
 const suite = RSABSSA.SHA384.PSS.Randomized();
@@ -8,7 +10,9 @@ const keyAlgorithm = { name: 'RSA-PSS', hash: 'SHA-384' };
 let keys: Promise<{ privateKey: CryptoKey; publicKey: CryptoKey }> | undefined;
 const loadKeys = () =>
   (keys ??= (async () => {
-    const privatePem = createPrivateKey(process.env.PASS_SIGNING_KEY!);
+    // Read at start, not passed as an environment variable: those are limited to 4 KB per function.
+    const { Parameter } = await ssm.send(new GetParameterCommand({ Name: process.env.PASS_SIGNING_KEY_PARAMETER }));
+    const privatePem = createPrivateKey(Parameter!.Value!);
     const pkcs8 = privatePem.export({ type: 'pkcs8', format: 'der' });
     const spki = createPublicKey(privatePem).export({ type: 'spki', format: 'der' });
     return {
@@ -16,7 +20,10 @@ const loadKeys = () =>
       privateKey: await crypto.subtle.importKey('pkcs8', pkcs8, keyAlgorithm, true, ['sign']),
       publicKey: await crypto.subtle.importKey('spki', spki, keyAlgorithm, true, ['verify']),
     };
-  })());
+  })().catch((error) => {
+    keys = undefined;
+    throw error;
+  }));
 
 export const passesPerMonth = 5;
 export const maxRigDays = 14;
@@ -24,8 +31,10 @@ export const maxRigDays = 14;
 export const signBlindedPass = async (blindedPass: Uint8Array) =>
   suite.blindSign((await loadKeys()).privateKey, blindedPass);
 
-export const isPassValid = async (pass: Uint8Array, signature: Uint8Array) =>
-  suite.verify((await loadKeys()).publicKey, signature, pass).catch(() => false);
+export const isPassValid = async (pass: Uint8Array, signature: Uint8Array) => {
+  const { publicKey } = await loadKeys();
+  return suite.verify(publicKey, signature, pass).catch(() => false);
+};
 
 export const hashOf = (data: Uint8Array | string) => createHash('sha256').update(data).digest('hex');
 
