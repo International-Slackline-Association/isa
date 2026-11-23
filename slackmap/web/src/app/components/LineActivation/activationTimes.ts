@@ -46,10 +46,12 @@ export const untilPresets = (from?: number) => {
 
 export const startFromDateInput = (value: string) => startOfDay(new Date(`${value}T00:00`));
 export const untilFromDateInput = (value: string) => endOfDay(new Date(`${value}T00:00`));
-export const dateInputBounds = (from?: number) => {
+export const dateInputBounds = (from?: number, after?: number) => {
   const base = from ? new Date(from * 1000) : new Date();
+  // An extension offers only days ending after the current end.
+  const firstDay = after ? new Date((after + 60) * 1000) : base;
   return {
-    min: format(base, 'yyyy-MM-dd'),
+    min: format(firstDay, 'yyyy-MM-dd'),
     max: format(addDays(base, maxActivationDays - 1), 'yyyy-MM-dd'),
   };
 };

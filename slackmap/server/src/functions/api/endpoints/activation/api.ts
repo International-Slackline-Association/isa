@@ -136,6 +136,7 @@ const extendActivation = async (req: Request<{ id: string }>) => {
   const body = validateApiPayload(req.body, extendSchema);
   const current = await db.getLineActivation(lineId);
   if (!current) throw new Error('Forbidden: This link does not manage a current activation');
+  if (body.until <= current.until) throw new Error('Validation: An extension must end after the current end');
   validateActivationEnd(current.from, body.until, new Date());
   await db.extendLineActivation(lineId, hashOf(body.code), body.until, nowSeconds()).catch(wrongLink);
   logger.info('activation extended', { lineId, until: body.until });

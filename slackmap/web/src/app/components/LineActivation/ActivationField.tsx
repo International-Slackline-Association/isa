@@ -93,7 +93,11 @@ const DateChip = (props: { bounds: { min: string; max: string }; onPick: (value:
       component="input"
       type="date"
       {...props.bounds}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) => e.target.value && props.onPick(e.target.value)}
+      // iOS fills an empty date with today as the picker opens.
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        if (value && value >= props.bounds.min && value <= props.bounds.max) props.onPick(value);
+      }}
       sx={{ border: 0, font: 'inherit', fontSize: 13, color: 'text.primary', bgcolor: 'transparent', width: 120 }}
     />
   </Box>
@@ -120,7 +124,7 @@ const UntilChips = (props: { from?: number; after?: number; value?: number; onPi
       {presets.map((p) => (
         <Chip key={p.label} label={p.label} onClick={() => props.onPick(p.until)} sx={chipSx(props.value === p.until, ui.live, ui.onLive)} />
       ))}
-      <DateChip bounds={dateInputBounds(props.from)} onPick={(value) => props.onPick(untilFromDateInput(value))} />
+      <DateChip bounds={dateInputBounds(props.from, props.after)} onPick={(value) => props.onPick(untilFromDateInput(value))} />
     </Stack>
   );
 };
@@ -407,7 +411,7 @@ export const ActivationField = (props: Props) => {
       )}
       {code && step === 'confirmDeactivate' && (
         <>
-          <Typography variant="subtitle1">Take it off the map?</Typography>
+          <Typography variant="subtitle1">Deactivate?</Typography>
           <Typography variant="body2" color="text.secondary">
             The manage link stops working.
           </Typography>
@@ -433,7 +437,7 @@ export const ActivationField = (props: Props) => {
               Extend
             </Button>
             <Button fullWidth variant="outlined" sx={{ bgcolor: '#fff' }} onClick={() => setStep('confirmDeactivate')}>
-              Take it off
+              Deactivate
             </Button>
           </Stack>
           <Button size="small" startIcon={<ShareIcon />} sx={{ alignSelf: 'flex-start' }} onClick={onShare}>
