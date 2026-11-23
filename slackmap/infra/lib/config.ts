@@ -58,7 +58,6 @@ export const dataAccess = {
 };
 export const sessionsTableName = `${namespace}-sessions`;
 
-// RSA private key that blind-signs the passes of anonymous rig reports; its public half is in the web app.
 export const passSigningKeyParameter = 'slackmap-pass-signing-key';
 
 export const geonamesUsernameParameter = 'slackmap-geonames-api-username';

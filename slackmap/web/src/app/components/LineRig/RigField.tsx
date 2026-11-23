@@ -25,7 +25,7 @@ import { selectIsUserSignedIn } from 'app/slices/app/selectors';
 import { appColors } from 'styles/theme/colors';
 import { showErrorNotification, showInfoNotification, showSuccessNotification } from 'utils';
 
-import { NoPassError, consumeManageLinkFromUrl, endRig, extendRig, manageCodeOf, manageLinkOf, reportRig } from './rigApi';
+import { NoPassError, consumeManageLinkFromUrl, endRig, extendRig, manageCodeFor, manageLinkOf, reportRig } from './rigApi';
 import {
   calendarFile,
   dateInputBounds,
@@ -52,12 +52,14 @@ const UntilSheet = (props: {
   confirmText: string;
   onClose: () => void;
   onConfirm: (until: number) => Promise<void>;
-  // Extending offers only later dates than the rig already has.
   after?: number;
 }) => {
   const presets = untilPresets().filter((p) => !props.after || p.until > props.after);
   const [until, setUntil] = useState(presets[0]?.until ?? 0);
   const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (props.open) setUntil(presets[0]?.until ?? 0);
+  }, [props.open]);
   const bounds = dateInputBounds();
 
   return (
@@ -121,8 +123,8 @@ export const RigField = (props: Props) => {
 
   useEffect(() => {
     consumeManageLinkFromUrl(props.lineId);
-    setCode(manageCodeOf(props.lineId));
-  }, [props.lineId]);
+    setCode(manageCodeFor(props.lineId, props.rig));
+  }, [props.lineId, props.rig?.reportedAt]);
 
   const rig = props.rig;
   const manageLink = code ? manageLinkOf(props.lineId, code) : undefined;
@@ -141,7 +143,7 @@ export const RigField = (props: Props) => {
     if (error instanceof NoPassError) {
       dispatch(
         showErrorNotification(
-          'No pass to report with. Accept the contributor agreement, or wait for next month if you used this month’s passes.',
+          'No pass to report with yet. Passes arrive in the background while you are signed in; if you used this month’s, they come back next month.',
         ),
       );
     } else {
@@ -152,7 +154,7 @@ export const RigField = (props: Props) => {
   const onReport = async (until: number) => {
     try {
       const result = await reportRig(props.lineId, until);
-      setCode(manageCodeOf(props.lineId));
+      setCode(manageCodeFor(props.lineId, result));
       setSheet(undefined);
       setDoneUntil(result.until);
       props.onChanged();

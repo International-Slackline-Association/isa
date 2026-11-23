@@ -68,7 +68,9 @@ const reportRig = async (req: Request<{ id: string }>) => {
   });
   const rig = { lineId, until: body.until, reportedAt: reportedAtHour(now), linkHash: body.linkHash };
   await db.putLineRig(rig, Math.floor(now.getTime() / 1000)).catch((error) => {
-    if (isConditionFailed(error)) throw new Error('Validation: This line is already reported rigged');
+    if (isConditionFailed(error)) {
+      throw new Error('Validation: This line was reported rigged a moment ago; your pass was used');
+    }
     throw error;
   });
   logger.info('rig reported', { lineId, until: rig.until });
@@ -76,7 +78,7 @@ const reportRig = async (req: Request<{ id: string }>) => {
 };
 
 const wrongLink = (error: unknown) => {
-  if (isConditionFailed(error)) throw new Error('Forbidden: This link does not manage the rig');
+  if (isConditionFailed(error)) throw new Error('Forbidden: This link does not manage a current rig');
   throw error;
 };
 
@@ -84,7 +86,7 @@ const extendRig = async (req: Request<{ id: string }>) => {
   const lineId = req.params.id;
   const body = validateApiPayload(req.body, extendSchema);
   validateRigUntil(body.until, new Date());
-  await db.extendLineRig(lineId, hashOf(body.code), body.until).catch(wrongLink);
+  await db.extendLineRig(lineId, hashOf(body.code), body.until, Math.floor(Date.now() / 1000)).catch(wrongLink);
   logger.info('rig extended', { lineId, until: body.until });
   return { until: body.until };
 };
@@ -92,7 +94,7 @@ const extendRig = async (req: Request<{ id: string }>) => {
 const endRig = async (req: Request<{ id: string }>) => {
   const lineId = req.params.id;
   const body = validateApiPayload(req.body, endSchema);
-  await db.endLineRig(lineId, hashOf(body.code)).catch(wrongLink);
+  await db.endLineRig(lineId, hashOf(body.code), Math.floor(Date.now() / 1000)).catch(wrongLink);
   logger.info('rig taken down', { lineId });
   return {};
 };
@@ -101,7 +103,6 @@ export const passRoutes: Record<string, Route> = {
   'POST /passes': jsonRoute(issuePasses),
 };
 
-// http.ts logs these without anything that could point to the person.
 export const rigRoutes: Record<string, Route> = {
   'POST /line/:id/rig': jsonRoute(reportRig),
   'PUT /line/:id/rig': jsonRoute(extendRig),

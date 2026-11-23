@@ -62,7 +62,6 @@ export const refillPasses = () =>
     const token = await fetchAuthSession().then((s) => s.tokens?.idToken?.toString());
     if (!token) return;
 
-    // The library is only needed here, so it stays out of the main bundle.
     const { RSABSSA } = await import('@cloudflare/blindrsa-ts');
     const suite = RSABSSA.SHA384.PSS.Randomized();
     const key = await publicKey();

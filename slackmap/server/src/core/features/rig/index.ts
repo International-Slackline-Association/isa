@@ -1,7 +1,7 @@
 import { RSABSSA } from '@cloudflare/blindrsa-ts';
 import { createHash, createPrivateKey, createPublicKey } from 'node:crypto';
 
-// RFC 9474. The web app holds the same public key in its source, so every member is signed with one key.
+// RFC 9474.
 const suite = RSABSSA.SHA384.PSS.Randomized();
 const keyAlgorithm = { name: 'RSA-PSS', hash: 'SHA-384' };
 
@@ -31,9 +31,9 @@ export const hashOf = (data: Uint8Array | string) => createHash('sha256').update
 
 export const currentMonth = (now: Date) => now.toISOString().slice(0, 7);
 
-// End of the month after this one: the count is not needed after its month ends.
+// The count matters only during its month.
 export const passCountExpiry = (now: Date) =>
-  Math.floor(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 2, 1) / 1000);
+  Math.floor(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1) / 1000);
 
 // Public, so it is kept to the hour: a report's exact time could be matched to other timed records.
 export const reportedAtHour = (now: Date) => Math.floor(now.getTime() / 3_600_000) * 3600;

@@ -47,7 +47,6 @@ const processRecord = async (record: DynamoDBRecord) => {
     console.log('Processed line details operation:', { keys, eventName });
   }
   if (isLineRigItem(keys)) {
-    // Reported, extended, taken down, or deleted by TTL after it ran out.
     const { lineId } = lineRigFromItem(keys);
     await refreshLineGeoJsonFiles({ lineIdToUpdate: lineId });
     logger.info('Line rig changed', { lineId, eventName });

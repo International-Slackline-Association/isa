@@ -1,40 +1,50 @@
 import { apiBaseUrl } from 'app/api/constants';
 import { ensureSession } from 'app/session';
 
-import { Pass, refillPasses, returnPass, takePass, toBase64Url } from './passes';
+import { Pass, returnPass, takePass, toBase64Url } from './passes';
 
-// Manage codes by line id, in this browser only. The server holds only their hashes.
+// The rig's reportedAt is kept with the code, so a code from an earlier rig on the same line is recognized as dead.
+type StoredLink = { code: string; reportedAt?: number };
 const linksKey = 'app.rigManageLinks';
 
-const readLinks = (): Record<string, string> => {
+const readLinks = (): Record<string, StoredLink> => {
   try {
     return JSON.parse(localStorage.getItem(linksKey) ?? '{}');
   } catch {
     return {};
   }
 };
-const writeLinks = (links: Record<string, string>) => {
+const writeLinks = (links: Record<string, StoredLink>) => {
   try {
     localStorage.setItem(linksKey, JSON.stringify(links));
   } catch {}
 };
-
-export const manageCodeOf = (lineId: string) => readLinks()[lineId];
-const storeManageCode = (lineId: string, code: string) => writeLinks({ ...readLinks(), [lineId]: code });
-export const forgetManageCode = (lineId: string) => {
+const storeLink = (lineId: string, link: StoredLink) => writeLinks({ ...readLinks(), [lineId]: link });
+const forgetManageCode = (lineId: string) => {
   const { [lineId]: _, ...rest } = readLinks();
   writeLinks(rest);
+};
+
+export const manageCodeFor = (lineId: string, rig?: { reportedAt: number }) => {
+  const link = readLinks()[lineId];
+  if (!link) return undefined;
+  if (!rig || (link.reportedAt !== undefined && link.reportedAt !== rig.reportedAt)) {
+    forgetManageCode(lineId);
+    return undefined;
+  }
+  // A shared link is bound to the rig it was opened on.
+  if (link.reportedAt === undefined) storeLink(lineId, { ...link, reportedAt: rig.reportedAt });
+  return link.code;
 };
 
 // After '#', so the code never reaches a server or its logs.
 export const manageLinkOf = (lineId: string, code: string) =>
   `${window.location.origin}/line/${lineId}#manage=${code}`;
 
-// A shared manage link: keep its code and take it out of the address bar.
 export const consumeManageLinkFromUrl = (lineId: string) => {
   const code = new URLSearchParams(window.location.hash.slice(1)).get('manage');
   if (!code) return;
-  storeManageCode(lineId, code);
+  storeLink(lineId, { code });
   history.replaceState(history.state, '', window.location.pathname + window.location.search);
 };
 
@@ -65,22 +75,21 @@ const call = async (method: string, lineId: string, body: unknown) => {
 
 export class NoPassError extends Error {}
 
+// Only a pass fetched earlier: fetching one around a report would make the two one moment.
 export const reportRig = async (lineId: string, until: number) => {
-  let pass: Pass | undefined = takePass();
-  if (!pass) {
-    await refillPasses();
-    pass = takePass();
-  }
+  const pass: Pass | undefined = takePass();
   if (!pass) throw new NoPassError();
   const code = toBase64Url(crypto.getRandomValues(new Uint8Array(16)));
   try {
-    const result = await call('POST', lineId, { until, ...pass, linkHash: await sha256Hex(code) });
-    storeManageCode(lineId, code);
-    refillPasses();
-    return result as { until: number; reportedAt: number };
+    const result = (await call('POST', lineId, { until, ...pass, linkHash: await sha256Hex(code) })) as {
+      until: number;
+      reportedAt: number;
+    };
+    storeLink(lineId, { code, reportedAt: result.reportedAt });
+    return result;
   } catch (error) {
     // Refused before it was spent (line already rigged, a bad date): the pass is still good.
-    if (!/Pass already used|Invalid pass/.test((error as Error).message)) returnPass(pass);
+    if (!/pass (already )?used|Invalid pass/i.test((error as Error).message)) returnPass(pass);
     throw error;
   }
 };

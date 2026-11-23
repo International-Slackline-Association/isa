@@ -6,8 +6,6 @@ import { INDEX_NAMES, KEY_FIELDS, TABLE_NAME, recursiveQuery } from '../../../ut
 export type LineRig = { lineId: string; until: number; reportedAt: number; linkHash: string };
 
 const skGsi = 'lineRig';
-// The item outlives its "until" a little, so a rig that just ran out can still be read; TTL deletes it after.
-const ttlGraceSeconds = 2 * 24 * 60 * 60;
 
 const key = (lineId: string) => ({ [KEY_FIELDS.PK]: `line:${lineId}`, [KEY_FIELDS.SK_GSI]: skGsi });
 
@@ -42,7 +40,6 @@ const getAllLineRigs = async () => {
   return items.map(toRig);
 };
 
-// Fails when a rig that has not run out is already there; an expired one waiting for TTL is replaced.
 const putLineRig = async (rig: LineRig, now: number) => {
   await ddb.send(
     new PutCommand({
@@ -53,7 +50,7 @@ const putLineRig = async (rig: LineRig, now: number) => {
         until: rig.until,
         reportedAt: rig.reportedAt,
         linkHash: rig.linkHash,
-        ddb_ttl: rig.until + ttlGraceSeconds,
+        ddb_ttl: rig.until,
       },
       ConditionExpression: 'attribute_not_exists(PK) OR #until <= :now',
       ExpressionAttributeNames: { '#until': 'until' },
@@ -62,26 +59,28 @@ const putLineRig = async (rig: LineRig, now: number) => {
   );
 };
 
-const extendLineRig = async (lineId: string, linkHash: string, until: number) => {
+// A link dies with its rig: an expired rig waiting for TTL cannot be extended or ended.
+const extendLineRig = async (lineId: string, linkHash: string, until: number, now: number) => {
   await ddb.send(
     new UpdateCommand({
       TableName: TABLE_NAME,
       Key: key(lineId),
-      UpdateExpression: 'SET #until = :until, ddb_ttl = :ttl',
-      ConditionExpression: 'linkHash = :linkHash',
+      UpdateExpression: 'SET #until = :until, ddb_ttl = :until',
+      ConditionExpression: 'linkHash = :linkHash AND #until > :now',
       ExpressionAttributeNames: { '#until': 'until' },
-      ExpressionAttributeValues: { ':until': until, ':ttl': until + ttlGraceSeconds, ':linkHash': linkHash },
+      ExpressionAttributeValues: { ':until': until, ':linkHash': linkHash, ':now': now },
     }),
   );
 };
 
-const endLineRig = async (lineId: string, linkHash: string) => {
+const endLineRig = async (lineId: string, linkHash: string, now: number) => {
   await ddb.send(
     new DeleteCommand({
       TableName: TABLE_NAME,
       Key: key(lineId),
-      ConditionExpression: 'linkHash = :linkHash',
-      ExpressionAttributeValues: { ':linkHash': linkHash },
+      ConditionExpression: 'linkHash = :linkHash AND #until > :now',
+      ExpressionAttributeNames: { '#until': 'until' },
+      ExpressionAttributeValues: { ':linkHash': linkHash, ':now': now },
     }),
   );
 };

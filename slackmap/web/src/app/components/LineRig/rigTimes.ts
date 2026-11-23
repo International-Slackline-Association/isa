@@ -3,7 +3,6 @@ import { format } from 'date-fns';
 export const maxRigDays = 14;
 const day = 24 * 3600;
 
-// A rig runs to the end of the chosen day, local time.
 const endOfDay = (date: Date) => {
   const end = new Date(date);
   end.setHours(23, 59, 0, 0);
@@ -50,7 +49,6 @@ export const formatReportedAgo = (reportedAt: number) => {
 
 export const expiresWithinADay = (until: number) => until - Date.now() / 1000 < day;
 
-// A calendar event the day before expiry, holding the manage link, made in the browser: nothing is sent.
 export const calendarFile = (lineName: string, until: number, manageLink: string) => {
   const remindAt = Math.max(until - day, Math.floor(Date.now() / 1000) + 3600);
   const stamp = (seconds: number) =>

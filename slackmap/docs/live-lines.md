@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: "Live lines"
-description: "Why slackmap has rigs (a line reported rigged now) and how anonymity shapes them: blind-signed passes, manage links, rig routes that never read the login or log identifying fields, rigs only on existing lines, no fields for consumers, reminders sent by nobody."
+description: "Rigs (a line reported rigged now) and anonymous reporting: why they exist, the liability promise, proof versus guesses, blind-signed passes, manage links, what rig routes may log, rigs on existing lines only, consumers, reminders."
 ---
 
 # Live lines
@@ -10,7 +10,7 @@ People did not put rigged lines on SlackMap because most lines are rigged unoffi
 
 ## The promise
 
-ISA must be technically unable to know who reported a rig. The reason is liability: "we cannot know", not "we promise not to look". Legally only proof counts: a correlation, like who was signed in around the time of a report, is a smart guess that does not hold up officially, and the report stays anonymous. So what must never exist is a record tying a report to a person; making guesses harder is not worth much.
+ISA must be technically unable to know who reported a rig. The reason is liability: "we cannot know", not "we promise not to look". Legally only proof counts: a correlation, like who was signed in around the time of a report, is a smart guess that does not hold up officially, and the report stays anonymous. So what must never exist is a record tying a report to a person.
 
 - A real member stands behind each report. The blind-signed pass proves that without saying which member; it is an industry standard kept simple, and reassuring to users who read about it.
 - The rig routes never read the login, and their log lines carry nothing that could match them to the same browser's signed-in calls. Everything else keeps its logs as they are: analytics and debugging are not given up for this.

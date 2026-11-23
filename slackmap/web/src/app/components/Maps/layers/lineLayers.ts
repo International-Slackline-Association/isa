@@ -59,7 +59,6 @@ export const lineLabelLayer = (opts: CommonOpts): SymbolLayer => {
   };
 };
 
-// Rigged now: an orange glow under the line, and under its point when zoomed out.
 const rigColor = appColors.riggedColor;
 
 export const riggedLineHaloLayer = (opts: CommonOpts): LineLayer => ({

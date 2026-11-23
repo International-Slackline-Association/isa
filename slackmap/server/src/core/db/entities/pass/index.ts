@@ -8,7 +8,6 @@ const countKey = (isaId: string, month: string) => ({
   [KEY_FIELDS.SK_GSI]: `passCount:${month}`,
 });
 
-// Fails when the count would pass the limit, so a member never gets more than the limit in a month.
 const addToPassCount = async (isaId: string, month: string, amount: number, limit: number, expiresAt: number) => {
   await ddb.send(
     new UpdateCommand({
@@ -22,7 +21,7 @@ const addToPassCount = async (isaId: string, month: string, amount: number, limi
   );
 };
 
-// Fails when the pass was spent before. Kept without TTL: a pass stays valid as long as the signing key does.
+// Kept without TTL: a pass stays valid as long as the signing key does.
 const spendPass = async (passHash: string) => {
   await ddb.send(
     new PutCommand({

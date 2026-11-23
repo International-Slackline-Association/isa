@@ -58,7 +58,6 @@ export function App() {
       .catch(() => dispatch(appActions.updateAuthState(AuthState.SigningOut)));
   }, [dispatch]);
 
-  // Passes are fetched whenever a member is signed in, ahead of any report.
   useEffect(() => {
     if (isSignedIn) refillPasses();
   }, [isSignedIn]);
