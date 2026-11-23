@@ -1,95 +1,196 @@
 # Flows
 
-Diagrams follow [decisions](decisions.md); an open decision can change them. Screens: [wireframes](wireframes.html).
+Two views of the same design: **architecture** (what talks to what, what each part knows) and **user** (what a slackliner does and sees). Decisions behind them: [decisions](decisions.md). Screens: [wireframes](wireframes.html).
 
-## 1. Big picture
+---
+
+# Architecture
+
+## A1. Parts and what each one knows
 
 ```mermaid
 flowchart LR
-    subgraph Phone["Rigger's phone"]
-        Signed["Signed in<br/>(ISA account)"]
-        Store["Browser storage:<br/>passes, rig keys"]
+    subgraph Device["User's devices"]
+        direction TB
+        subgraph Browser["Browser"]
+            ISACtx["ISA context<br/>ISA login"]
+            AnonCtx["Anonymous context<br/>rigger session<br/>no ISA login, no cookies"]
+            Passes["Stored passes"]
+        end
+        Keychain["Passkey store<br/>iCloud Keychain / Google PM<br/>synced across own devices"]
     end
 
-    subgraph ISA["SlackMap"]
-        Issuer["Pass issuer<br/>sees: member, count"]
-        RigAPI["Rig endpoint<br/>sees: valid pass, rig<br/>never: who, IP"]
-        Line[("Line record<br/>+ rig fields")]
-        File["lines/all.geojson<br/>lines/points.geojson<br/>(existing files)"]
+    subgraph ISA["SlackMap backend"]
+        direction TB
+        Cognito["isa-users<br/>(ISA sign-in)"]
+        Issuer["Pass issuer"]
+        RiggerAPI["Rigger API<br/>register · sign in · rig"]
+        subgraph Table["Table"]
+            Counts[("pass counts<br/>member → n this year")]
+            Spent[("spent passes")]
+            Riggers[("anonymous riggers<br/>id → passkey public key")]
+            Lines[("lines<br/>+ rig: until, reported at, rigger id")]
+        end
+        Files["lines/all.geojson<br/>lines/points.geojson<br/>(until, reported at only)"]
     end
 
-    Map["SlackMap map"]
-
-    Signed -- "blinded passes, with login" --> Issuer
-    Issuer -- "stamped, still sealed" --> Store
-    Store -- "rig + pass + rig key hash,<br/>no login" --> RigAPI
-    RigAPI --> Line -- "existing stream handler" --> File --> Map
+    ISACtx -- login --> Cognito
+    ISACtx -- "sealed passes + login" --> Issuer
+    Issuer --> Counts
+    Issuer -- "stamped passes" --> Passes
+    Passes --> AnonCtx
+    Keychain <-->|Face ID| AnonCtx
+    AnonCtx -- "pass, passkey, rigs<br/>never the ISA login" --> RiggerAPI
+    RiggerAPI --> Spent
+    RiggerAPI --> Riggers
+    RiggerAPI --> Lines
+    Lines -- "existing stream handler" --> Files
 ```
 
-ISA sees both arrows into it but nothing that links them.
+| Part | Knows | Never knows |
+|---|---|---|
+| Pass issuer | member X took n passes this year | which passes, which rigger |
+| Rigger API | a valid pass was spent; rigger R owns rigs 1, 2, 3 | which member R is |
+| Map files | line is rigged until T, reported at T₀ | any rigger id |
+| Apple / Google | a passkey for slackmap.com exists on this person's devices | its contents (end-to-end encrypted) |
 
-## 2. Rigger
+The one bridge between the left and right columns of ISA's knowledge is the stored pass, and the blind signature makes it unrecognisable.
 
-```mermaid
-flowchart TD
-    A([Opens a line on the map]) --> B{Signed in?}
-    B -- no --> S["Sign in"] --> C
-    B -- yes --> C{Line already rigged?}
-    C -- "yes, by someone else" --> V(["Sees: Rigged until Sat,<br/>reported 2 h ago"])
-    C -- "yes, from this phone" --> O["Card shows<br/>Extend / Taken down"]
-    C -- no --> R["'Report rigged'"]
-    R --> F{First time?}
-    F -- yes --> E["One-time explainer:<br/>how anonymous reporting works"] --> Sh
-    F -- no --> Sh["Sheet: until (Today ▾)"]
-    Sh --> K["Sent without login, with one pass<br/>+ rig key hash"]
-    K --> Done["Rigged ✓<br/>'Add reminder to calendar'"]
-    Done --> O
-    O -- extend --> O
-    O -- "24 h before expiry" --> Ban["Banner: expires tomorrow, extend?"] --> O
-    O -- taken down --> End([Rig ends])
-    O -- "nothing, time passes" --> Exp([Expires, disappears from map])
-```
-
-## 3. A rig's life
-
-```mermaid
-stateDiagram-v2
-    [*] --> Rigged: owner reports (costs one pass)
-    Rigged --> Rigged: owner extends
-    Rigged --> Ended: owner takes it down
-    Rigged --> Expired: rigged-until passes
-    Ended --> [*]
-    Expired --> [*]
-```
-
-Only the owner's phone (the rig key) or time ends a rig.
-
-## 4. The pass (blind signature)
+## A2. Passes, in the background
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant P as Phone
-    participant I as ISA pass issuer
-    participant L as ISA rig endpoint
-
-    Note over P,I: Signed in, ahead of time, automatic
-    P->>P: make 5 random passes, seal each (blind)
-    P->>I: 5 sealed passes + ISA login
-    I->>I: under monthly limit? stamp without opening
-    I-->>P: 5 stamped, still sealed
-    P->>P: unseal → 5 stamped passes ISA has never seen
-
-    Note over P,L: Reporting: no login, no cookies
-    P->>P: make rig key, keep it
-    P->>L: line id, until + one pass + hash(rig key)
-    L->>L: stamp valid? pass unused? line not rigged?
-    L-->>P: ok
-
-    Note over P,L: Extend / take down
-    P->>L: line id + rig key
-    L->>L: hash matches?
-    L-->>P: ok
+    participant B as Browser (ISA context)
+    participant I as Pass issuer
+    Note over B,I: Any time a member is signed in, if fewer than 2 passes are stored
+    B->>B: make random passes, seal each (blind)
+    B->>I: sealed passes + ISA login
+    I->>I: under the yearly limit? count += n
+    I-->>B: stamped, still sealed
+    B->>B: unseal, store
 ```
 
-Details and leaks to close: [anonymity](anonymity.md).
+## A3. Creating the anonymous rigger (once)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant B as Browser (anonymous context)
+    participant K as Passkey store
+    participant R as Rigger API
+    B->>R: start registration
+    R-->>B: challenge, random rigger id
+    B->>K: create passkey "SlackMap anonymous rigger"
+    K-->>B: Face ID ✓, public key
+    B->>R: public key + one stored pass
+    R->>R: pass stamp valid? not spent? mark spent, save rigger
+    R-->>B: rigger session
+```
+
+## A4. Reporting, extending, taking down
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant B as Browser (anonymous context)
+    participant K as Passkey store
+    participant R as Rigger API
+    participant T as Table → map files
+    alt no rigger session on this device yet
+        B->>R: sign-in challenge
+        B->>K: sign challenge
+        K-->>B: Face ID ✓
+        B->>R: signature
+        R-->>B: rigger session
+    end
+    B->>R: report line L rigged until T
+    R->>R: L exists? not rigged? rigger under active-rig cap?
+    R->>T: L.rig = until T, reported now, rigger R
+    T-->>T: stream handler rewrites map files
+    B->>R: extend / take down L
+    R->>R: L.rig.rigger == R?
+    R->>T: update or clear L.rig
+```
+
+## A5. A rig's life
+
+```mermaid
+stateDiagram-v2
+    [*] --> Rigged: rigger reports
+    Rigged --> Rigged: rigger extends
+    Rigged --> Ended: rigger takes it down
+    Rigged --> Expired: until-time passes, map hides it
+    Ended --> [*]
+    Expired --> [*]
+```
+
+---
+
+# User
+
+## U1. First report
+
+```mermaid
+flowchart TD
+    A([Opens a line on the map]) --> B{Signed in to SlackMap?}
+    B -- no --> S["Sign in<br/>(passes arrive quietly)"] --> C
+    B -- yes --> C["Taps 'Report rigged'"]
+    C --> E["Explainer: reporting is anonymous<br/>'Got it'"]
+    E --> P["Phone asks: save a passkey<br/>'SlackMap anonymous rigger'?<br/>Face ID"]
+    P --> Sh["Sheet: rigged until  Today ▾"]
+    Sh --> D["✓ Rigged until today 20:00<br/>'Add reminder to calendar'"]
+    D --> M([Line glows on the map for everyone])
+```
+
+## U2. Every report after that
+
+```mermaid
+flowchart TD
+    A([Opens a line]) --> C["Taps 'Report rigged'"]
+    C --> F{This device already<br/>used the passkey recently?}
+    F -- no --> P["Face ID"] --> Sh
+    F -- yes --> Sh["Sheet: until  Today ▾"]
+    Sh --> D["✓ Rigged · calendar reminder"]
+```
+
+No ISA sign-in needed ([D4](decisions.md#d4-does-reporting-need-the-isa-sign-in)).
+
+## U3. Rigged on the laptop, taken down from the phone
+
+```mermaid
+flowchart TD
+    L["Laptop: reports the line rigged<br/>(passkey saved to iCloud / Google)"] --> Sync[["Passkey syncs to the phone<br/>by itself"]]
+    Sync --> O["Phone, two days later: opens the line"]
+    O --> Q{Phone has a rigger session?}
+    Q -- no --> Btn["Card shows 'Rigged until Sun'<br/>+ 'Is this yours? Manage'"]
+    Btn --> F["Face ID"] --> Own
+    Q -- yes --> Own["Card shows Extend / Taken down"]
+    Own --> T["Taps 'Taken down' → confirm"]
+    T --> Gone([Line stops glowing])
+
+    W["Windows laptop without the passkey"] -.-> QR["Browser shows a QR code<br/>scan with the phone, Face ID there"] -.-> Own
+```
+
+The "Is this yours? Manage" link replaces asking the server who owns a rig: the device proves it with Face ID, otherwise nothing is revealed.
+
+## U4. Reminder and expiry
+
+```mermaid
+flowchart TD
+    D["Rigged until Sun 20:00"] --> Cal["Saturday 20:00: calendar reminder on the phone<br/>(set at report time)"]
+    Cal --> O["Opens the line: banner 'Expires tomorrow. Still up?'"]
+    O -- "Extend" --> X["Sheet: until  1 week ▾"] --> D
+    O -- "Taken down" --> End([Gone from the map])
+    O -- ignores --> Exp([Sunday 20:00: disappears by itself])
+```
+
+## U5. Lost every device
+
+```mermaid
+flowchart LR
+    Lost["Phone and laptop gone,<br/>passkey not synced anywhere"] --> R["Rigs run until their 'until'<br/>and disappear"]
+    R --> New["Next time: sign in, get a pass,<br/>create a new anonymous rigger"]
+```
+
+Nobody, including ISA, can recover the old rigger: that is the point.

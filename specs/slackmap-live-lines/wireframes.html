@@ -236,13 +236,14 @@
           <div class="rig live new">
             <div class="top"><span class="badge">RIGGED</span> until Sat 29 Nov, 20:00</div>
             <div class="sub">Reported 2 h ago</div>
+            <div class="link new" style="font-size:10.5px;margin-top:6px;display:inline-block">Is this yours? Manage</div>
           </div>
           <div class="field"><div class="fi">⚠</div><div class="fb"><b>Restrictions</b><div>None known</div></div></div>
           <div class="field"><div class="fi">↔</div><div class="fb"><b>Specs</b> <span class="ok">Measured ✓</span><div>Type: Highline · Length: 85m · Height: 120m</div></div></div>
           <div class="field"><div class="fi">✎</div><div class="fb"><b>Description</b><div class="ghost"></div></div></div>
         </div>
       </div></div>
-      <figcaption><b>Rigged, seen by anyone else.</b> No buttons: only whoever reported it can change it. Never shows who.</figcaption>
+      <figcaption><b>Rigged, seen by anyone else.</b> No buttons; "Manage" asks for the rigger passkey (Face ID), so the rigger on a new device gets in. Never shows who.</figcaption>
     </figure>
 
     <figure>
@@ -253,14 +254,14 @@
           <div class="img">cover image</div>
           <div class="rig live new">
             <div class="top"><span class="badge">RIGGED</span> until Sat 29 Nov, 20:00</div>
-            <div class="sub">Reported from this phone · 2 h ago</div>
+            <div class="sub">Reported by you · 2 h ago</div>
             <div class="btns"><div class="btn">Extend</div><div class="btn live">Taken down</div></div>
           </div>
           <div class="field"><div class="fi">⚠</div><div class="fb"><b>Restrictions</b><div>None known</div></div></div>
           <div class="field"><div class="fi">↔</div><div class="fb"><b>Specs</b> <span class="ok">Measured ✓</span><div>Type: Highline · Length: 85m · Height: 120m</div></div></div>
         </div>
       </div></div>
-      <figcaption><b>Rigged, on the phone that reported it.</b> The browser knows (the rig key is in its storage); the server is never asked "is this mine?".</figcaption>
+      <figcaption><b>Rigged, seen by its rigger.</b> On any device signed in to the anonymous rigger (Face ID once per device).</figcaption>
     </figure>
 
     <figure>
@@ -297,7 +298,7 @@
           <ul class="tight">
             <li><b>SlackMap cannot know it was you.</b> Not "won't tell": the report reaches us without your account.</li>
             <li>We only learn that <i>a</i> SlackMap member sent it, through an anonymous pass your phone got in advance.</li>
-            <li>Only this phone can extend it or take it down.</li>
+            <li>Your phone saves an anonymous rigger passkey. Only you can extend or take down your rigs, from any of your devices, with Face ID.</li>
             <li>People nearby may still guess who rigs here. We can't protect against that.</li>
           </ul>
           <div class="link" style="font-size:11px">How this works (open standard, Privacy Pass)</div>
@@ -332,7 +333,7 @@
           <div>It's on the map now. Others see when it was reported, never who.</div>
           <div class="btns" style="margin-top:12px"><div class="btn pri">📅 Add reminder to calendar</div></div>
           <div style="font-size:10.5px;color:var(--muted);margin-top:6px">A calendar event 1 day before it expires, on your phone only. SlackMap sends nothing.</div>
-          <div style="font-size:10.5px;color:var(--muted);margin-top:8px">Only this phone can extend or take it down. If you lose it, the rig ends at its expiry.</div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:8px">Only you can change it, from any device with your rigger passkey.</div>
           <div class="actions"><span>Done</span></div>
         </div>
       </div></div>

@@ -16,7 +16,7 @@ Scope: lines only, and only lines already on the map.
 
 ## The shape, in one paragraph
 
-Rigging is an **extension of an existing line**: a few fields on the line (rigged until, reported at), carried in the map's existing line file. A signed-in member reports with one tap; under the hood the report goes out **without the login**, carrying a **blind-signed pass** (proves "a member", not which; IETF Privacy Pass) and the hash of a **rig key** the phone keeps, so only that phone can extend or take it down. Reminders are a calendar event on the phone and a banner on the card; nothing is sent by ISA.
+Rigging is an **extension of an existing line**: a few fields on the line (rigged until, reported at), carried in the map's existing line file. Rigs belong to an **anonymous rigger passkey**: no email, no account, just Face ID, synced across the user's own devices by Apple or Google, so they can rig on the laptop and take down from the phone. The passkey is created once with a **blind-signed pass** (proves "a member", not which; IETF Privacy Pass), so ISA cannot tie it to the member. Reminders are a calendar event on the phone and a banner on the card; nothing is sent by ISA.
 
 ## Files
 

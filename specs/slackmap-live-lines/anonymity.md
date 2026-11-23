@@ -17,23 +17,23 @@
 
 Backups (35-day PITR, monthly kept a year, 6-monthly Drive archives) can't be cleaned afterwards, so identity must never reach the table.
 
-## Two things on the phone
+## Two things the user holds
 
 | Thing | Proves | Made when |
 |---|---|---|
-| **Pass** (blind-signed) | "a real member sent this", not which | fetched ahead, automatically, while signed in |
-| **Rig key** (random) | "I'm whoever reported this rig" | when reporting; ISA keeps only its hash |
+| **Pass** (blind-signed) | "a real member created this rigger", not which | fetched ahead, automatically, while signed in; spent once |
+| **Anonymous rigger passkey** | "I'm the rigger who owns this rig", from any of the user's devices | the first report; ISA keeps only its public key |
 
-Neither carries identity. The user sees neither.
+Neither carries identity. The user never sees the pass; the passkey shows up as a Face ID prompt and an entry "SlackMap anonymous rigger" in their password manager.
 
 ## How the pass works
 
-1. **Signed in**, the phone makes random passes, blinds them (seals each) and sends them with the login.
-2. ISA checks the member is under the monthly limit and signs them **without seeing them**. ISA stores only "member X took N passes this month".
-3. The phone unseals them: valid signatures on passes ISA never saw.
-4. **Reporting**, without login, the phone sends one pass. ISA checks the signature and that the pass is unused.
+1. **Signed in**, the browser makes random passes, blinds them (seals each) and sends them with the login.
+2. ISA checks the member is under the yearly limit and signs them **without seeing them**. ISA stores only "member X took N passes this year", no time.
+3. The browser unseals them: valid signatures on passes ISA never saw.
+4. **Creating the anonymous rigger**, without login, the browser sends one pass with the new passkey's public key. ISA checks the signature and that the pass is unused.
 
-ISA holds "member X took 5" and "pass #a91f… was used", and no maths connects them.
+ISA holds "member X took 2" and "pass #a91f… created rigger R", and no maths connects them.
 
 Standard: Privacy Pass (RFC 9576 architecture, 9578 issuance) with RSA blind signatures (RFC 9474). Simplest deployment: ISA is both issuer and verifier. Cloudflare publishes TypeScript implementations (`@cloudflare/privacypass-ts`, `@cloudflare/blindrsa-ts`), to verify before choosing.
 
@@ -41,20 +41,23 @@ Standard: Privacy Pass (RFC 9576 architecture, 9578 issuance) with RSA blind sig
 
 | Leak | Close it by |
 |---|---|
-| **Timing**: passes at 14:02, report at 14:03 | Passes fetched ahead and automatically. Never "get a pass now to report". |
+| **Timing**: pass at 14:02, rigger created at 14:03 | Passes fetched ahead and automatically on any sign-in; pass counts stored without time. A first-ever user who signs in and creates a rigger right away is linkable only by someone watching live, not afterwards. |
+| **The browser-check session cookie** (Turnstile, [data access](/slackmap/docs/data-access.md)) sent with both ISA-signed-in and rigger requests | Rigger API doesn't accept or log that cookie, or the anonymous context gets its own browser-check session. To settle in the deep dive. |
+| **The rigger links its own rigs** | Accepted: one pseudonym. Someone wanting more can make a fresh rigger with another pass. |
 | **IP** of the issuing and reporting requests match | Rig endpoint never logs or stores IPs; Turnstile called without `remoteip`. Optionally Oblivious HTTP ([D8](decisions.md#d8-how-hard-do-we-hide-the-ip)). |
 | **Login token or cookie** sent with the report | Rig calls go through a client that carries nothing from sign-in. |
 | **Rate-limit keys** derived from IP | Hash with a secret rotated daily. |
 | **Lambda / CloudFront logs** | No body, headers, IP on this endpoint. |
 | **Line changelog / editors** | Rig fields never write an editor record or a changelog entry with a user id. Line edits and rig updates are separate paths. |
-| **"Is this my rig?"** | Decided in the browser (rig key in storage), never asked of the server while signed in. |
+| **"Is this my rig?"** | Asked only from the anonymous context with a rigger session; the public card shows no rigger id. |
+| **Passkey user name** | A fixed label ("SlackMap anonymous rigger") and a random user id; never the ISA email. |
 
 ## Abuse without identity
 
 | Abuse | Answer |
 |---|---|
-| Spam / fake rigs | each new rig costs a pass; passes capped per member; Turnstile on top |
-| Taking down others' rigs | impossible: needs the rig key |
+| Spam / fake rigs | a rigger costs a pass; passes capped per member; active rigs capped per rigger; Turnstile on top |
+| Taking down others' rigs | impossible: needs their passkey |
 | Stale "rigged" | required expiry; reminder on the owner's phone |
 | A fake rig blocks the line until expiry | max 14 days; whether others can flag it is for later |
 

@@ -17,6 +17,7 @@ Each item: the question, the options, a recommendation. ⭐ = recommended. Chang
 | G9 | UI: Claude wireframes first from the current app, Can reviews. [Wireframes](wireframes.html). |
 | G10 | **No fields or UI for consumers' sake** (aviation or other). SlackMap serves slackliners; what others do with the data is not its concern. A rig is: rigged, until when, reported when. |
 | G11 | The owner must be able to edit **from any of their devices** (start on the laptop, end on the phone). |
+| G12 | **The rig belongs to an anonymous rigger passkey** ([D2](#d2-how-the-owner-edits-from-any-device-without-isa-knowing-who) C), created once with a blind pass. |
 
 ---
 
@@ -46,7 +47,7 @@ G3 + G5 + G11. "Edit with your own ISA account" would mean ISA checks which acco
 
 C is the burner done right: a second identity, but no account to sign in to with email and password, only the device's Face ID.
 
-**Status:** open
+**Status:** Decided: C, the anonymous rigger passkey. The blind pass is spent once, to create it.
 
 ## D3. Who can see live rigs?
 
@@ -57,14 +58,14 @@ C is the burner done right: a second identity, but no account to sign in to with
 
 **Status:** open
 
-## D4. Can someone report while signed out?
+## D4. Does reporting need the ISA sign-in?
 
-The pass is fetched while signed in; reporting itself needs no login.
+The ISA sign-in is needed only to fetch passes, and a pass only to create the anonymous rigger. After that, reporting and editing need only the passkey.
 
 | Option | Effect |
 |---|---|
-| ⭐ A. Must be signed in to report (passes fetched in the background then) | One flow. The report itself still goes out without the login. |
-| B. A member with passes left may report while signed out | Same security, more states to explain. |
+| ⭐ A. Only the first time (to create the rigger); afterwards the passkey alone, signed in or not | Fewer prompts; the two identities never meet in one request. |
+| B. Always signed in to ISA as well | Simpler to explain, but both identities sit in the same browser at the same time: more care needed so no request carries both. |
 
 **Status:** open
 
@@ -93,7 +94,7 @@ The pass is fetched while signed in; reporting itself needs no login.
 
 | Recommendation | Why |
 |---|---|
-| e.g. 5 passes per month, fetched automatically whenever a member is signed in; each new rig costs one; extend and take down cost none (the rig key proves it) | Caps spam; fetching ahead breaks the timing link "passes at 14:02, report at 14:03". |
+| A pass creates an anonymous rigger. E.g. 2 passes per year per member, fetched automatically whenever a member is signed in. Rigs themselves need no pass; a cap on active rigs per rigger (e.g. 5) limits spam. | Caps how many anonymous riggers one member can make; fetching ahead breaks the timing link "pass at 14:02, rigger created at 14:03". |
 
 **Status:** open
 
