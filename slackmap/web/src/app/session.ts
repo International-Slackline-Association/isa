@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { apiBaseUrl, domain } from 'app/api/constants';
+import { apiBaseUrl, domain, sessionRequired } from 'app/api/constants';
 
 // Public.
 const turnstileSiteKey = '0x4AAAAAAGDecDHSrTlBoDNO';
@@ -34,7 +34,7 @@ const writeExpiry = (expiresAt: number) => {
     localStorage.setItem(expiryStorageKey, String(expiresAt));
   } catch {}
 };
-const hasSession = () => readExpiry() - renewMarginSeconds > Date.now() / 1000;
+const hasSession = () => !sessionRequired || readExpiry() - renewMarginSeconds > Date.now() / 1000;
 
 const loadTurnstile = () =>
   new Promise<Turnstile>((resolve, reject) => {
@@ -129,10 +129,10 @@ const startSession = async () => {
 
 let pending: Promise<void> | undefined;
 
-// Settles once the browser holds a session cookie for data.slackmap.com and the API, or the check
-// failed; the requests then go out anyway and the server decides.
+// Settles once the browser holds a session cookie for the data host and the API, or the check
+// failed; the requests then go out anyway and the server decides. At once where no session is required.
 export const ensureSession = (renew = false): Promise<void> => {
-  if (!renew && hasSession()) return Promise.resolve();
+  if (!sessionRequired || (!renew && hasSession())) return Promise.resolve();
   pending ??= startSession()
     .catch((error) => console.warn('Session not started', error))
     .finally(() => {
