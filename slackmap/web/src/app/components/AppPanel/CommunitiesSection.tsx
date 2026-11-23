@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Box, Stack, Typography } from '@mui/material';
 
-import { getCommunityMapStats } from 'app/api/geojson-data';
+import { getCommunityMapStats, useMapDataVersion } from 'app/api/geojson-data';
 import { appColors } from 'styles/theme/colors';
 
 const Count = (props: { color: string; label: string }) => (
@@ -14,10 +14,11 @@ const Count = (props: { color: string; label: string }) => (
 
 export const CommunitiesSection = () => {
   const [stats, setStats] = useState<Awaited<ReturnType<typeof getCommunityMapStats>>>();
+  const dataVersion = useMapDataVersion('groups');
 
   useEffect(() => {
     getCommunityMapStats().then(setStats);
-  }, []);
+  }, [dataVersion]);
 
   return (
     <Stack spacing={1.5} sx={{ mt: 1.75 }}>

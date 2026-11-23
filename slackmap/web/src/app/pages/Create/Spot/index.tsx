@@ -21,14 +21,14 @@ export function CreateSpotPage() {
   const [features, setFeatures] = useState<Feature[]>([]);
   const [mapErrors, setMapErrors] = useState<string[]>([]);
 
-  const [createSpot, { isLoading: isSaving, isSuccess: isSavedChanges }] =
+  const [createSpot, { isLoading: isSaving, data: createdSpot }] =
     spotApi.useCreateSpotMutation();
 
   useEffect(() => {
-    if (isSavedChanges) {
-      navigate({ pathname: '/', search: searchParams.toString() });
+    if (createdSpot) {
+      navigate(`/spot/${createdSpot.id}`);
     }
-  }, [isSavedChanges]);
+  }, [createdSpot]);
 
   useEffect(() => {
     const errors = validateSpotFeatures(features);

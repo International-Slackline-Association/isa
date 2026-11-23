@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 
 import Button from '@mui/material/Button';
 
-import { signInWithRedirect } from 'aws-amplify/auth';
+import { ResumeAction, signIn } from 'app/signIn';
 import isaLogo from 'isa-brand/logos/isa-wide/isa-wide-color.svg';
 
 import { PopupDialog } from './PopupDialog';
 
+type Target = { to?: string; resume?: ResumeAction };
+
 export const useSignInDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [target, setTarget] = useState<Target>({});
 
   const SignInDialog: React.FC = () => (
     <PopupDialog
@@ -20,14 +23,15 @@ export const useSignInDialog = () => {
       title="Sign in to continue"
       description="SlackMap uses your ISA account. If you don't have one, creating it takes a few seconds."
       actions={
-        <Button variant="contained" onClick={() => signInWithRedirect()}>
+        <Button variant="contained" onClick={() => signIn(target)}>
           Sign in or sign up
         </Button>
       }
     />
   );
 
-  const showSignInDialog = () => {
+  const showSignInDialog = (afterSignIn: Target = {}) => {
+    setTarget(afterSignIn);
     setIsOpen(true);
   };
 

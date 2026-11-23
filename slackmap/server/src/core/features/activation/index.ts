@@ -10,7 +10,7 @@ const keyAlgorithm = { name: 'RSA-PSS', hash: 'SHA-384' };
 let keys: Promise<{ privateKey: CryptoKey; publicKey: CryptoKey }> | undefined;
 const loadKeys = () =>
   (keys ??= (async () => {
-    // Read at start, not passed as an environment variable: those are limited to 4 KB per function.
+    // Not passed as an environment variable: those are limited to 4 KB per function.
     const { Parameter } = await ssm.send(new GetParameterCommand({ Name: process.env.PASS_SIGNING_KEY_PARAMETER }));
     const privatePem = createPrivateKey(Parameter!.Value!);
     const pkcs8 = privatePem.export({ type: 'pkcs8', format: 'der' });

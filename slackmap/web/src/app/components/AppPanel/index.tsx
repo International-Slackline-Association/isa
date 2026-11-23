@@ -19,7 +19,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { getActiveLinePoints } from 'app/api/geojson-data';
+import { getActiveLinePoints, useMapDataVersion } from 'app/api/geojson-data';
 import { useInfoDialog } from 'app/components/Dialogs/useInfoDialog';
 import { useSessionReady } from 'app/session';
 import { panelTheme } from 'styles/theme/panelTheme';
@@ -50,6 +50,7 @@ const isLandingPath = (pathname: string) => pathname === '/' || pathname === '/c
 
 const useActiveCount = () => {
   const sessionReady = useSessionReady();
+  const dataVersion = useMapDataVersion('features');
   const [count, setCount] = useState(0);
   useEffect(() => {
     if (!sessionReady) return;
@@ -57,7 +58,7 @@ const useActiveCount = () => {
     load();
     const timer = setInterval(load, 60_000);
     return () => clearInterval(timer);
-  }, [sessionReady]);
+  }, [sessionReady, dataVersion]);
   return count;
 };
 

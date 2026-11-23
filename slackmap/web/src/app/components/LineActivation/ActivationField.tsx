@@ -13,6 +13,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import { Box, Button, ButtonBase, Chip, Link, Stack, Typography } from '@mui/material';
 
 import { useSignInDialog } from 'app/components/Dialogs/useSignInDialog';
+import { useResumeAfterSignIn } from 'app/signIn';
 import { selectIsUserSignedIn } from 'app/slices/app/selectors';
 import { format } from 'date-fns';
 import { ui } from 'styles/theme/ui';
@@ -38,7 +39,7 @@ import {
   untilFromDateInput,
   untilPresets,
 } from './activationTimes';
-import { hasPass, passQuota } from './passes';
+import { hasPass, passQuota, refillSettled } from './passes';
 
 
 interface Props {
@@ -173,8 +174,12 @@ export const ActivationField = (props: Props) => {
     }
   };
 
+  // A first sign-in on this device is still fetching passes; opening before they land would show
+  // anonymous as unavailable.
+  useResumeAfterSignIn('activate', () => refillSettled().then(() => setDialogOpen(true)));
+
   const onActivateClicked = () => {
-    if (!isSignedIn) return showSignInDialog();
+    if (!isSignedIn) return showSignInDialog({ resume: 'activate' });
     setDialogOpen(true);
   };
 

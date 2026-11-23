@@ -1,9 +1,72 @@
+import { useSyncExternalStore } from 'react';
+
 import { featureCollection } from '@turf/turf';
 import { Feature, FeatureCollection } from 'geojson';
 
 import { ensureSession, showSessionFailure } from 'app/session';
 
 import { geoJsonURL } from './constants';
+
+export type MapDataKind = 'features' | 'groups';
+
+// The file the server's stream handler rewrites last for each kind, so once it changes the whole set is new.
+const lastRewrittenFile: Record<MapDataKind, string> = {
+  features: geoJsonURL.countryPoints,
+  groups: geoJsonURL.communityCountries,
+};
+const pollEveryMs = 1500;
+const giveUpAfterMs = 30_000;
+
+const versions: Record<MapDataKind, number> = { features: 0, groups: 0 };
+const listeners = new Set<() => void>();
+
+export const useMapDataVersion = (kind: MapDataKind) =>
+  useSyncExternalStore(
+    (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    () => versions[kind],
+  );
+
+// A new URL is what makes the map fetch a source again.
+export const versionedUrl = (url: string, version: number) => (version ? `${url}?v=${version}` : url);
+
+const lastModified = async (kind: MapDataKind) => {
+  await ensureSession();
+  const response = await fetch(lastRewrittenFile[kind], { method: 'HEAD', credentials: 'include', cache: 'no-store' });
+  return response.headers.get('last-modified');
+};
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// The server rebuilds the map files a few seconds after a write, so the map reloads when they change.
+// Other people's writes rebuild the same files and one of them can land first, so it keeps watching
+// for the whole window; a write the server does not rebuild for (a name edit) just ends it quietly.
+export const reloadMapDataAfterWrite = async (kind: MapDataKind, write: Promise<unknown>) => {
+  try {
+    let seen = await lastModified(kind);
+    await write;
+    for (let waited = 0; waited < giveUpAfterMs; waited += pollEveryMs) {
+      await sleep(pollEveryMs);
+      const current = await lastModified(kind);
+      if (current === seen) continue;
+      seen = current;
+      if (kind === 'features') {
+        cache.allSlacklinePoints = undefined;
+        cache.countrySlacklinePoints = undefined;
+        cache.slacklinePointFeaturesOfCountry = {};
+      } else {
+        cache.slacklineGroups = undefined;
+      }
+      versions[kind] += 1;
+      listeners.forEach((listener) => listener());
+    }
+  } catch (error) {
+    // A failed write is reported by its own request.
+    console.warn('Map data not reloaded', kind, error);
+  }
+};
 
 const cache = {
   allSlacklinePoints: undefined as FeatureCollection | undefined,
@@ -91,7 +154,6 @@ export const getSlacklinePointFeaturesOfCountry = async (code: string) => {
   return cache.slacklinePointFeaturesOfCountry[code];
 };
 
-// Lines whose 'au' (active until, epoch seconds) is still ahead.
 export const getActiveLinePoints = async () => {
   const allPointsGeoJson = await getAllSlacklinePointsGeoJson();
   const nowSeconds = Date.now() / 1000;

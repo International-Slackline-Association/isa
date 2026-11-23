@@ -13,7 +13,6 @@ export type ActivationMode = 'anonymous' | 'named';
 interface Props {
   open: boolean;
   lineName: string;
-  // Set when this browser holds no anonymous pass: why the Anonymous choice is unavailable.
   anonymousUnavailable?: string;
   onClose: () => void;
   onChoose: (mode: ActivationMode) => void;

@@ -18,6 +18,7 @@ import { ContributorAgreementDialog } from './components/ContributorAgreement';
 import { withErrorBoundry } from './components/ErrorBoundary';
 import { refillPasses } from './components/LineActivation/passes';
 import { MaintenancePage } from './components/MaintenancePage';
+import { SignInReturn } from './signIn';
 
 const CreateGroupPage = lazy(() => import('./pages/Create/Group').then((m) => ({ default: m.CreateGroupPage })));
 const GroupEditPage = lazy(() => import('./pages/Group/GroupEditPage').then((m) => ({ default: m.GroupEditPage })));
@@ -85,6 +86,7 @@ export function App() {
         <BrowserRouter>
           <AppPanel>
             <Suspense fallback={null}>
+              <SignInReturn>
               <Routes>
                 <Route path="/" element={<SlacklineMapPage />} />
                 <Route path="/line/:lineId" element={<SlacklineMapPage />} />
@@ -109,6 +111,7 @@ export function App() {
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="*" element={<SlacklineMapPage />} />
               </Routes>
+              </SignInReturn>
             </Suspense>
           </AppPanel>
 

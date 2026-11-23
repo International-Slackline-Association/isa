@@ -26,14 +26,14 @@ export function CreateLinePage() {
   const [features, setFeatures] = useState<Feature[]>([]);
   const [mapErrors, setMapErrors] = useState<string[]>([]);
 
-  const [createLine, { isLoading: isSaving, isSuccess: isSavedChanges }] =
+  const [createLine, { isLoading: isSaving, data: createdLine }] =
     lineApi.useCreateLineMutation();
 
   useEffect(() => {
-    if (isSavedChanges) {
-      navigate({ pathname: '/', search: searchParams.toString() });
+    if (createdLine) {
+      navigate(`/line/${createdLine.id}`);
     }
-  }, [isSavedChanges]);
+  }, [createdLine]);
 
   useEffect(() => {
     const errors = validateLineFeatures(features);

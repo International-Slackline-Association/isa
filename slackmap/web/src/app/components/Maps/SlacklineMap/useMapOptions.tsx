@@ -6,7 +6,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import { Box, Chip, ListItemIcon, Menu, MenuItem, Stack } from '@mui/material';
 
 import { SlacklineType, SpotType } from '@server/core/types';
-import { getSlacklineMapStats } from 'app/api/geojson-data';
+import { getSlacklineMapStats, useMapDataVersion } from 'app/api/geojson-data';
 import { useSessionReady } from 'app/session';
 import { appColors } from 'styles/theme/colors';
 import { shadow, ui } from 'styles/theme/ui';
@@ -58,10 +58,11 @@ export const useMapOptions = () => {
   const [styleMenuAnchor, setStyleMenuAnchor] = useState<HTMLElement | null>(null);
   const [stats, setStats] = useState<Stats>();
   const savedMapStyle = useAppLocalStorage('mapSettings.mapStyle', 'default');
+  const dataVersion = useMapDataVersion('features');
 
   useEffect(() => {
     if (sessionReady) getSlacklineMapStats().then(setStats);
-  }, [sessionReady]);
+  }, [sessionReady, dataVersion]);
 
   const typeFilter =
     selectedDisplayFeature === 'line' || selectedDisplayFeature === 'active'

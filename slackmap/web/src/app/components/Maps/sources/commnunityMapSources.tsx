@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { Layer, Source } from 'react-map-gl/mapbox';
 
 import { geoJsonURL } from 'app/api/constants';
+import { useMapDataVersion, versionedUrl } from 'app/api/geojson-data';
 
 import { countryPointLayer, countryPolygonOutlineLayer } from '../layers/countryLayers';
 import { slacklineGroupsPointLayer } from '../layers/slacklineGroupsLayer';
@@ -19,6 +20,7 @@ export const CommunityMapSources = (props: {
   };
 }) => {
   const sessionReady = useSessionReady();
+  const dataVersion = useMapDataVersion('groups');
   const { filter } = props;
   const [countryFilterExpr, setCountryFilterExpr] = React.useState<any>();
 
@@ -38,7 +40,7 @@ export const CommunityMapSources = (props: {
       <Source
         id={CommunityMapSourceIds.slacklineGroups}
         type="geojson"
-        data={geoJsonURL.groups}
+        data={versionedUrl(geoJsonURL.groups, dataVersion)}
         generateId={true}
         promoteId="id"
       >
@@ -52,7 +54,7 @@ export const CommunityMapSources = (props: {
       <Source
         id={CommunityMapSourceIds.communityCountries}
         type="geojson"
-        data={geoJsonURL.communityCountries}
+        data={versionedUrl(geoJsonURL.communityCountries, dataVersion)}
         generateId
         promoteId="id"
       >

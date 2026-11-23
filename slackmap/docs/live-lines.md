@@ -21,7 +21,7 @@ ISA must be technically unable to know who activated a line anonymously. The rea
 
 ## With a name
 
-People who do not need anonymity can activate with their name instead. The name is only a label: such an activation is managed by the same manage link, so there is one way to manage every activation. An activation with a name follows the feature changelog flow like any other change to a line.
+People who do not need anonymity can activate with their name instead. The name is only a label: such an activation is managed by the same manage link, so there is one way to manage every activation.
 
 ## What an activation is
 

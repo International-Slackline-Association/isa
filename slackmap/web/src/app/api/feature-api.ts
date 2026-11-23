@@ -8,6 +8,8 @@ import { DeleteFeatureRequestPostBody } from '@server/functions/api/endpoints/fe
 import { baseApi } from 'store/rtk-query';
 import { showSuccessNotification } from 'utils';
 
+import { reloadMapDataAfterWrite } from './geojson-data';
+
 type GetFeatureChangelogsResponse = Awaited<ReturnType<typeof getFeatureChangelogs>>;
 type RequestTemporaryEditorshipResponse = Awaited<ReturnType<typeof requestTemporaryEditorship>>;
 type DeleteFeatureAPIResponse = Awaited<ReturnType<typeof deleteFeature>>;
@@ -76,7 +78,8 @@ export const featureApi = baseApi
           url: `feature/${params.id}/${params.type}`,
           method: 'DELETE',
         }),
-        async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        async onQueryStarted({ type }, { dispatch, queryFulfilled }) {
+          reloadMapDataAfterWrite(type === 'group' ? 'groups' : 'features', queryFulfilled);
           await queryFulfilled.then(() => {
             dispatch(showSuccessNotification('Feature Deleted'));
           });

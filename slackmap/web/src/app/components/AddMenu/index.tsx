@@ -35,20 +35,18 @@ export const AddMenu = () => {
 
   const open = (path: string) => {
     setAnchor(null);
+    const search = lastMapLocation
+      ? `?map=${mapUrlSearchParams.stringify(
+          lastMapLocation.longitude,
+          lastMapLocation.latitude,
+          lastMapLocation.zoom,
+        )}`
+      : '';
     if (!isUserSignedIn) {
-      showSignInDialog();
+      showSignInDialog({ to: path + search });
       return;
     }
-    navigate({
-      pathname: path,
-      search: lastMapLocation
-        ? `map=${mapUrlSearchParams.stringify(
-            lastMapLocation.longitude,
-            lastMapLocation.latitude,
-            lastMapLocation.zoom,
-          )}`
-        : undefined,
-    });
+    navigate(path + search);
   };
 
   return (

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 
 import { countryApi } from 'app/api/country-api';
 import { CloseAndRefreshActions, FeatureCard, FeatureStats, FlagAvatar } from 'app/components/FeatureCard';
-import { getSlacklinePointFeaturesOfCountry } from 'app/api/geojson-data';
+import { getSlacklinePointFeaturesOfCountry, useMapDataVersion } from 'app/api/geojson-data';
 
 import { CountryHistoryField } from '../../components/FeatureDetailFields/CountryHistoryField';
 
@@ -34,13 +34,14 @@ export const CountryDetailCard = (props: Props) => {
     refetch,
   } = countryApi.useGetCountryDetailsQuery(props.countryCode);
 
+  const dataVersion = useMapDataVersion('features');
   useEffect(() => {
     const loadStats = async () => {
       const points = await getSlacklinePointFeaturesOfCountry(props.countryCode);
       setStatsInfo(points.stats);
     };
     loadStats();
-  }, [props.countryCode, setStatsInfo]);
+  }, [props.countryCode, setStatsInfo, dataVersion]);
 
   const onCloseClicked = () => {
     navigate({ pathname: '/' });

@@ -74,6 +74,8 @@ const publicKey = async () => {
 
 let refilling: Promise<void> | undefined;
 
+export const refillSettled = () => refilling ?? Promise.resolve();
+
 export const refillPasses = () =>
   (refilling ??= (async () => {
     const missing = keepStored - readPasses().length;

@@ -4,7 +4,9 @@ import {
   UpdateSpotPostBody,
 } from '@server/functions/api/endpoints/spot/schema';
 import { baseApi } from 'store/rtk-query';
-import { showInfoNotification } from 'utils';
+import { showSuccessNotification } from 'utils';
+
+import { reloadMapDataAfterWrite } from './geojson-data';
 
 export type GetSpotDetailsAPIResponse = Awaited<ReturnType<typeof getSpotDetails>>;
 
@@ -25,8 +27,9 @@ export const spotApi = baseApi
           body: body,
         }),
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
+          reloadMapDataAfterWrite('features', queryFulfilled);
           await queryFulfilled.then(() => {
-            dispatch(showInfoNotification('Refresh the page after few seconds', 5000));
+            dispatch(showSuccessNotification('Changes Saved'));
           });
         },
       }),
@@ -41,8 +44,9 @@ export const spotApi = baseApi
         }),
         invalidatesTags: ['spotDetails'],
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
+          reloadMapDataAfterWrite('features', queryFulfilled);
           await queryFulfilled.then(() => {
-            dispatch(showInfoNotification('Refresh the page after few seconds', 5000));
+            dispatch(showSuccessNotification('Changes Saved'));
           });
         },
       }),

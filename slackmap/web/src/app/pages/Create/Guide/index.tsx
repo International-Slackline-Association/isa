@@ -21,14 +21,14 @@ export function CreateGuidePage() {
   const [features, setFeatures] = useState<Feature[]>([]);
   const [mapErrors, setMapErrors] = useState<string[]>([]);
 
-  const [createGuide, { isLoading: isSaving, isSuccess: isSavedChanges }] =
+  const [createGuide, { isLoading: isSaving, data: createdGuide }] =
     guideApi.useCreateGuideMutation();
 
   useEffect(() => {
-    if (isSavedChanges) {
-      navigate({ pathname: '/', search: searchParams.toString() });
+    if (createdGuide) {
+      navigate(`/guide/${createdGuide.id}`);
     }
-  }, [isSavedChanges]);
+  }, [createdGuide]);
 
   useEffect(() => {
     const errors = validateGuideFeatures(features);

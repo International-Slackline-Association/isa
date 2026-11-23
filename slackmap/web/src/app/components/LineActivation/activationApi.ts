@@ -1,4 +1,5 @@
 import { apiBaseUrl } from 'app/api/constants';
+import { reloadMapDataAfterWrite } from 'app/api/geojson-data';
 import { ensureSession } from 'app/session';
 import { fetchAuthSession } from 'aws-amplify/auth';
 
@@ -55,10 +56,10 @@ const sha256Hex = async (text: string) =>
     .join('');
 
 // Only the named activation sends the login; every other call must not carry who is signed in.
-const call = async (method: string, lineId: string, body: unknown, opts: { named?: boolean } = {}) => {
+const send = async (method: string, lineId: string, body: unknown, opts: { named?: boolean }) => {
   const token = opts.named ? await fetchAuthSession().then((s) => s.tokens?.idToken?.toString()) : undefined;
   if (opts.named && !token) throw new Error('Sign in to activate with your name');
-  const send = () =>
+  const request = () =>
     fetch(`${apiBaseUrl}/line/${encodeURIComponent(lineId)}/activation${opts.named ? '/named' : ''}`, {
       method,
       credentials: 'include',
@@ -66,14 +67,20 @@ const call = async (method: string, lineId: string, body: unknown, opts: { named
       body: JSON.stringify(body),
     });
   await ensureSession();
-  let response = await send();
+  let response = await request();
   if (response.status === 403 && (await response.clone().json()).code === 'SessionRequired') {
     await ensureSession(true);
-    response = await send();
+    response = await request();
   }
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Something went wrong');
   return data;
+};
+
+const call = (method: string, lineId: string, body: unknown, opts: { named?: boolean } = {}) => {
+  const result = send(method, lineId, body, opts);
+  reloadMapDataAfterWrite('features', result);
+  return result;
 };
 
 export class NoPassError extends Error {}

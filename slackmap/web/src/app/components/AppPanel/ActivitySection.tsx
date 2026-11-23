@@ -6,7 +6,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Avatar, AvatarGroup, Box, Button, ButtonBase, Collapse, Stack, Typography } from '@mui/material';
 
 import { activityApi } from 'app/api/activity-api';
-import { getActiveLinePoints } from 'app/api/geojson-data';
+import { getActiveLinePoints, useMapDataVersion } from 'app/api/geojson-data';
 import { lineApi } from 'app/api/line-api';
 import { ChangelogActionIcon } from 'app/components/FeatureDetailFields/FeatureHistoryField';
 import { formatUntil } from 'app/components/LineActivation/activationTimes';
@@ -44,13 +44,14 @@ const ActiveLineRow = (props: { line: ActiveLine; onOpen: () => void }) => {
 export const ActiveNowSection = (props: { onNavigate?: () => void }) => {
   const navigate = useNavigate();
   const [lines, setLines] = useState<ActiveLine[]>();
+  const dataVersion = useMapDataVersion('features');
 
   useEffect(() => {
     const load = () => getActiveLinePoints().then(setLines);
     load();
     const timer = setInterval(load, 60_000);
     return () => clearInterval(timer);
-  }, []);
+  }, [dataVersion]);
 
   return (
     <Box>

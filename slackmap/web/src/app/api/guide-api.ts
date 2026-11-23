@@ -4,7 +4,9 @@ import {
   UpdateGuidePostBody,
 } from '@server/functions/api/endpoints/guide/schema';
 import { baseApi } from 'store/rtk-query';
-import { showInfoNotification, showSuccessNotification } from 'utils';
+import { showSuccessNotification } from 'utils';
+
+import { reloadMapDataAfterWrite } from './geojson-data';
 
 export type GetGuideDetailsAPIResponse = Awaited<ReturnType<typeof getGuideDetails>>;
 
@@ -25,8 +27,9 @@ export const guideApi = baseApi
           body: body,
         }),
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
+          reloadMapDataAfterWrite('features', queryFulfilled);
           await queryFulfilled.then(() => {
-            dispatch(showInfoNotification('Refresh the page after few seconds', 5000));
+            dispatch(showSuccessNotification('Changes Saved'));
           });
         },
       }),
@@ -41,6 +44,7 @@ export const guideApi = baseApi
         }),
         invalidatesTags: ['guideDetails'],
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
+          reloadMapDataAfterWrite('features', queryFulfilled);
           await queryFulfilled.then(() => {
             dispatch(showSuccessNotification('Changes Saved'));
           });

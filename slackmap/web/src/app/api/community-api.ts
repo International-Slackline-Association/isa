@@ -5,7 +5,9 @@ import {
   UpdateGroupPostBody,
 } from '@server/functions/api/endpoints/group/schema';
 import { baseApi } from 'store/rtk-query';
-import { showInfoNotification } from 'utils';
+import { showSuccessNotification } from 'utils';
+
+import { reloadMapDataAfterWrite } from './geojson-data';
 
 type GetCommunityCountryDetailsAPIResponse = Awaited<ReturnType<typeof getCommunityCountryDetails>>;
 export type GetGroupDetailsAPIResponse = Awaited<ReturnType<typeof getGroupDetails>>;
@@ -28,8 +30,9 @@ export const communityApi = baseApi
         query: (body) => ({ url: `group`, method: 'POST', body }),
         invalidatesTags: ['communityCountryDetails'],
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
+          reloadMapDataAfterWrite('groups', queryFulfilled);
           await queryFulfilled.then(() => {
-            dispatch(showInfoNotification('Refresh the page after few seconds', 5000));
+            dispatch(showSuccessNotification('Changes Saved'));
           });
         },
       }),
@@ -40,8 +43,9 @@ export const communityApi = baseApi
         query: ({ id, payload }) => ({ url: `group/${id}`, method: 'PUT', body: payload }),
         invalidatesTags: ['groupDetails', 'communityCountryDetails'],
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
+          reloadMapDataAfterWrite('groups', queryFulfilled);
           await queryFulfilled.then(() => {
-            dispatch(showInfoNotification('Refresh the page after few seconds', 5000));
+            dispatch(showSuccessNotification('Changes Saved'));
           });
         },
       }),

@@ -4,6 +4,7 @@ import { Layer, Source } from 'react-map-gl/mapbox';
 
 import { SlacklineType, SpotType } from '@server/core/types';
 import { geoJsonURL } from 'app/api/constants';
+import { useMapDataVersion, versionedUrl } from 'app/api/geojson-data';
 
 import { SelectedDisplayFeature } from '../SlacklineMap/useMapOptions';
 import { countryPointLayer, countryPolygonOutlineLayer } from '../layers/countryLayers';
@@ -44,6 +45,7 @@ export const SlacklineMapSources = (props: {
   };
 }) => {
   const sessionReady = useSessionReady();
+  const dataVersion = useMapDataVersion('features');
   const { displayFeature, filter } = props;
 
   const [idFilterExpr, setIdFilterExpr] = React.useState<any>();
@@ -51,7 +53,6 @@ export const SlacklineMapSources = (props: {
   const [spotTypeFilterExpr, setSpotTypeFilterExpr] = React.useState<any>();
   const [countryFilterExpr, setCountryFilterExpr] = React.useState<any>();
 
-  // An activation is shown until its 'au' (active until, epoch seconds) passes; checked again every minute.
   const [nowSeconds, setNowSeconds] = React.useState(() => Math.floor(Date.now() / 1000));
   useEffect(() => {
     const timer = setInterval(() => setNowSeconds(Math.floor(Date.now() / 1000)), 60_000);
@@ -104,7 +105,7 @@ export const SlacklineMapSources = (props: {
       <Source
         id={SlacklineMapSourceIds.spots}
         type="geojson"
-        data={geoJsonURL.spots}
+        data={versionedUrl(geoJsonURL.spots, dataVersion)}
         generateId={true}
         promoteId="id"
         filter={idFilterExpr}
@@ -118,7 +119,7 @@ export const SlacklineMapSources = (props: {
       <Source
         id={SlacklineMapSourceIds.lines}
         type="geojson"
-        data={geoJsonURL.lines}
+        data={versionedUrl(geoJsonURL.lines, dataVersion)}
         generateId
         promoteId="id"
         filter={idFilterExpr}
@@ -146,7 +147,7 @@ export const SlacklineMapSources = (props: {
       <Source
         id={SlacklineMapSourceIds.guides}
         type="geojson"
-        data={geoJsonURL.guides}
+        data={versionedUrl(geoJsonURL.guides, dataVersion)}
         generateId={true}
         promoteId="id"
         filter={idFilterExpr}
@@ -181,7 +182,7 @@ export const SlacklineMapSources = (props: {
       <Source
         id={SlacklineMapSourceIds.linePoints}
         type="geojson"
-        data={geoJsonURL.linePoints}
+        data={versionedUrl(geoJsonURL.linePoints, dataVersion)}
         generateId
         promoteId="id"
       >
@@ -202,7 +203,7 @@ export const SlacklineMapSources = (props: {
       <Source
         id={SlacklineMapSourceIds.spotPoints}
         type="geojson"
-        data={geoJsonURL.spotPoints}
+        data={versionedUrl(geoJsonURL.spotPoints, dataVersion)}
         generateId
         promoteId="id"
       >
@@ -217,7 +218,7 @@ export const SlacklineMapSources = (props: {
       <Source
         id={SlacklineMapSourceIds.guidePoints}
         type="geojson"
-        data={geoJsonURL.guidePoints}
+        data={versionedUrl(geoJsonURL.guidePoints, dataVersion)}
         generateId
         promoteId="id"
       >
@@ -233,7 +234,7 @@ export const SlacklineMapSources = (props: {
       <Source
         id={SlacklineMapSourceIds.countryPoints}
         type="geojson"
-        data={geoJsonURL.countryPoints}
+        data={versionedUrl(geoJsonURL.countryPoints, dataVersion)}
         generateId
         promoteId="id"
       >

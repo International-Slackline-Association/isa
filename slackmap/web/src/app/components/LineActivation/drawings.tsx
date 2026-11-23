@@ -106,7 +106,6 @@ const Helicopter = (p: { x: number; y: number }) => (
   </g>
 );
 
-// Why: a rigged line is passed on to whoever needs to know; the person stays out of it.
 const WhySlide = () => (
   <SlideSvg>
     <rect x={8} y={10} width={284} height={110} rx={14} fill={C.card} />
