@@ -84,7 +84,7 @@ const activateAnonymously = async (req: Request<{ id: string }>) => {
   const from = activationStart(body.from, now);
   validateActivationEnd(from, body.until, now);
   if (!(await isPassValid(body.pass, body.signature))) throw new Error('Forbidden: Invalid pass');
-  await ensureLineCanBeActivated(lineId, now);
+  const line = await ensureLineCanBeActivated(lineId, now);
 
   await db.spendPass(hashOf(body.pass)).catch((error) => {
     if (isConditionFailed(error)) throw new Error('Forbidden: Pass already used');
@@ -92,6 +92,10 @@ const activateAnonymously = async (req: Request<{ id: string }>) => {
   });
   const activation = { lineId, from, until: body.until, activatedAt: activatedAtHour(now), linkHash: body.linkHash };
   await saveActivation(activation, true);
+  // Never fails the activation once it is saved: the manage link would be lost. The hourly job writes it again.
+  if (from <= now.getTime() / 1000) {
+    await addActivatedChangelog(line, undefined, new Date(from * 1000)).catch(() => logger.warn('history entry failed', { lineId }));
+  }
   logger.info('line activated', { lineId, from, until: activation.until });
   return { from, until: activation.until, activatedAt: activation.activatedAt };
 };
@@ -115,7 +119,9 @@ const activateWithName = async (req: Request<{ id: string }>) => {
   };
   await saveActivation(activation, false);
   // Dated at the start, the same entry the hourly job writes; a later start is written by that job.
-  if (from <= now.getTime() / 1000) await addActivatedChangelog(line, isaId, new Date(from * 1000));
+  if (from <= now.getTime() / 1000) {
+    await addActivatedChangelog(line, isaId, new Date(from * 1000)).catch(() => logger.warn('history entry failed', { lineId }));
+  }
   logger.info('line activated with name', { lineId, from, until: activation.until, userId: isaId });
   return { from, until: activation.until, activatedAt: activation.activatedAt };
 };

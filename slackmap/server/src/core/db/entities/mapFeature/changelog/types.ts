@@ -12,7 +12,8 @@ type IndexedKeyAttrs = {
 };
 
 type NonKeyAttrs = {
-  userId: string;
+  // None for an anonymous activation.
+  userId?: string;
   action: MapFeatureChangelogAction;
   updatedPaths?: string[];
 };

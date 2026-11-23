@@ -47,9 +47,10 @@ const calculateContributorStats = (featureChangelogs: DDBMapFeatureChangelogType
 
   for (const changelog of featureChangelogs) {
     const userId = changelog.userId;
+    if (!userId) continue;
     if (!userStats[userId]) {
       userStats[userId] = {
-        userId: changelog.userId,
+        userId,
         added: { features: [], count: 0 },
         updated: { features: [], count: 0 },
       };

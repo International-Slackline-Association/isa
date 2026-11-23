@@ -161,8 +161,8 @@ export const addUpdatedOwnersChangelog = async (
   });
 };
 
-// Only an activation with the member's name: an anonymous one must never reach a record tied to a person.
-export const addActivatedChangelog = async (item: GenericMapFeatureItemType, userId: string, date: Date) => {
+// Without a user for an anonymous activation, dated to the hour like activatedAt.
+export const addActivatedChangelog = async (item: GenericMapFeatureItemType, userId: string | undefined, date: Date) => {
   const feature = genericFeatureFromItem(item);
   await db.putFeatureChangelog({
     featureId: feature.id,
@@ -201,9 +201,9 @@ export const getChangelogsOfFeature = async (
 ) => {
   const { items, lastEvaluatedKey } = await db.getFeatureChangelogs(featureId, featureType, opts);
   const featureChangelogs = await db.getMultipleFeatureChangelog(items);
-  const userDetailsDict = await getMultipleUserDetails(featureChangelogs.map((c) => c.userId));
+  const userDetailsDict = await usersOf(featureChangelogs);
   const changelogs = featureChangelogs.map((c) => {
-    return { ...prettifyChangelog(c), user: userDetailsDict[c.userId] };
+    return { ...prettifyChangelog(c), user: c.userId ? userDetailsDict[c.userId] : undefined };
   });
   return { changelogs, lastEvaluatedKey };
 };
@@ -220,9 +220,9 @@ export const getChangelogsOfCountry = async (
     lastEvaluatedKey,
   } = await db.getCountryChangelogs(code, opts);
   const featureChangelogs = await db.getMultipleFeatureChangelog(mapFeatureChangelogs);
-  const userDetailsDict = await getMultipleUserDetails(featureChangelogs.map((c) => c.userId));
+  const userDetailsDict = await usersOf(featureChangelogs);
   const changelogs = featureChangelogs.map((c) => {
-    return { ...prettifyChangelog(c), user: userDetailsDict[c.userId] };
+    return { ...prettifyChangelog(c), user: c.userId ? userDetailsDict[c.userId] : undefined };
   });
 
   return { changelogs, lastEvaluatedKey };
@@ -267,12 +267,15 @@ export const getChangelogsOfGlobal = async (
     }
   } while (startKey && collected.length < limit);
 
-  const userDetailsDict = await getMultipleUserDetails(collected.map((c) => c.userId));
+  const userDetailsDict = await usersOf(collected);
   const changelogs = collected.map((c) => {
-    return { ...prettifyChangelog(c), user: userDetailsDict[c.userId] };
+    return { ...prettifyChangelog(c), user: c.userId ? userDetailsDict[c.userId] : undefined };
   });
   return { changelogs, lastEvaluatedKey };
 };
+
+const usersOf = (changelogs: DDBMapFeatureChangelogTypes['Entity'][]) =>
+  getMultipleUserDetails(changelogs.flatMap((c) => (c.userId ? [c.userId] : [])));
 
 const prettifyChangelog = (changelog: DDBMapFeatureChangelogTypes['Entity']) => {
   const paths = changelog.updatedPaths
@@ -288,6 +291,7 @@ const prettifyChangelog = (changelog: DDBMapFeatureChangelogTypes['Entity']) => 
     countryName:
       countriesJson[changelog.country as keyof typeof countriesJson]?.name || changelog.country,
     actionType: changelog.action,
+    anonymous: !changelog.userId,
     updatedPathsString: pathsString,
   };
 };

@@ -16,6 +16,7 @@ ISA must be technically unable to know who activated a line anonymously. The rea
 
 - A real member stands behind each activation. For an anonymous one the blind-signed pass proves that without saying which member; it is an industry standard kept simple, and reassuring to users who read about it.
 - The anonymous activation routes never read the login, and their log lines carry nothing that could match them to the same browser's signed-in calls. Everything else keeps its logs as they are: analytics and debugging are not given up for this.
+- An anonymous activation is in the line's history and the activity feeds too, only as "the line was activated": no person, and its time only to the hour.
 - Ownership is a manage link, not an account. Sharing it is how someone moves to another device or hands the activation to their crew, one mechanism for both.
 - Reminders before expiry are a calendar event on the person's device and a banner on the card. ISA sends nothing.
 

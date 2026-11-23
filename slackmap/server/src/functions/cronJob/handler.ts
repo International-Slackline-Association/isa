@@ -20,9 +20,9 @@ const refreshStartedActivations = async () => {
   );
   for (const activation of started) {
     await refreshLineGeoJsonFiles({ lineIdToUpdate: activation.lineId });
-    const line = activation.activatedBy && (await db.getLineDetails(activation.lineId));
+    const line = await db.getLineDetails(activation.lineId);
     // Dated at the start, so a second run in the window rewrites the same entry.
-    if (line) await addActivatedChangelog(line, activation.activatedBy!, new Date(activation.from * 1000));
+    if (line) await addActivatedChangelog(line, activation.activatedBy, new Date(activation.from * 1000));
   }
   logger.info('Started activations refreshed', { count: started.length });
 };

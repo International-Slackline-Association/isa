@@ -65,7 +65,7 @@ export const activationStart = (requested: number | undefined, now: Date) => {
   if (requested > nowSeconds + maxActivationDays * day) {
     throw new Error(`Validation: from must be within ${maxActivationDays} days`);
   }
-  return requested;
+  return activatedAtHour(new Date(requested * 1000));
 };
 
 export const validateActivationEnd = (from: number, until: number, now: Date) => {
