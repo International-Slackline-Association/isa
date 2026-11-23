@@ -12,10 +12,10 @@ import type { MapRef } from 'react-map-gl/mapbox';
 import { Box } from '@mui/material';
 
 import { appActions } from 'app/slices/app';
+import { mapControlsSx } from 'styles/theme/panelTheme';
 
 import type { FeatureCollection } from 'geojson';
 
-import { MapLogo } from '../Components/Logo';
 import { MapTermsNote } from '../Components/TermsNote';
 import { MapImage } from '../Components/MapImage';
 import { MapDataLoadingIndicator } from '../Components/MapDataLoadingIndicator';
@@ -33,7 +33,6 @@ import { CountryLayerIds } from '../layers/countryLayers';
 import { SlacklineGroupsLayerIds } from '../layers/slacklineGroupsLayer';
 import { CommunityMapSourceIds, CommunityMapSources } from '../sources/commnunityMapSources';
 import { MapFeatureEntity } from '../types';
-import { CommunityMapLegend } from './Legend';
 
 interface Props {
   onSelectedFeatureChange?: (feature?: MapGeoJSONFeature) => void;
@@ -94,9 +93,14 @@ export const CommunityMap = (props: Props) => {
         position: 'relative',
         width: '100%',
         height: '100%',
+        ...mapControlsSx,
         '& .mapboxgl-ctrl-logo': {
           display: 'none',
         },
+        // On phones the panel's bar covers the bottom 56px.
+        '& .mapboxgl-ctrl-bottom-left': { marginBottom: { xs: '56px', lg: 0 } },
+        // and the add button sits above it.
+        '& .mapboxgl-ctrl-bottom-right': { marginBottom: { xs: '140px', lg: 0 } },
       }}
     >
       {!isMapLoaded && <MapLoadingPlaceholder pad={Boolean(props.activeCommunityFeature)} />}
@@ -105,9 +109,7 @@ export const CommunityMap = (props: Props) => {
         isMapLoaded={isMapLoaded}
         sourceId={CommunityMapSourceIds.slacklineGroups}
       />
-      <MapLogo />
       <MapTermsNote />
-      {isMapLoaded && <CommunityMapLegend />}
       <ReactMapGL
         {...defaultMapSettings}
         initialViewState={defaultMapViewState}
@@ -127,9 +129,9 @@ export const CommunityMap = (props: Props) => {
           dispatch(appActions.updateLastMapLocation({ longitude, latitude, zoom }));
         }}
       >
-        <GeolocateControl />
+        <GeolocateControl position="bottom-right" />
         <AttributionControl compact customAttribution="International Slackline Association" />
-        <NavigationControl />
+        <NavigationControl position="bottom-right" showCompass={false} />
         <MapImage name={'slackmap-country-symbol'} url={'/images/country-symbol.png'} />
         <CommunityMapSources
           filter={{

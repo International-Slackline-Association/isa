@@ -15,9 +15,7 @@ import { Box } from '@mui/material';
 import type { FeatureCollection } from 'geojson';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-import { MapLogo } from '../Components/Logo';
 import { MapTermsNote } from '../Components/TermsNote';
-import { MapActivityButton } from '../Components/MapActivityButton';
 import { MapImage } from '../Components/MapImage';
 import { MapDataLoadingIndicator } from '../Components/MapDataLoadingIndicator';
 import { MapLoadingPlaceholder } from '../Components/MapLoadingPlaceholder';
@@ -33,9 +31,9 @@ import { useZoomToUserLocationOnMapLoad } from '../hooks/useZoomToUserLocation';
 import { cursorInteractableLayerIds, isMouseHoverableLayer } from '../layers';
 import { SlacklineMapSourceIds, SlacklineMapSources } from '../sources/slacklineMapSources';
 import { MapFeatureEntity } from '../types';
-import { SlacklineMapLegend } from './Legend';
 import { GeocoderControl } from './geocoderControl';
 import { useMapOptions } from './useMapOptions';
+import { mapControlsSx } from 'styles/theme/panelTheme';
 
 interface Props {
   onMapMoveEnd?: (event: ViewStateChangeEvent) => void;
@@ -51,7 +49,8 @@ export const SlacklineMap = (props: Props) => {
   const [zoomLevel, setZoomLevel] = useState(props.initialViewState?.zoom);
 
   const {
-    MapOptionsComponent,
+    FilterChips,
+    MapStyleButton,
     selectedDisplayFeature,
     selectedLineType,
     selectedSpotType,
@@ -121,12 +120,13 @@ export const SlacklineMap = (props: Props) => {
         width: '100%',
         height: '100%',
         '& .mapboxgl-ctrl-top-left': {
-          'margin-left': { xs: '20%', lg: 0 },
-          'margin-right': { xs: '18%', lg: 'auto' },
+          right: { xs: 0, lg: 'auto' },
         },
         '& .mapboxgl-ctrl-geocoder': {
-          'margin-top': { xs: '20px', lg: '10px' },
-          'margin-left': { xs: '0', lg: '10px' },
+          marginTop: '10px',
+          marginLeft: '10px',
+          width: { xs: 'calc(100vw - 20px)', lg: '300px' },
+          maxWidth: 'none',
         },
         '& .mapboxgl-ctrl-geocoder--input': {
           height: { xs: 'unset', lg: '36px' },
@@ -137,9 +137,14 @@ export const SlacklineMap = (props: Props) => {
           top: { xs: '12px', lg: '12px' },
         },
 
+        ...mapControlsSx,
         '& .mapboxgl-ctrl-logo': {
           display: 'none',
         },
+        // On phones the panel's bar covers the bottom 56px.
+        '& .mapboxgl-ctrl-bottom-left': { marginBottom: { xs: '56px', lg: 0 } },
+        // and the add button sits above it.
+        '& .mapboxgl-ctrl-bottom-right': { marginBottom: { xs: '140px', lg: 0 } },
       }}
     >
       {!isMapLoaded && <MapLoadingPlaceholder pad={Boolean(props.activeSlacklineFeature)} />}
@@ -148,11 +153,9 @@ export const SlacklineMap = (props: Props) => {
         isMapLoaded={isMapLoaded}
         sourceId={SlacklineMapSourceIds.linePoints}
       />
-      <MapLogo />
       <MapTermsNote />
-      {isMapLoaded && !props.activeSlacklineFeature && <SlacklineMapLegend />}
-      <MapActivityButton isSelected={props.activeSlacklineFeature?.type === 'activity'} />
-      {MapOptionsComponent}
+      {FilterChips}
+      {MapStyleButton}
       <ReactMapGL
         {...defaultMapSettings}
         initialViewState={props.initialViewState || defaultMapViewState}
@@ -169,9 +172,9 @@ export const SlacklineMap = (props: Props) => {
         ref={mapRef}
         projection={projection}
       >
-        <GeolocateControl />
+        <GeolocateControl position="bottom-right" />
         <AttributionControl compact customAttribution="International Slackline Association" />
-        <NavigationControl />
+        <NavigationControl position="bottom-right" showCompass={false} />
         <GeocoderControl
           mapboxAccessToken={MAPBOX_TOKEN}
           position="top-left"

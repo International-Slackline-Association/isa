@@ -1,308 +1,203 @@
-import { ReactNode, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
-import ForestIcon from '@mui/icons-material/Forest';
-import GridViewIcon from '@mui/icons-material/GridView';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import CheckIcon from '@mui/icons-material/Check';
 import LayersRoundedIcon from '@mui/icons-material/LayersRounded';
-import PentagonIcon from '@mui/icons-material/Pentagon';
-import SatelliteAltIcon from '@mui/icons-material/SatelliteAlt';
-import SignpostIcon from '@mui/icons-material/Signpost';
-import SensorsIcon from '@mui/icons-material/Sensors';
-import {
-  Box,
-  Dialog,
-  Divider,
-  FormControl,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Box, Chip, IconButton, ListItemIcon, Menu, MenuItem, Stack, Tooltip } from '@mui/material';
 
 import { SlacklineType, SpotType } from '@server/core/types';
-import { SlacklineFeatureIcon } from 'app/components/Icons/SlacklineFeatureIcon';
+import { getSlacklineMapStats } from 'app/api/geojson-data';
+import { useSessionReady } from 'app/session';
+import { appColors } from 'styles/theme/colors';
+import { glass, panelSurface } from 'styles/theme/panelTheme';
 import { useAppLocalStorage } from 'utils/hooks/useAppLocalStorage';
 import { spotTypeOptions } from 'utils/spotTypes';
 
 export type SelectedDisplayFeature = SlacklineMapFeatureType | 'all' | 'active';
 export type SelectedMapStyle = 'default' | 'satellite' | 'outdoors' | 'streets';
 
-const features: {
-  key: SelectedDisplayFeature;
-  label: string;
-  icon: React.JSX.Element;
-}[] = [
-  {
-    key: 'all',
-    label: 'All',
-    icon: <GridViewIcon fontSize="inherit" />,
-  },
-  {
-    key: 'line',
-    label: 'Lines',
-    icon: <SlacklineFeatureIcon fontSize="inherit" />,
-  },
-  {
-    key: 'spot',
-    label: 'Spots',
-    icon: <PentagonIcon fontSize="inherit" />,
-  },
-  {
-    key: 'guide',
-    label: 'Access Guides',
-    icon: <FollowTheSignsIcon fontSize="inherit" />,
-  },
-  {
-    key: 'active',
-    label: 'Active now',
-    icon: <SensorsIcon fontSize="inherit" />,
-  },
+const lineTypeFilterItems: { key: SlacklineType; label: string }[] = [
+  { key: 'highline', label: 'Highline' },
+  { key: 'longline', label: 'Longline' },
+  { key: 'waterline', label: 'Waterline' },
+  { key: 'midline', label: 'Midline' },
+  { key: 'rodeoline', label: 'Rodeoline' },
+  { key: 'trickline', label: 'Trickline' },
+  { key: 'parkline', label: 'Parkline' },
 ];
 
-const lineTypeFilterItems: {
-  key: SlacklineType;
-  label: string;
-}[] = [
-  {
-    key: 'highline',
-    label: 'Highline',
-  },
-  {
-    key: 'longline',
-    label: 'Longline',
-  },
-  {
-    key: 'waterline',
-    label: 'Waterline',
-  },
-  {
-    key: 'midline',
-    label: 'Midline',
-  },
-  {
-    key: 'rodeoline',
-    label: 'Rodeoline',
-  },
-  {
-    key: 'trickline',
-    label: 'Trickline',
-  },
-  {
-    key: 'parkline',
-    label: 'Parkline',
-  },
+const mapStyleItems: { key: SelectedMapStyle; label: string }[] = [
+  { key: 'default', label: 'Default' },
+  { key: 'satellite', label: 'Satellite' },
+  { key: 'outdoors', label: 'Outdoors' },
+  { key: 'streets', label: 'Streets' },
 ];
 
+type Stats = Awaited<ReturnType<typeof getSlacklineMapStats>>;
+
+// The chips float on the map, so their hover and focus colors must stay opaque.
+const chipSx = (selected: boolean, extra: object = {}) => ({
+  bgcolor: selected ? '#fff' : glass.background,
+  color: selected ? panelSurface : glass.text,
+  backdropFilter: glass.blur,
+  border: 'none',
+  fontWeight: selected ? 600 : 500,
+  flexShrink: 0,
+  '&&:hover, &&.Mui-focusVisible': { bgcolor: selected ? '#e9edf1' : glass.hover },
+  '& .MuiChip-deleteIcon': { color: selected ? panelSurface : glass.muted },
+  ...extra,
+});
+
+// The chips are the legend and the filter at once: their colors are the map's colors.
 export const useMapOptions = () => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const sessionReady = useSessionReady();
   const [selectedDisplayFeature, setSelectedDisplayFeature] =
     useState<SelectedDisplayFeature>('all');
   const [selectedType, setSelectedType] = useState<SlacklineType | SpotType | 'none'>('none');
+  const [typeMenuAnchor, setTypeMenuAnchor] = useState<HTMLElement | null>(null);
+  const [styleMenuAnchor, setStyleMenuAnchor] = useState<HTMLElement | null>(null);
+  const [stats, setStats] = useState<Stats>();
+  const savedMapStyle = useAppLocalStorage('mapSettings.mapStyle', 'default');
+
+  useEffect(() => {
+    if (sessionReady) getSlacklineMapStats().then(setStats);
+  }, [sessionReady]);
 
   const typeFilter =
     selectedDisplayFeature === 'line' || selectedDisplayFeature === 'active'
-      ? { label: 'Slackline Type', items: lineTypeFilterItems }
+      ? { label: 'Line type', items: lineTypeFilterItems }
       : selectedDisplayFeature === 'spot'
-        ? {
-            label: 'Spot Type',
-            items: spotTypeOptions.map((o) => ({ key: o.value, label: o.label })),
-          }
+        ? { label: 'Spot type', items: spotTypeOptions.map((o) => ({ key: o.value, label: o.label })) }
         : undefined;
 
-  const savedMapStyle = useAppLocalStorage('mapSettings.mapStyle', 'default');
+  const count = (n?: number) => (n === undefined ? '' : ` ${n.toLocaleString()}`);
+  const displayChips: { key: SelectedDisplayFeature; label: string; color?: string; hidden?: boolean }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'line', label: `Lines${count(stats?.lineCount)}`, color: appColors.lineStrokeColor },
+    { key: 'spot', label: `Spots${count(stats?.spotCount)}`, color: appColors.spotFillColor },
+    { key: 'guide', label: `Access guides${count(stats?.guideCount)}`, color: appColors.guideFeaturesColor },
+    {
+      key: 'active',
+      label: `Active now${count(stats?.activeCount)}`,
+      color: appColors.activeColor,
+      hidden: !stats?.activeCount,
+    },
+  ];
 
-  const Item = (props: { text: string; children: ReactNode }) => {
-    return (
-      <Stack direction={'row'} spacing={4} sx={{ alignItems: 'center' }}>
-        <Typography variant={'body2'}>{props.text} </Typography>
-        <Stack direction={'row'} spacing={2} sx={{ alignItems: 'center' }}>
-          {props.children}
-        </Stack>
-      </Stack>
-    );
-  };
+  const selectedTypeLabel = typeFilter?.items.find((i) => i.key === selectedType)?.label;
 
-  const IconOption = (props: {
-    icon: ReactNode;
-    label: string;
-    checked?: boolean;
-    onClick: () => void;
-  }) => {
-    return (
-      <Stack spacing={1} sx={{ alignItems: 'center', p: 1,
-          borderRadius: '0.5rem',
-          border: (theme) =>
-            props.checked ? `2px solid ${theme.palette.primary.main}` : undefined,
-          color: (theme) => (props.checked ? theme.palette.primary.main : undefined),
-          '& svg': {
-            color: (theme) => (props.checked ? theme.palette.primary.main : undefined),
-          },
-          '&:hover': {
-            color: (theme) => theme.palette.primary.main,
-            '& svg': {
-              color: (theme) => theme.palette.primary.main,
-            },
-          } }}>
-        <IconButton
-          size="small"
-          onClick={props.onClick}
-          sx={{
-            p: 0,
-          }}
-        >
-          {props.icon}
-        </IconButton>
-        <Typography variant="body2" sx={{}}>
-          {props.label}
-        </Typography>
-      </Stack>
-    );
-  };
-
-  const MapOptionsComponent = (
-    <Box
+  const FilterChips = (
+    <Stack
+      direction="row"
+      spacing={0.75}
       sx={{
         position: 'absolute',
         zIndex: 3,
-        bottom: '2rem',
-        left: '2rem',
+        top: { xs: 64, lg: 60 },
+        left: 10,
+        right: { xs: 0, lg: 160 },
+        overflowX: 'auto',
+        pb: 0.5,
+        scrollbarWidth: 'none',
       }}
     >
-      <Dialog
-        open={isDialogOpen}
-        onClose={() => {
-          setIsDialogOpen(false);
-        }}
-        sx={{
-          '& .MuiDialog-paper': {
-            p: 2,
-          },
-        }}
-      >
-        <Stack spacing={2}>
-          <Stack spacing={1}>
-            <Typography variant={'body2Bold'}>Features</Typography>
-            <Divider />
-            <Item text={'Display'}>
-              {features.map((feature) => (
-                <IconOption
-                  key={feature.key}
-                  icon={feature.icon}
-                  label={feature.label}
-                  checked={selectedDisplayFeature === feature.key}
-                  onClick={() => {
-                    setSelectedDisplayFeature(feature.key);
-                    setSelectedType('none');
-                  }}
-                />
-              ))}
-            </Item>
-            <Divider />
-            <Item text={'Filter'}>
-              <FormControl size="small" sx={{ m: 1, minWidth: '15ch' }} disabled={!typeFilter}>
-                <InputLabel id="feature-type">{typeFilter?.label ?? 'Type'}</InputLabel>
-                <Select
-                  labelId="feature-type"
-                  value={selectedType}
-                  autoWidth
-                  label={typeFilter?.label ?? 'Type'}
-                  onChange={(event) => {
-                    setSelectedType(event.target.value as SlacklineType | SpotType | 'none');
-                  }}
-                >
-                  <MenuItem value="none">None</MenuItem>
-                  {typeFilter?.items.map((item) => (
-                    <MenuItem key={item.key} value={item.key}>
-                      {item.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Item>
-          </Stack>
-          <Stack spacing={1}>
-            <Typography variant={'body2Bold'}>
-              Map{' '}
-              <Typography variant={'caption'} component={'span'}>
-                (Settings are saved in your browser)
-              </Typography>
-            </Typography>
-
-            <Divider />
-            <Item text={'Style'}>
-              <IconOption
-                icon={<CheckBoxIcon />}
-                label={'Default'}
-                checked={savedMapStyle.value === 'default'}
-                onClick={() => {
-                  savedMapStyle.set('default');
-                }}
-              />
-              <IconOption
-                icon={<SatelliteAltIcon />}
-                label={'Satellite'}
-                checked={savedMapStyle.value === 'satellite'}
-                onClick={() => {
-                  savedMapStyle.set('satellite');
-                }}
-              />
-              <IconOption
-                icon={<ForestIcon />}
-                label={'Outdoors'}
-                checked={savedMapStyle.value === 'outdoors'}
-                onClick={() => {
-                  savedMapStyle.set('outdoors');
-                }}
-              />
-              <IconOption
-                icon={<SignpostIcon />}
-                label={'Streets'}
-                checked={savedMapStyle.value === 'streets'}
-                onClick={() => {
-                  savedMapStyle.set('streets');
-                }}
-              />
-            </Item>
-          </Stack>
-        </Stack>
-      </Dialog>
-
-      <IconButton
-        onClick={() => {
-          setIsDialogOpen(true);
-        }}
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          fontSize: '2.2rem',
-          borderRadius: '50%',
-          width: '100',
-          height: '100%',
-          backgroundColor: (theme) => theme.palette.primary.main,
-          '&:hover': {
-            backgroundColor: (theme) => theme.palette.primary.main,
-            borderStyle: 'solid',
-            borderWidth: '2px',
-            borderColor: (theme) => theme.palette.primary.contrastText,
-          },
-        }}
-      >
-        <LayersRoundedIcon
-          fontSize={'inherit'}
-          sx={{
-            color: (theme) => theme.palette.primary.contrastText,
-          }}
+      {displayChips
+        .filter((c) => !c.hidden)
+        .map((c) => {
+          const selected = selectedDisplayFeature === c.key;
+          return (
+            <Chip
+              key={c.key}
+              label={c.label}
+              size="small"
+              icon={
+                c.color ? (
+                  <Box component="span" sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: c.color }} />
+                ) : undefined
+              }
+              onClick={() => {
+                setSelectedDisplayFeature(c.key);
+                setSelectedType('none');
+              }}
+              sx={chipSx(selected, { '& .MuiChip-icon': { ml: 1 } })}
+            />
+          );
+        })}
+      {typeFilter && (
+        <Chip
+          label={selectedTypeLabel ?? typeFilter.label}
+          size="small"
+          deleteIcon={<ArrowDropDownIcon />}
+          onDelete={(e) => setTypeMenuAnchor(e.currentTarget.parentElement)}
+          onClick={(e) => setTypeMenuAnchor(e.currentTarget)}
+          sx={chipSx(Boolean(selectedTypeLabel))}
         />
-      </IconButton>
-    </Box>
+      )}
+      <Menu anchorEl={typeMenuAnchor} open={Boolean(typeMenuAnchor)} onClose={() => setTypeMenuAnchor(null)}>
+        <MenuItem
+          onClick={() => {
+            setSelectedType('none');
+            setTypeMenuAnchor(null);
+          }}
+        >
+          All types
+        </MenuItem>
+        {typeFilter?.items.map((item) => (
+          <MenuItem
+            key={item.key}
+            selected={item.key === selectedType}
+            onClick={() => {
+              setSelectedType(item.key as SlacklineType | SpotType);
+              setTypeMenuAnchor(null);
+            }}
+          >
+            {item.label}
+          </MenuItem>
+        ))}
+      </Menu>
+    </Stack>
+  );
+
+  const MapStyleButton = (
+    <>
+      <Tooltip title="Map style" placement="left">
+        <IconButton
+          onClick={(e) => setStyleMenuAnchor(e.currentTarget)}
+          sx={{
+            position: 'absolute',
+            zIndex: 3,
+            top: { xs: 104, lg: 64 },
+            right: { xs: 10, lg: 16 },
+            bgcolor: glass.background,
+            backdropFilter: glass.blur,
+            color: glass.text,
+            borderRadius: '10px',
+            '&:hover': { bgcolor: glass.hover },
+          }}
+        >
+          <LayersRoundedIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Menu anchorEl={styleMenuAnchor} open={Boolean(styleMenuAnchor)} onClose={() => setStyleMenuAnchor(null)}>
+        {mapStyleItems.map((item) => (
+          <MenuItem
+            key={item.key}
+            onClick={() => {
+              savedMapStyle.set(item.key);
+              setStyleMenuAnchor(null);
+            }}
+          >
+            <ListItemIcon>{savedMapStyle.value === item.key && <CheckIcon fontSize="small" />}</ListItemIcon>
+            {item.label}
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
   );
 
   return {
-    MapOptionsComponent,
+    FilterChips,
+    MapStyleButton,
     selectedDisplayFeature,
     selectedLineType:
       (selectedDisplayFeature === 'line' || selectedDisplayFeature === 'active') && selectedType !== 'none'
@@ -312,6 +207,6 @@ export const useMapOptions = () => {
       selectedDisplayFeature === 'spot' && selectedType !== 'none'
         ? (selectedType as SpotType)
         : undefined,
-    selectedMapStyle: savedMapStyle.value,
+    selectedMapStyle: savedMapStyle.value as SelectedMapStyle,
   };
 };

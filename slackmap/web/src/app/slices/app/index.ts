@@ -26,6 +26,12 @@ const appSlice = createSlice({
     ) {
       state.lastMapLocation = action.payload;
     },
+    updateHighlightedFeature(
+      state,
+      action: PayloadAction<{ id: string; type: SlacklineMapFeatureType } | undefined>,
+    ) {
+      state.highlightedFeature = action.payload;
+    },
     updateSnackbarNotification(state, action: PayloadAction<SnackbarNotification | 'error'>) {
       let notification: SnackbarNotification;
       if (action.payload === 'error') {

@@ -23,3 +23,8 @@ export const selectSnackbarNotification = createSelector(
   [selectSlice],
   (state) => state.snackbarNotification,
 );
+
+export const selectHighlightedFeature = createSelector(
+  [selectSlice],
+  (state) => state.highlightedFeature,
+);

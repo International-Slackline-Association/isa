@@ -91,6 +91,21 @@ export const getSlacklinePointFeaturesOfCountry = async (code: string) => {
   return cache.slacklinePointFeaturesOfCountry[code];
 };
 
+// Lines whose 'au' (active until, epoch seconds) is still ahead.
+export const getActiveLinePoints = async () => {
+  const allPointsGeoJson = await getAllSlacklinePointsGeoJson();
+  const nowSeconds = Date.now() / 1000;
+  return allPointsGeoJson.features
+    .filter((f) => f.properties?.ft === 'l' && f.properties?.au > nowSeconds)
+    .map((f) => ({
+      id: f.properties!.id as string,
+      activeUntil: f.properties!.au as number,
+      length: f.properties!.l as string | undefined,
+      country: f.properties!.c as string | undefined,
+    }))
+    .sort((a, b) => a.activeUntil - b.activeUntil);
+};
+
 export const getSlacklineMapStats = async () => {
   const allPointsGeoJson = await getAllSlacklinePointsGeoJson();
   const featureStats = getSlacklineFeatureStats(allPointsGeoJson);

@@ -14,6 +14,8 @@ export interface AppState {
     longitude: number;
     zoom: number;
   };
+  // A feature the side panel points at (a hovered row); the map rings it.
+  highlightedFeature?: { id: string; type: SlacklineMapFeatureType };
 }
 export type SnackbarNotification = {
   message: string;
