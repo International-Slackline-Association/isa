@@ -12,7 +12,7 @@ const orange = '#FF8A00';
 export const appColors = {
   slacklinePoint: slackmapGreen,
   lineStrokeColor: red,
-  riggedColor: orange,
+  activeColor: orange,
   guideFeaturesColor: muiColors.orange[400],
   spotFillColor: slackmapGreen,
   mainClusterColor: isaBlue,

@@ -14,6 +14,7 @@ import {
 } from '../../../../core/features/mapFeature/editors';
 import { updateFeatureImagesInS3 } from '../../../../core/features/mapFeature/imageUpload';
 import { assignFromSourceToTarget } from '../../../../core/utils';
+import { getUserDetails } from '../../../../core/features/isaUser';
 import { logger } from '../../../../core/logger';
 import { FeatureCollection } from 'geojson';
 import { nanoid } from 'nanoid';
@@ -31,10 +32,15 @@ export const getLineDetails = async (req: Request) => {
   if (!line) {
     throw new Error(`NotFound: Line ${req.params.id} not found`);
   }
-  const [editPermission, rig] = await Promise.all([
+  const [editPermission, activation] = await Promise.all([
     validateMapFeatureEditor(line.lineId, 'line', req.user?.isaId),
-    db.getLineRig(line.lineId),
+    db.getLineActivation(line.lineId),
   ]);
+
+  const activatedBy =
+    activation?.activatedBy && activation.until > Date.now() / 1000
+      ? (await getUserDetails(activation.activatedBy))?.fullname
+      : undefined;
 
   return getLineDetailsResponse(
     line,
@@ -42,7 +48,8 @@ export const getLineDetails = async (req: Request) => {
       canDelete: canDeleteFeature(editPermission),
       canEdit: Boolean(editPermission),
     },
-    rig,
+    activation,
+    activatedBy,
   );
 };
 

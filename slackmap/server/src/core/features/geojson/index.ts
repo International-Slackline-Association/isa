@@ -22,7 +22,7 @@ export const processLineGeoJson = (
     length?: number;
     country: string;
     // Only for the map files; the line item's stored geoJson never carries it.
-    rig?: { until: number; reportedAt: number };
+    activation?: { until: number; activatedAt: number };
   },
 ): FeatureCollection => {
   const features: Feature[] = [];
@@ -39,12 +39,12 @@ export const processLineGeoJson = (
     if (meta.country) {
       f.properties['c'] = meta.country;
     }
-    if (meta.rig) {
-      f.properties['ru'] = meta.rig.until;
-      f.properties['ra'] = meta.rig.reportedAt;
+    if (meta.activation) {
+      f.properties['au'] = meta.activation.until;
+      f.properties['aa'] = meta.activation.activatedAt;
     } else {
-      delete f.properties['ru'];
-      delete f.properties['ra'];
+      delete f.properties['au'];
+      delete f.properties['aa'];
     }
     features.push(f);
   }
@@ -170,9 +170,9 @@ export const refreshLineGeoJsonFiles = async (
   let updatedLines: Awaited<ReturnType<typeof db.getAllLines>> | undefined;
 
   if (opts.lineIdToUpdate) {
-    const [line, rig] = await Promise.all([
+    const [line, activation] = await Promise.all([
       db.getLineDetails(opts.lineIdToUpdate),
-      db.getLineRig(opts.lineIdToUpdate),
+      db.getLineActivation(opts.lineIdToUpdate),
     ]);
     mainGeoJSON = await getFromS3('geojson/lines/all.geojson');
     mainGeoJSON.features = mainGeoJSON.features.filter(
@@ -184,7 +184,7 @@ export const refreshLineGeoJsonFiles = async (
         type: line.type,
         length: line.length,
         country: line.country,
-        rig: rig ?? undefined,
+        activation: activation ?? undefined,
       });
       mainGeoJSON.features.push(...geoJson.features);
       updatedLines = [line];
@@ -195,7 +195,7 @@ export const refreshLineGeoJsonFiles = async (
       features: [],
     };
     updatedLines = await db.getAllLines();
-    const rigs = new Map((await db.getAllLineRigs()).map((rig) => [rig.lineId, rig]));
+    const activations = new Map((await db.getAllLineActivations()).map((a) => [a.lineId, a]));
     for (const line of updatedLines) {
       if (line) {
         const geoJson = processLineGeoJson(JSON.parse(line.geoJson), {
@@ -203,7 +203,7 @@ export const refreshLineGeoJsonFiles = async (
           type: line.type,
           length: line.length,
           country: line.country,
-          rig: rigs.get(line.lineId),
+          activation: activations.get(line.lineId),
         });
         for (const feature of geoJson.features) {
           mainGeoJSON.features.push(feature);

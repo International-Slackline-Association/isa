@@ -4,7 +4,7 @@ import type { DynamoDBRecord, DynamoDBStreamEvent } from 'aws-lambda';
 import { groupDetailsDB } from '../../core/db/entities/group/details';
 import { guideDetailsDB } from '../../core/db/entities/guide/details';
 import { lineDetailsDB } from '../../core/db/entities/line/details';
-import { isLineRigItem, lineRigFromItem } from '../../core/db/entities/line/rig';
+import { isLineActivationItem, lineActivationFromItem } from '../../core/db/entities/line/activation';
 import { refreshLineGeoJsonFiles } from '../../core/features/geojson';
 import { mapFeatureChangelogDB } from '../../core/db/entities/mapFeature/changelog';
 import { spotDetailsDB } from '../../core/db/entities/spot/details';
@@ -46,10 +46,10 @@ const processRecord = async (record: DynamoDBRecord) => {
     await processLineDetailsOperation(newItem, oldItem, eventName);
     console.log('Processed line details operation:', { keys, eventName });
   }
-  if (isLineRigItem(keys)) {
-    const { lineId } = lineRigFromItem(keys);
+  if (isLineActivationItem(keys)) {
+    const { lineId } = lineActivationFromItem(keys);
     await refreshLineGeoJsonFiles({ lineIdToUpdate: lineId });
-    logger.info('Line rig changed', { lineId, eventName });
+    logger.info('Line activation changed', { lineId, eventName });
   }
   if (spotDetailsDB.converter.isItemMatching(keys)) {
     await processSpotDetailsOperation(newItem, oldItem, eventName);

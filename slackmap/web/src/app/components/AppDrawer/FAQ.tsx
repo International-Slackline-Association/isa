@@ -98,7 +98,7 @@ const sections: { title: string; items: { q: string; a: React.ReactNode }[] }[] 
         ),
       },
       {
-        q: 'How is reporting a line rigged anonymous?',
+        q: 'How does activating a line anonymously work?',
         a: (
           <>
             While you are signed in, your browser gets a few anonymous passes from SlackMap. They are
@@ -107,9 +107,10 @@ const sections: { title: string; items: { q: string; a: React.ReactNode }[] }[] 
               RFC 9474
             </Link>
             ): we sign them without seeing them, so we can later tell a pass is real but not whose it
-            was. A report carries one pass and never your account, so we learn only that a member sent
-            it. It gives you a manage link instead of tying the rig to you: whoever has the link can
-            extend it or take it down. The code is open source, so anyone can check this.
+            was. An anonymous activation carries one pass and never your account, so we learn only that a
+            member sent it. It gives you a manage link instead of tying the activation to you: whoever has
+            the link can extend or deactivate it. You can also activate with your name instead. The code is
+            open source, so anyone can check this.
           </>
         ),
       },

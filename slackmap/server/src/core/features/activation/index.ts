@@ -26,7 +26,7 @@ const loadKeys = () =>
   }));
 
 export const passesPerMonth = 5;
-export const maxRigDays = 14;
+export const maxActivationDays = 14;
 
 export const signBlindedPass = async (blindedPass: Uint8Array) =>
   suite.blindSign((await loadKeys()).privateKey, blindedPass);
@@ -44,13 +44,13 @@ export const currentMonth = (now: Date) => now.toISOString().slice(0, 7);
 export const passCountExpiry = (now: Date) =>
   Math.floor(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1) / 1000);
 
-// Public, so it is kept to the hour: a report's exact time could be matched to other timed records.
-export const reportedAtHour = (now: Date) => Math.floor(now.getTime() / 3_600_000) * 3600;
+// Public, so it is kept to the hour: an activation's exact time could be matched to other timed records.
+export const activatedAtHour = (now: Date) => Math.floor(now.getTime() / 3_600_000) * 3600;
 
-export const validateRigUntil = (until: number, now: Date) => {
+export const validateActivationUntil = (until: number, now: Date) => {
   const nowSeconds = now.getTime() / 1000;
   if (!(until > nowSeconds)) throw new Error('Validation: until must be in the future');
-  if (until > nowSeconds + maxRigDays * 24 * 3600) {
-    throw new Error(`Validation: until must be within ${maxRigDays} days`);
+  if (until > nowSeconds + maxActivationDays * 24 * 3600) {
+    throw new Error(`Validation: until must be within ${maxActivationDays} days`);
   }
 };

@@ -3,38 +3,51 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import EventIcon from '@mui/icons-material/Event';
 import LockIcon from '@mui/icons-material/Lock';
+import PersonIcon from '@mui/icons-material/Person';
 import SensorsIcon from '@mui/icons-material/Sensors';
 import ShareIcon from '@mui/icons-material/Share';
-import { Alert, Box, Button, Chip, Stack, TextField, Typography } from '@mui/material';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Alert, Box, Button, ButtonBase, Chip, Stack, TextField, Typography } from '@mui/material';
 
 import { useSignInDialog } from 'app/components/Dialogs/useSignInDialog';
 import { selectIsUserSignedIn } from 'app/slices/app/selectors';
 import { appColors } from 'styles/theme/colors';
 import { showErrorNotification, showInfoNotification, showSuccessNotification } from 'utils';
 
-import { NoPassError, consumeManageLinkFromUrl, endRig, extendRig, manageCodeFor, manageLinkOf, reportRig } from './rigApi';
+import {
+  NoPassError,
+  activateAnonymously,
+  activateWithName,
+  consumeManageLinkFromUrl,
+  deactivate,
+  extendActivation,
+  manageCodeFor,
+  manageLinkOf,
+} from './activationApi';
 import {
   calendarFile,
   dateInputBounds,
   expiresWithinADay,
-  formatReportedAgo,
+  formatActivatedAgo,
   formatUntil,
   untilFromDateInput,
   untilPresets,
-} from './rigTimes';
+} from './activationTimes';
 
-const rigColor = appColors.riggedColor;
-const explainerSeenKey = 'app.rigExplainerSeen';
+const activeColor = appColors.activeColor;
+const explainerSeenKey = 'app.activationExplainerSeen';
 
 interface Props {
   lineId: string;
   lineName: string;
-  rig?: { until: number; reportedAt: number };
+  activation?: { until: number; activatedAt: number; activatedBy?: string };
   onChanged: () => void;
 }
 
+type Mode = 'anonymous' | 'named';
+
 // Everything happens inside the card, so it stays within the detail panel on desktop.
-type Step = 'explainer' | 'activate' | 'extend' | 'confirmEnd' | 'done';
+type Step = 'explainer' | 'activate' | 'extend' | 'confirmDeactivate' | 'done';
 
 const Panel = (props: { live?: boolean; children: React.ReactNode }) => (
   <Box
@@ -50,19 +63,72 @@ const Panel = (props: { live?: boolean; children: React.ReactNode }) => (
   </Box>
 );
 
+const ModeOption = (props: {
+  selected: boolean;
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+  onClick: () => void;
+}) => (
+  <ButtonBase
+    onClick={props.onClick}
+    sx={{
+      flex: 1,
+      p: 1,
+      borderRadius: 1.5,
+      border: '2px solid',
+      borderColor: props.selected ? 'primary.main' : 'divider',
+      bgcolor: 'background.paper',
+      textAlign: 'left',
+      justifyContent: 'flex-start',
+      alignItems: 'flex-start',
+    }}
+  >
+    <Stack spacing={0.5}>
+      <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', color: props.selected ? 'primary.main' : 'text.primary' }}>
+        {props.icon}
+        <Typography variant="body2Bold">{props.title}</Typography>
+      </Stack>
+      <Typography variant="caption" color="text.secondary">
+        {props.text}
+      </Typography>
+    </Stack>
+  </ButtonBase>
+);
+
 const UntilPicker = (props: {
   title: string;
-  confirmText: string;
   after?: number;
+  withMode?: boolean;
+  confirmText: (mode: Mode) => string;
   onCancel: () => void;
-  onConfirm: (until: number) => Promise<void>;
+  onConfirm: (until: number, mode: Mode) => Promise<void>;
 }) => {
   const presets = untilPresets().filter((p) => !props.after || p.until > props.after);
   const [until, setUntil] = useState(presets[0]?.until ?? 0);
+  const [mode, setMode] = useState<Mode>('anonymous');
   const [busy, setBusy] = useState(false);
 
   return (
     <>
+      {props.withMode && (
+        <Stack direction="row" spacing={1}>
+          <ModeOption
+            selected={mode === 'anonymous'}
+            icon={<VisibilityOffIcon fontSize="small" />}
+            title="Anonymous"
+            text="SlackMap cannot know it was you."
+            onClick={() => setMode('anonymous')}
+          />
+          <ModeOption
+            selected={mode === 'named'}
+            icon={<PersonIcon fontSize="small" />}
+            title="With my name"
+            text="Your name shows on this line while it is active."
+            onClick={() => setMode('named')}
+          />
+        </Stack>
+      )}
       <Typography variant="body2Bold">{props.title}</Typography>
       <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
         {presets.map((p) => (
@@ -94,17 +160,17 @@ const UntilPicker = (props: {
           disabled={busy || !until}
           onClick={async () => {
             setBusy(true);
-            await props.onConfirm(until).finally(() => setBusy(false));
+            await props.onConfirm(until, mode).finally(() => setBusy(false));
           }}
         >
-          {props.confirmText}
+          {props.confirmText(mode)}
         </Button>
       </Stack>
     </>
   );
 };
 
-export const RigField = (props: Props) => {
+export const ActivationField = (props: Props) => {
   const dispatch = useDispatch();
   const isSignedIn = useSelector(selectIsUserSignedIn);
   const { SignInDialog, showSignInDialog } = useSignInDialog();
@@ -115,12 +181,12 @@ export const RigField = (props: Props) => {
 
   useEffect(() => {
     consumeManageLinkFromUrl(props.lineId);
-    setCode(manageCodeFor(props.lineId, props.rig));
-  }, [props.lineId, props.rig?.reportedAt]);
+    setCode(manageCodeFor(props.lineId, props.activation));
+  }, [props.lineId, props.activation?.activatedAt]);
 
   useEffect(() => setStep(undefined), [props.lineId]);
 
-  const rig = props.rig;
+  const activation = props.activation;
   const manageLink = code ? manageLinkOf(props.lineId, code) : undefined;
 
   const onActivateClicked = () => {
@@ -136,7 +202,7 @@ export const RigField = (props: Props) => {
     if (error instanceof NoPassError) {
       dispatch(
         showErrorNotification(
-          'No pass to activate with yet. Passes arrive in the background while you are signed in; if you used this month’s, they come back next month.',
+          'No pass to activate anonymously yet. Passes arrive in the background while you are signed in; if you used this month’s, they come back next month.',
         ),
       );
     } else {
@@ -144,9 +210,12 @@ export const RigField = (props: Props) => {
     }
   };
 
-  const onActivate = async (until: number) => {
+  const onActivate = async (until: number, mode: Mode) => {
     try {
-      const result = await reportRig(props.lineId, until);
+      const result =
+        mode === 'named'
+          ? await activateWithName(props.lineId, until)
+          : await activateAnonymously(props.lineId, until);
       setCode(manageCodeFor(props.lineId, result));
       setDoneUntil(result.until);
       // The card reloads on onChanged and would drop this step, so it reloads when the step is closed.
@@ -159,7 +228,7 @@ export const RigField = (props: Props) => {
   const onExtend = async (until: number) => {
     if (!code) return;
     try {
-      await extendRig(props.lineId, code, until);
+      await extendActivation(props.lineId, code, until);
       setStep(undefined);
       dispatch(showSuccessNotification(`Extended until ${formatUntil(until)}`));
       props.onChanged();
@@ -168,13 +237,13 @@ export const RigField = (props: Props) => {
     }
   };
 
-  const onTakeDown = async () => {
+  const onDeactivate = async () => {
     if (!code) return;
     try {
-      await endRig(props.lineId, code);
+      await deactivate(props.lineId, code);
       setCode(undefined);
       setStep(undefined);
-      dispatch(showSuccessNotification('Marked as taken down'));
+      dispatch(showSuccessNotification('Deactivated'));
       props.onChanged();
     } catch (error) {
       fail(error);
@@ -183,7 +252,7 @@ export const RigField = (props: Props) => {
 
   const onShare = async () => {
     if (!manageLink) return;
-    const text = `Manage the rig of ${props.lineName} on SlackMap`;
+    const text = `Manage the activation of ${props.lineName} on SlackMap`;
     try {
       if (navigator.share) {
         await navigator.share({ title: 'SlackMap manage link', text, url: manageLink });
@@ -199,7 +268,7 @@ export const RigField = (props: Props) => {
     const url = URL.createObjectURL(calendarFile(props.lineName, until, manageLink));
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'slackmap-rig-reminder.ics';
+    a.download = 'slackmap-activation-reminder.ics';
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -207,17 +276,17 @@ export const RigField = (props: Props) => {
   if (step === 'explainer') {
     return (
       <Panel>
-        <Typography variant="body2Bold">Activating is anonymous</Typography>
+        <Typography variant="body2Bold">Activating a line</Typography>
         <Box component="ul" sx={{ pl: 2, m: 0, '& li': { mb: 0.5 } }}>
           <Typography component="li" variant="body2">
-            <b>SlackMap cannot know it was you.</b> The report reaches us without your account.
+            You choose: <b>anonymous</b>, or <b>with your name</b>.
           </Typography>
           <Typography component="li" variant="body2">
-            We only learn that <i>a</i> SlackMap member sent it, through an anonymous pass your browser got in
-            advance.
+            <b>Anonymous: SlackMap cannot know it was you.</b> The activation reaches us without your account; we
+            only learn that <i>a</i> SlackMap member sent it, through an anonymous pass your browser got in advance.
           </Typography>
           <Typography component="li" variant="body2">
-            You get a <b>manage link</b>. Whoever has it can extend or take down this rig: keep it, or share it with
+            Either way you get a <b>manage link</b>. Whoever has it can extend or deactivate: keep it, or share it with
             your other devices or your crew.
           </Typography>
           <Typography component="li" variant="body2">
@@ -245,12 +314,13 @@ export const RigField = (props: Props) => {
     );
   }
 
-  if (step === 'activate' && !rig) {
+  if (step === 'activate' && !activation) {
     return (
       <Panel>
         <UntilPicker
-          title="Rigged until"
-          confirmText="Activate"
+          withMode
+          title="Active until"
+          confirmText={(mode) => (mode === 'named' ? 'Activate with my name' : 'Activate')}
           onCancel={() => setStep(undefined)}
           onConfirm={onActivate}
         />
@@ -262,9 +332,7 @@ export const RigField = (props: Props) => {
     return (
       <Panel live>
         <Typography variant="body2Bold">✓ Active until {formatUntil(doneUntil)}</Typography>
-        <Typography variant="body2">
-          It shows on the map within a minute. Others see when it was reported, never who.
-        </Typography>
+        <Typography variant="body2">It shows on the map within a minute.</Typography>
         <Button variant="contained" startIcon={<EventIcon />} onClick={() => onCalendar(doneUntil)}>
           Add reminder to calendar
         </Button>
@@ -274,7 +342,7 @@ export const RigField = (props: Props) => {
         <Stack direction="row" spacing={1} sx={{ color: 'text.secondary' }}>
           <LockIcon fontSize="small" />
           <Typography variant="caption">
-            The manage link is saved in this browser. Whoever has it can extend or take down this rig.
+            The manage link is saved in this browser. Whoever has it can extend or deactivate.
           </Typography>
         </Stack>
         <Button
@@ -289,7 +357,7 @@ export const RigField = (props: Props) => {
     );
   }
 
-  if (!rig) {
+  if (!activation) {
     return (
       <>
         <SignInDialog />
@@ -304,49 +372,57 @@ export const RigField = (props: Props) => {
     <Panel live>
       <Box>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <Chip label="RIGGED" size="small" sx={{ bgcolor: rigColor, color: '#fff', fontWeight: 800 }} />
-          <Typography variant="body2Bold">until {formatUntil(rig.until)}</Typography>
+          <Chip label="ACTIVE" size="small" sx={{ bgcolor: activeColor, color: '#fff', fontWeight: 800 }} />
+          <Typography variant="body2Bold">until {formatUntil(activation.until)}</Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-          Reported {formatReportedAgo(rig.reportedAt)}
+          Activated {formatActivatedAgo(activation.activatedAt)}
+          {activation.activatedBy ? ` by ${activation.activatedBy}` : ''}
           {code ? ' · you have the manage link' : ''}
         </Typography>
       </Box>
       {code && step === 'extend' && (
         <UntilPicker
           title="Extend until"
-          confirmText="Extend"
-          after={rig.until}
+          confirmText={() => 'Extend'}
+          after={activation.until}
           onCancel={() => setStep(undefined)}
           onConfirm={onExtend}
         />
       )}
-      {code && step === 'confirmEnd' && (
+      {code && step === 'confirmDeactivate' && (
         <>
-          <Typography variant="body2">Mark as taken down? It disappears from the map and the manage link stops working.</Typography>
+          <Typography variant="body2">
+            Deactivate? It disappears from the map and the manage link stops working.
+          </Typography>
           <Stack direction="row" spacing={1}>
             <Button fullWidth variant="outlined" onClick={() => setStep(undefined)}>
               Cancel
             </Button>
-            <Button fullWidth variant="contained" sx={{ bgcolor: rigColor }} onClick={onTakeDown}>
-              Taken down
+            <Button fullWidth variant="contained" sx={{ bgcolor: activeColor }} onClick={onDeactivate}>
+              Deactivate
             </Button>
           </Stack>
         </>
       )}
       {code && !step && (
         <>
-          {expiresWithinADay(rig.until) && (
+          {expiresWithinADay(activation.until) && (
             <Alert severity="warning">
-              Expires {formatUntil(rig.until)} and disappears from the map. Still up?
+              Ends {formatUntil(activation.until)} and disappears from the map. Still up?
             </Alert>
           )}
           <Stack direction="row" spacing={1}>
             <Button fullWidth variant="outlined" onClick={() => setStep('extend')}>
               Extend
             </Button>
-            <Button fullWidth variant="contained" sx={{ bgcolor: rigColor }} onClick={() => setStep('confirmEnd')}>
-              Taken down
+            <Button
+              fullWidth
+              variant="contained"
+              sx={{ bgcolor: activeColor }}
+              onClick={() => setStep('confirmDeactivate')}
+            >
+              Deactivate
             </Button>
           </Stack>
           <Button size="small" startIcon={<ShareIcon />} sx={{ alignSelf: 'flex-start' }} onClick={onShare}>

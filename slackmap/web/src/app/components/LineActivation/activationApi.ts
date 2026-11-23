@@ -1,11 +1,12 @@
 import { apiBaseUrl } from 'app/api/constants';
 import { ensureSession } from 'app/session';
+import { fetchAuthSession } from 'aws-amplify/auth';
 
 import { Pass, returnPass, takePass, toBase64Url } from './passes';
 
-// The rig's reportedAt is kept with the code, so a code from an earlier rig on the same line is recognized as dead.
-type StoredLink = { code: string; reportedAt?: number };
-const linksKey = 'app.rigManageLinks';
+// The activation's activatedAt is kept with the code, so a code from an earlier activation on the same line is recognized as dead.
+type StoredLink = { code: string; activatedAt?: number };
+const linksKey = 'app.activationManageLinks';
 
 const readLinks = (): Record<string, StoredLink> => {
   try {
@@ -25,15 +26,15 @@ const forgetManageCode = (lineId: string) => {
   writeLinks(rest);
 };
 
-export const manageCodeFor = (lineId: string, rig?: { reportedAt: number }) => {
+export const manageCodeFor = (lineId: string, activation?: { activatedAt: number }) => {
   const link = readLinks()[lineId];
   if (!link) return undefined;
-  if (!rig || (link.reportedAt !== undefined && link.reportedAt !== rig.reportedAt)) {
+  if (!activation || (link.activatedAt !== undefined && link.activatedAt !== activation.activatedAt)) {
     forgetManageCode(lineId);
     return undefined;
   }
-  // A shared link is bound to the rig it was opened on.
-  if (link.reportedAt === undefined) storeLink(lineId, { ...link, reportedAt: rig.reportedAt });
+  // A shared link is bound to the activation it was opened on.
+  if (link.activatedAt === undefined) storeLink(lineId, { ...link, activatedAt: activation.activatedAt });
   return link.code;
 };
 
@@ -53,13 +54,15 @@ const sha256Hex = async (text: string) =>
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 
-// No Authorization header: these calls must not carry who is signed in.
-const call = async (method: string, lineId: string, body: unknown) => {
+// Only the named activation sends the login; every other call must not carry who is signed in.
+const call = async (method: string, lineId: string, body: unknown, opts: { named?: boolean } = {}) => {
+  const token = opts.named ? await fetchAuthSession().then((s) => s.tokens?.idToken?.toString()) : undefined;
+  if (opts.named && !token) throw new Error('Sign in to activate with your name');
   const send = () =>
-    fetch(`${apiBaseUrl}/line/${encodeURIComponent(lineId)}/rig`, {
+    fetch(`${apiBaseUrl}/line/${encodeURIComponent(lineId)}/activation${opts.named ? '/named' : ''}`, {
       method,
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify(body),
     });
   await ensureSession();
@@ -75,29 +78,39 @@ const call = async (method: string, lineId: string, body: unknown) => {
 
 export class NoPassError extends Error {}
 
-// Only a pass fetched earlier: fetching one around a report would make the two one moment.
-export const reportRig = async (lineId: string, until: number) => {
+// Only a pass fetched earlier: fetching one around an activation would make the two one moment.
+export const activateAnonymously = async (lineId: string, until: number) => {
   const pass: Pass | undefined = takePass();
   if (!pass) throw new NoPassError();
   const code = toBase64Url(crypto.getRandomValues(new Uint8Array(16)));
   try {
     const result = (await call('POST', lineId, { until, ...pass, linkHash: await sha256Hex(code) })) as {
       until: number;
-      reportedAt: number;
+      activatedAt: number;
     };
-    storeLink(lineId, { code, reportedAt: result.reportedAt });
+    storeLink(lineId, { code, activatedAt: result.activatedAt });
     return result;
   } catch (error) {
-    // Refused before it was spent (line already rigged, a bad date): the pass is still good.
+    // Refused before it was spent (line already active, a bad date): the pass is still good.
     if (!/pass (already )?used|Invalid pass/i.test((error as Error).message)) returnPass(pass);
     throw error;
   }
 };
 
-export const extendRig = (lineId: string, code: string, until: number) =>
+export const activateWithName = async (lineId: string, until: number) => {
+  const code = toBase64Url(crypto.getRandomValues(new Uint8Array(16)));
+  const result = (await call('POST', lineId, { until, linkHash: await sha256Hex(code) }, { named: true })) as {
+    until: number;
+    activatedAt: number;
+  };
+  storeLink(lineId, { code, activatedAt: result.activatedAt });
+  return result;
+};
+
+export const extendActivation = (lineId: string, code: string, until: number) =>
   call('PUT', lineId, { until, code }) as Promise<{ until: number }>;
 
-export const endRig = async (lineId: string, code: string) => {
+export const deactivate = async (lineId: string, code: string) => {
   await call('DELETE', lineId, { code });
   forgetManageCode(lineId);
 };

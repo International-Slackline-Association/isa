@@ -16,11 +16,11 @@ CQIDAQAB
 
 export type Pass = { pass: string; signature: string };
 
-const storageKey = 'app.rigPasses';
+const storageKey = 'app.activationPasses';
 // Fetched once a month, the month's whole allowance in one go: a refill after every use would put a
 // signed-in call right after each activation, and the two would be one moment again.
 const keepStored = 5;
-const fetchedMonthKey = 'app.rigPassesMonth';
+const fetchedMonthKey = 'app.activationPassesMonth';
 const thisMonth = () => new Date().toISOString().slice(0, 7);
 const fetchedThisMonth = () => {
   try {

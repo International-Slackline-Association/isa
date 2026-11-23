@@ -27,7 +27,7 @@ import { SlacklineFeatureIcon } from 'app/components/Icons/SlacklineFeatureIcon'
 import { useAppLocalStorage } from 'utils/hooks/useAppLocalStorage';
 import { spotTypeOptions } from 'utils/spotTypes';
 
-export type SelectedDisplayFeature = SlacklineMapFeatureType | 'all' | 'rigged';
+export type SelectedDisplayFeature = SlacklineMapFeatureType | 'all' | 'active';
 export type SelectedMapStyle = 'default' | 'satellite' | 'outdoors' | 'streets';
 
 const features: {
@@ -56,8 +56,8 @@ const features: {
     icon: <FollowTheSignsIcon fontSize="inherit" />,
   },
   {
-    key: 'rigged',
-    label: 'Rigged now',
+    key: 'active',
+    label: 'Active now',
     icon: <SensorsIcon fontSize="inherit" />,
   },
 ];
@@ -103,7 +103,7 @@ export const useMapOptions = () => {
   const [selectedType, setSelectedType] = useState<SlacklineType | SpotType | 'none'>('none');
 
   const typeFilter =
-    selectedDisplayFeature === 'line' || selectedDisplayFeature === 'rigged'
+    selectedDisplayFeature === 'line' || selectedDisplayFeature === 'active'
       ? { label: 'Slackline Type', items: lineTypeFilterItems }
       : selectedDisplayFeature === 'spot'
         ? {
@@ -305,7 +305,7 @@ export const useMapOptions = () => {
     MapOptionsComponent,
     selectedDisplayFeature,
     selectedLineType:
-      (selectedDisplayFeature === 'line' || selectedDisplayFeature === 'rigged') && selectedType !== 'none'
+      (selectedDisplayFeature === 'line' || selectedDisplayFeature === 'active') && selectedType !== 'none'
         ? (selectedType as SlacklineType)
         : undefined,
     selectedSpotType:

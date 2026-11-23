@@ -3,28 +3,30 @@ import { ddb } from '../../../../aws/clients';
 import { INDEX_NAMES, KEY_FIELDS, TABLE_NAME, recursiveQuery } from '../../../utils';
 
 // Epoch seconds. The hash of the manage link's code is the only proof of ownership and never leaves the table.
-export type LineRig = { lineId: string; until: number; reportedAt: number; linkHash: string };
+// activatedBy only when the member chose to activate with their name; an anonymous one never has it.
+export type LineActivation = { lineId: string; until: number; activatedAt: number; linkHash: string; activatedBy?: string };
 
-const skGsi = 'lineRig';
+const skGsi = 'lineActivation';
 
 const key = (lineId: string) => ({ [KEY_FIELDS.PK]: `line:${lineId}`, [KEY_FIELDS.SK_GSI]: skGsi });
 
-const toRig = (item: Record<string, any>): LineRig => ({
+const toRig = (item: Record<string, any>): LineActivation => ({
   lineId: (item[KEY_FIELDS.PK] as string).slice('line:'.length),
   until: item.until,
-  reportedAt: item.reportedAt,
+  activatedAt: item.activatedAt,
   linkHash: item.linkHash,
+  activatedBy: item.activatedBy,
 });
 
-export const isLineRigItem = (keys: Record<string, any>) => keys[KEY_FIELDS.SK_GSI] === skGsi;
-export const lineRigFromItem = (item: Record<string, any>) => toRig(item);
+export const isLineActivationItem = (keys: Record<string, any>) => keys[KEY_FIELDS.SK_GSI] === skGsi;
+export const lineActivationFromItem = (item: Record<string, any>) => toRig(item);
 
-const getLineRig = async (lineId: string) => {
+const getLineActivation = async (lineId: string) => {
   const { Item } = await ddb.send(new GetCommand({ TableName: TABLE_NAME, Key: key(lineId) }));
   return Item ? toRig(Item) : null;
 };
 
-const getAllLineRigs = async () => {
+const getAllLineActivations = async () => {
   const { items } = await recursiveQuery((lastEvaluatedKey) =>
     ddb.send(
       new QueryCommand({
@@ -40,17 +42,18 @@ const getAllLineRigs = async () => {
   return items.map(toRig);
 };
 
-const putLineRig = async (rig: LineRig, now: number) => {
+const putLineActivation = async (activation: LineActivation, now: number) => {
   await ddb.send(
     new PutCommand({
       TableName: TABLE_NAME,
       Item: {
-        ...key(rig.lineId),
-        [KEY_FIELDS.GSI_SK]: `line:${rig.lineId}`,
-        until: rig.until,
-        reportedAt: rig.reportedAt,
-        linkHash: rig.linkHash,
-        ddb_ttl: rig.until,
+        ...key(activation.lineId),
+        [KEY_FIELDS.GSI_SK]: `line:${activation.lineId}`,
+        until: activation.until,
+        activatedAt: activation.activatedAt,
+        linkHash: activation.linkHash,
+        activatedBy: activation.activatedBy,
+        ddb_ttl: activation.until,
       },
       ConditionExpression: 'attribute_not_exists(PK) OR #until <= :now',
       ExpressionAttributeNames: { '#until': 'until' },
@@ -59,8 +62,8 @@ const putLineRig = async (rig: LineRig, now: number) => {
   );
 };
 
-// A link dies with its rig: an expired rig waiting for TTL cannot be extended or ended.
-const extendLineRig = async (lineId: string, linkHash: string, until: number, now: number) => {
+// A link dies with its activation: an expired one waiting for TTL cannot be extended or ended.
+const extendLineActivation = async (lineId: string, linkHash: string, until: number, now: number) => {
   await ddb.send(
     new UpdateCommand({
       TableName: TABLE_NAME,
@@ -73,7 +76,7 @@ const extendLineRig = async (lineId: string, linkHash: string, until: number, no
   );
 };
 
-const endLineRig = async (lineId: string, linkHash: string, now: number) => {
+const endLineActivation = async (lineId: string, linkHash: string, now: number) => {
   await ddb.send(
     new DeleteCommand({
       TableName: TABLE_NAME,
@@ -85,16 +88,16 @@ const endLineRig = async (lineId: string, linkHash: string, now: number) => {
   );
 };
 
-// The line is gone, so its rig goes with it.
-const deleteLineRig = async (lineId: string) => {
+// The line is gone, so its activation goes with it.
+const deleteLineActivation = async (lineId: string) => {
   await ddb.send(new DeleteCommand({ TableName: TABLE_NAME, Key: key(lineId) }));
 };
 
-export const lineRigDB = {
-  getLineRig,
-  getAllLineRigs,
-  putLineRig,
-  extendLineRig,
-  endLineRig,
-  deleteLineRig,
+export const lineActivationDB = {
+  getLineActivation,
+  getAllLineActivations,
+  putLineActivation,
+  extendLineActivation,
+  endLineActivation,
+  deleteLineActivation,
 };

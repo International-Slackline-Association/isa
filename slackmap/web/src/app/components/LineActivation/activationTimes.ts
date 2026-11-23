@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 
-export const maxRigDays = 14;
+export const maxActivationDays = 14;
 const day = 24 * 3600;
 
 const endOfDay = (date: Date) => {
@@ -28,7 +28,7 @@ export const untilPresets = () => {
 export const untilFromDateInput = (value: string) => endOfDay(new Date(`${value}T00:00`));
 export const dateInputBounds = () => ({
   min: format(new Date(), 'yyyy-MM-dd'),
-  max: format(new Date(Date.now() + (maxRigDays - 1) * day * 1000), 'yyyy-MM-dd'),
+  max: format(new Date(Date.now() + (maxActivationDays - 1) * day * 1000), 'yyyy-MM-dd'),
 });
 
 export const formatUntil = (until: number) => {
@@ -40,8 +40,8 @@ export const formatUntil = (until: number) => {
   return `${format(date, 'EEE d MMM')}, ${time}`;
 };
 
-export const formatReportedAgo = (reportedAt: number) => {
-  const hours = Math.floor((Date.now() / 1000 - reportedAt) / 3600);
+export const formatActivatedAgo = (activatedAt: number) => {
+  const hours = Math.floor((Date.now() / 1000 - activatedAt) / 3600);
   if (hours < 1) return 'within the last hour';
   if (hours < 24) return `${hours} h ago`;
   return `${Math.floor(hours / 24)} d ago`;
@@ -57,14 +57,14 @@ export const calendarFile = (lineName: string, until: number, manageLink: string
   const ics = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//SlackMap//Rig reminder//EN',
+    'PRODID:-//SlackMap//Activation reminder//EN',
     'BEGIN:VEVENT',
     `UID:${crypto.randomUUID()}@slackmap`,
     `DTSTAMP:${stamp(Math.floor(Date.now() / 1000))}`,
     `DTSTART:${stamp(remindAt)}`,
     `DTEND:${stamp(remindAt + 900)}`,
-    `SUMMARY:${escape(`${lineName} rig expires ${formatUntil(until)}`)}`,
-    `DESCRIPTION:${escape(`Still up? Extend it, or mark it taken down: ${manageLink}`)}`,
+    `SUMMARY:${escape(`${lineName} activation ends ${formatUntil(until)}`)}`,
+    `DESCRIPTION:${escape(`Still up? Extend it, or deactivate it: ${manageLink}`)}`,
     `URL:${manageLink}`,
     'END:VEVENT',
     'END:VCALENDAR',

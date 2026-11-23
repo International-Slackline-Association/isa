@@ -18,8 +18,8 @@ import {
   lineLabelLayer,
   lineLineStringLayer,
   linePointLayer,
-  riggedLineHaloLayer,
-  riggedPointHaloLayer,
+  activeLineHaloLayer,
+  activePointHaloLayer,
 } from '../layers/lineLayers';
 import { spotPointLayer, spotPolygonLayer, spotPolygonOutlineLayer } from '../layers/spotLayers';
 
@@ -51,16 +51,16 @@ export const SlacklineMapSources = (props: {
   const [spotTypeFilterExpr, setSpotTypeFilterExpr] = React.useState<any>();
   const [countryFilterExpr, setCountryFilterExpr] = React.useState<any>();
 
-  // A rig is shown until its 'ru' (rigged until, epoch seconds) passes; checked again every minute.
+  // An activation is shown until its 'au' (active until, epoch seconds) passes; checked again every minute.
   const [nowSeconds, setNowSeconds] = React.useState(() => Math.floor(Date.now() / 1000));
   useEffect(() => {
     const timer = setInterval(() => setNowSeconds(Math.floor(Date.now() / 1000)), 60_000);
     return () => clearInterval(timer);
   }, []);
-  const riggedFilterExpr = ['>', ['to-number', ['get', 'ru'], 0], nowSeconds];
+  const activeFilterExpr = ['>', ['to-number', ['get', 'au'], 0], nowSeconds];
 
   const options = {
-    lines: displayFeature === 'line' || displayFeature === 'all' || displayFeature === 'rigged',
+    lines: displayFeature === 'line' || displayFeature === 'all' || displayFeature === 'active',
     spots: displayFeature === 'spot' || displayFeature === 'all',
     guides: displayFeature === 'guide' || displayFeature === 'all',
   };
@@ -92,8 +92,8 @@ export const SlacklineMapSources = (props: {
   }, [filter]);
 
   const lineFilterExpr =
-    displayFeature === 'rigged'
-      ? ['all', riggedFilterExpr, lineTypeFilterExpr || true]
+    displayFeature === 'active'
+      ? ['all', activeFilterExpr, lineTypeFilterExpr || true]
       : lineTypeFilterExpr;
 
   // The data needs the session cookie; the map draws without it until the browser check is done.
@@ -124,9 +124,9 @@ export const SlacklineMapSources = (props: {
         filter={idFilterExpr}
       >
         <Layer
-          {...riggedLineHaloLayer({
+          {...activeLineHaloLayer({
             visible: options.lines,
-            filter: ['all', riggedFilterExpr, lineTypeFilterExpr || true],
+            filter: ['all', activeFilterExpr, lineTypeFilterExpr || true],
           })}
         />
         <Layer
@@ -186,9 +186,9 @@ export const SlacklineMapSources = (props: {
         promoteId="id"
       >
         <Layer
-          {...riggedPointHaloLayer({
+          {...activePointHaloLayer({
             visible: options.lines,
-            filter: ['all', riggedFilterExpr, countryFilterExpr || true, lineTypeFilterExpr || true],
+            filter: ['all', activeFilterExpr, countryFilterExpr || true, lineTypeFilterExpr || true],
           })}
         />
         <Layer

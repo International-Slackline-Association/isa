@@ -12,13 +12,13 @@ export const SlacklineMapLegend = () => {
     spotCount: number;
     guideCount: number;
     countryCount: number;
-    riggedCount: number;
+    activeCount: number;
   }>({
     lineCount: 0,
     spotCount: 0,
     guideCount: 0,
     countryCount: 0,
-    riggedCount: 0,
+    activeCount: 0,
   });
 
   const { isDesktop } = useMediaQuery();
@@ -68,8 +68,8 @@ export const SlacklineMapLegend = () => {
     >
       <Stack spacing={1} direction={'row'} sx={{ alignItems: 'center' }}>
         <Item color={appColors.lineStrokeColor} label={`${statsInfo.lineCount} lines`} />
-        {statsInfo.riggedCount > 0 && (
-          <Item color={appColors.riggedColor} label={`${statsInfo.riggedCount} rigged now`} />
+        {statsInfo.activeCount > 0 && (
+          <Item color={appColors.activeColor} label={`${statsInfo.activeCount} active now`} />
         )}
         <Item color={appColors.spotFillColor} label={`${statsInfo.spotCount} spots`} />
         <Item

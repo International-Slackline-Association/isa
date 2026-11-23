@@ -39,7 +39,7 @@ export const processLineDetailsOperation = async (
   if (eventName === 'REMOVE' && oldLine) {
     await db.deleteAllFeatureEditors(oldLine.lineId, 'line');
     await db.deleteAllFeatureChangelogs(oldLine.lineId, 'line');
-    await db.deleteLineRig(oldLine.lineId);
+    await db.deleteLineActivation(oldLine.lineId);
     await deleteAllFeatureImages(oldLine.lineId);
     await refreshLineGeoJsonFiles({ lineIdToUpdate: oldLine.lineId });
   }

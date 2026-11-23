@@ -19,7 +19,7 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 - Touching how shared links display, or the pages CloudFront sends to the API: [link previews](link-previews.md)
 - Answering a usage question: [usage analytics](usage-analytics.md)
 - Touching the browser check, the session cookie or the terms: [data access](data-access.md)
-- Touching rigs, passes or the rig routes: [live lines](live-lines.md): reports must never be tied to a person
+- Touching activations, passes or the activation routes: [live lines](live-lines.md): an anonymous activation must never be tied to a person
 
 ## From higher scopes
 

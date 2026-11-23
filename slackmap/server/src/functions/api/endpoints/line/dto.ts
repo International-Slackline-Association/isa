@@ -1,5 +1,5 @@
 import { DDBLineDetailTypes } from '../../../../core/db/entities/line/details/types';
-import { LineRig } from '../../../../core/db/entities/line/rig';
+import { LineActivation } from '../../../../core/db/entities/line/activation';
 import { FeatureCollection } from 'geojson';
 
 export const getLineDetailsResponse = (
@@ -8,9 +8,10 @@ export const getLineDetailsResponse = (
     canDelete: boolean;
     canEdit: boolean;
   },
-  rig?: LineRig | null,
+  activation?: LineActivation | null,
+  activatedByName?: string,
 ) => {
-  const isRigged = rig && rig.until > Date.now() / 1000;
+  const isActive = activation && activation.until > Date.now() / 1000;
   return {
     id: item.lineId,
     geoJson: JSON.parse(item.geoJson) as FeatureCollection,
@@ -34,6 +35,8 @@ export const getLineDetailsResponse = (
     images: item.images,
     editorPermissions,
     // Never the link hash.
-    rig: isRigged ? { until: rig.until, reportedAt: rig.reportedAt } : undefined,
+    activation: isActive
+      ? { until: activation.until, activatedAt: activation.activatedAt, activatedBy: activatedByName }
+      : undefined,
   };
 };
