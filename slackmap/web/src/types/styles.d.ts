@@ -12,12 +12,12 @@ declare module '@mui/material/styles' {
 
   interface Palette {
     neutral: Palette['primary'];
-    live: Palette['primary'];
+    active: Palette['primary'];
   }
 
   interface PaletteOptions {
     neutral?: PaletteOptions['primary'];
-    live?: PaletteOptions['primary'];
+    active?: PaletteOptions['primary'];
   }
 }
 
@@ -31,12 +31,12 @@ declare module '@mui/material/Typography' {
 declare module '@mui/material/Button' {
   interface ButtonPropsColorOverrides {
     neutral: true;
-    live: true;
+    active: true;
   }
 }
 
 declare module '@mui/material/Chip' {
   interface ChipPropsColorOverrides {
-    live: true;
+    active: true;
   }
 }

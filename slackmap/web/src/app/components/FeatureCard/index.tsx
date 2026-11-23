@@ -88,7 +88,7 @@ const Actions = (props: { overImage?: boolean; children?: React.ReactNode }) => 
 );
 
 // A dot shows the map color it belongs to.
-export const FeatureTag = (props: { label: React.ReactNode; dot?: string; color?: 'live' }) => (
+export const FeatureTag = (props: { label: React.ReactNode; dot?: string; color?: 'active' }) => (
   <Box
     component="span"
     sx={{
@@ -101,8 +101,8 @@ export const FeatureTag = (props: { label: React.ReactNode; dot?: string; color?
       fontSize: 12.5,
       fontWeight: props.color ? 600 : 500,
       whiteSpace: 'nowrap',
-      bgcolor: props.color === 'live' ? ui.live : ui.fill,
-      color: props.color === 'live' ? ui.onLive : ui.text,
+      bgcolor: props.color === 'active' ? ui.active : ui.fill,
+      color: props.color === 'active' ? ui.onActive : ui.text,
     }}
   >
     {props.dot && <Box component="span" sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: props.dot }} />}

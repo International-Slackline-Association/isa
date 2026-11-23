@@ -1,7 +1,7 @@
 ---
 type: reference
 title: "Partner data"
-description: "How approved partners fetch the map data with their app client: the scope per stage, /v1/session for the session cookie, the map files at data.slackmap.com including the live file active.geojson and its fields; granting a partner."
+description: "How approved partners fetch the map data with their app client: the scope per stage, /v1/session for the session cookie, the map files at data.slackmap.com including active.geojson, the active lines and spots, and its fields; granting a partner."
 ---
 
 # Partner data

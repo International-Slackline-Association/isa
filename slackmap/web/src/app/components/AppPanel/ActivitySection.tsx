@@ -34,7 +34,7 @@ const ActiveRow = (props: { feature: ActiveFeature; onOpen: () => void }) => {
   const highlight = useHighlight();
   return (
     <PanelRow
-      accent={ui.live}
+      accent={ui.active}
       title={data ? data.name || 'No name' : '…'}
       subtitle={`${isSpot ? 'Spot, until' : 'until'} ${formatUntil(props.feature.activeUntil)}`}
       flag={props.feature.country}

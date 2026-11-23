@@ -137,8 +137,8 @@ export const useActivePointPulse = (map: MapboxMap | undefined) => {
       }
       frame = requestAnimationFrame(tick);
     };
-    // Every paint change redraws the map and keeps it from going idle, so the pulse runs only while a
-    // live marker is on screen; the rest of the time the map rests.
+    // Every paint change redraws the map and keeps it from going idle, so the pulse runs only while
+    // an active marker is on screen; the rest of the time the map rests.
     const check = () => {
       const present = markers.filter((id) => map.getLayer(id));
       const onScreen =

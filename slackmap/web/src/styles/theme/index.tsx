@@ -139,7 +139,7 @@ export const theme: Theme = createTheme({
         filled: { backgroundColor: ui.fill },
       },
       variants: [
-        { props: { color: 'live' }, style: { backgroundColor: ui.live, color: ui.onLive, fontWeight: 600 } },
+        { props: { color: 'active' }, style: { backgroundColor: ui.active, color: ui.onActive, fontWeight: 600 } },
       ],
     },
     MuiTooltip: {

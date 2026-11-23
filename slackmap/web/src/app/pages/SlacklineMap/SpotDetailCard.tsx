@@ -57,7 +57,7 @@ export const SpotDetailCard = (props: Props) => {
         spotDetails && (
           <>
             <FeatureTag label="Spot" dot={appColors.spotFillColor} />
-            {spotDetails.activation && spotDetails.activation.from <= Date.now() / 1000 && <FeatureTag label="Active" color="live" />}
+            {spotDetails.activation && spotDetails.activation.from <= Date.now() / 1000 && <FeatureTag label="Active" color="active" />}
             {spotTypeOptions
               .filter((o) => spotDetails.types?.includes(o.value))
               .map((o) => (

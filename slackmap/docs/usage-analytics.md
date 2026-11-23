@@ -17,7 +17,7 @@ A usage question answered from the logs, without exploring the code first.
 | `slackmap-prod-cdn-access` | us-east-1 | One CloudFront request to `data.slackmap.com` or `images.slackmap.com`; `x-host-header` says which. |
 | The API function's log group (prefix `slackmap-prod-app-ApiFunctionLogs`) | eu-central-1 | One API call, `message = "Request"`; its fields are under `data.` and written in [http.ts](/slackmap/server/src/functions/http.ts). |
 
-Both keep 180 days and hold no IP addresses. The anonymous activation routes' `Request` lines (`/line/:id/activation`, `/spot/:id/activation`) carry only route, method, status and latency ([why](live-lines.md)). `country` and `c-country` come from CloudFront; `asn` is the viewer's network, so a cloud provider's network usually means a script.
+Both keep 180 days and hold no IP addresses. The anonymous activation routes' `Request` lines (`/line/:id/activation`, `/spot/:id/activation`) carry only route, method, status and latency ([why](activations.md)). `country` and `c-country` come from CloudFront; `asn` is the viewer's network, so a cloud provider's network usually means a script.
 
 ## Steps
 

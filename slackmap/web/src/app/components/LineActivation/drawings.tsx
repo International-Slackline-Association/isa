@@ -5,7 +5,7 @@ import { ui } from 'styles/theme/ui';
 const C = {
   blue: ui.blue,
   green: appColors.slackmapGreen,
-  live: appColors.activeColor,
+  active: appColors.activeColor,
   red: appColors.lineStrokeColor,
   ink: ui.text,
   card: ui.fill,
@@ -63,7 +63,7 @@ const choiceBox = { viewBox: '0 0 150 92', width: '100%', style: { maxWidth: 150
 
 export const AnonymousDrawing = () => (
   <svg {...choiceBox}>
-    <Anchors y={70} x1={18} x2={132} color={C.live} />
+    <Anchors y={70} x1={18} x2={132} color={C.active} />
     <Person x={75} y={42} s={1.15} shades />
     <g transform="translate(104 8)">
       <rect width={26} height={24} rx={8} fill={C.blue} />
@@ -77,7 +77,7 @@ export const AnonymousDrawing = () => (
 
 export const NamedDrawing = () => (
   <svg {...choiceBox}>
-    <Anchors y={70} x1={18} x2={132} color={C.live} />
+    <Anchors y={70} x1={18} x2={132} color={C.active} />
     <Person x={60} y={42} s={1.15} />
     <NameTag x={88} y={22} text="Mia" />
   </svg>
@@ -109,7 +109,7 @@ const Helicopter = (p: { x: number; y: number }) => (
 const WhySlide = () => (
   <SlideSvg>
     <rect x={8} y={10} width={284} height={110} rx={14} fill={C.card} />
-    <Anchors y={78} x1={26} x2={86} color={C.live} />
+    <Anchors y={78} x1={26} x2={86} color={C.active} />
     <Person x={56} y={54} s={0.8} shades />
     <Arrow x={98} y={70} w={30} />
     <g transform="translate(136 46)">
@@ -129,7 +129,7 @@ const WhySlide = () => (
   </SlideSvg>
 );
 
-const LiveSlide = () => (
+const ActiveSlide = () => (
   <SlideSvg>
     <rect x={8} y={10} width={284} height={110} rx={14} fill={C.card} />
     <g opacity={0.55}>
@@ -138,13 +138,13 @@ const LiveSlide = () => (
       <circle cx={108} cy={74} r={4} fill={C.red} />
     </g>
     <Arrow x={122} y={66} w={22} />
-    <path d="M160 56 L240 74" stroke={C.live} strokeWidth={10} strokeLinecap="round" opacity={0.4} />
-    <path d="M160 56 L240 74" stroke={C.live} strokeWidth={4} strokeLinecap="round" />
-    <circle cx={160} cy={56} r={5} fill={C.live} />
-    <circle cx={240} cy={74} r={5} fill={C.live} />
+    <path d="M160 56 L240 74" stroke={C.active} strokeWidth={10} strokeLinecap="round" opacity={0.4} />
+    <path d="M160 56 L240 74" stroke={C.active} strokeWidth={4} strokeLinecap="round" />
+    <circle cx={160} cy={56} r={5} fill={C.active} />
+    <circle cx={240} cy={74} r={5} fill={C.active} />
     <g transform="translate(212 20)">
-      <rect width={66} height={24} rx={12} fill={C.live} />
-      <text x={33} y={17} textAnchor="middle" {...font} fontSize={12.5} fill={ui.onLive}>
+      <rect width={66} height={24} rx={12} fill={C.active} />
+      <text x={33} y={17} textAnchor="middle" {...font} fontSize={12.5} fill={ui.onActive}>
         until Sun
       </text>
     </g>
@@ -193,7 +193,7 @@ const AnonymousSlide = () => (
 const NamedSlide = () => (
   <SlideSvg>
     <rect x={8} y={10} width={284} height={110} rx={14} fill={C.card} />
-    <Anchors y={50} x1={86} x2={250} color={C.live} />
+    <Anchors y={50} x1={86} x2={250} color={C.active} />
     <Person x={150} y={62} s={1.1} />
     <NameTag x={184} y={34} text="by Mia" />
   </SlideSvg>
@@ -233,9 +233,9 @@ const EndSlide = () => (
   <SlideSvg>
     <g transform="translate(34 18)">
       <rect width={88} height={92} rx={12} fill="#fff" />
-      <rect width={88} height={24} rx={12} fill={C.live} />
-      <rect y={12} width={88} height={12} fill={C.live} />
-      <text x={44} y={17} textAnchor="middle" {...font} fontSize={12} fill={ui.onLive}>
+      <rect width={88} height={24} rx={12} fill={C.active} />
+      <rect y={12} width={88} height={12} fill={C.active} />
+      <text x={44} y={17} textAnchor="middle" {...font} fontSize={12} fill={ui.onActive}>
         MAX 14 DAYS
       </text>
       <text x={44} y={70} textAnchor="middle" {...font} fontSize={38} fill={C.ink}>
@@ -301,7 +301,7 @@ export const slides: {
     ),
   },
   {
-    drawing: <LiveSlide />,
+    drawing: <ActiveSlide />,
     text: (
       <>
         Activating says: <b>this line or spot is rigged</b>, from now or a day you pick, until the day you pick.

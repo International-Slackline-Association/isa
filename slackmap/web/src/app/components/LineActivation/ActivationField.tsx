@@ -57,8 +57,8 @@ interface Props {
 // The choice happens in a pop-up; every step after it happens inside the card.
 type Step = 'until' | 'done' | 'extend' | 'confirmDeactivate';
 
-const Section = (props: { live?: boolean; children: React.ReactNode }) => (
-  <Stack spacing={1.25} sx={{ borderRadius: '14px', p: 1.5, bgcolor: props.live ? ui.liveTint : ui.fill }}>
+const Section = (props: { active?: boolean; children: React.ReactNode }) => (
+  <Stack spacing={1.25} sx={{ borderRadius: '14px', p: 1.5, bgcolor: props.active ? ui.activeTint : ui.fill }}>
     {props.children}
   </Stack>
 );
@@ -123,7 +123,7 @@ const UntilChips = (props: { from?: number; after?: number; value?: number; onPi
   return (
     <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.75 }}>
       {presets.map((p) => (
-        <Chip key={p.label} label={p.label} onClick={() => props.onPick(p.until)} sx={chipSx(props.value === p.until, ui.live, ui.onLive)} />
+        <Chip key={p.label} label={p.label} onClick={() => props.onPick(p.until)} sx={chipSx(props.value === p.until, ui.active, ui.onActive)} />
       ))}
       <DateChip bounds={dateInputBounds(props.from, props.after)} onPick={(value) => props.onPick(untilFromDateInput(value))} />
     </Stack>
@@ -135,7 +135,7 @@ const Tile = (props: { icon: React.ReactNode; title: string; line: string; onCli
     onClick={props.onClick}
     sx={{ flex: 1, flexDirection: 'column', gap: 0.25, p: 1.25, borderRadius: '12px', bgcolor: '#fff', '&:hover': { bgcolor: ui.fill } }}
   >
-    <Box sx={{ color: ui.liveInk, '& .MuiSvgIcon-root': { fontSize: 22 } }}>{props.icon}</Box>
+    <Box sx={{ color: ui.activeInk, '& .MuiSvgIcon-root': { fontSize: 22 } }}>{props.icon}</Box>
     <Typography variant="body2Bold">{props.title}</Typography>
     <Typography variant="caption" color="text.secondary">
       {props.line}
@@ -315,7 +315,7 @@ export const ActivationField = (props: Props) => {
             <Button
               fullWidth
               variant="contained"
-              color="live"
+              color="active"
               startIcon={<SensorsIcon />}
               disabled={busy || !until}
               onClick={onActivate}
@@ -330,10 +330,10 @@ export const ActivationField = (props: Props) => {
 
   if (step === 'done' && doneUntil) {
     return (
-      <Section live>
+      <Section active>
         <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
-          <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: ui.live, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
-            <CheckIcon sx={{ color: ui.onLive }} />
+          <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: ui.active, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+            <CheckIcon sx={{ color: ui.onActive }} />
           </Box>
           <Box>
             <Typography variant="h5">
@@ -374,7 +374,7 @@ export const ActivationField = (props: Props) => {
         <SignInDialog />
         {dialog}
         <Stack spacing={0.5}>
-          <Button variant="contained" color="live" fullWidth startIcon={<SensorsIcon />} onClick={onActivateClicked}>
+          <Button variant="contained" color="active" fullWidth startIcon={<SensorsIcon />} onClick={onActivateClicked}>
             Activate
           </Button>
           <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center' }}>
@@ -388,13 +388,13 @@ export const ActivationField = (props: Props) => {
   const scheduled = activation.from > Date.now() / 1000;
 
   return (
-    <Section live>
+    <Section active>
       <Box>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           {scheduled ? (
             <Chip label="Scheduled" size="small" sx={{ bgcolor: ui.blue, color: ui.onBlue, fontWeight: 600 }} />
           ) : (
-            <Chip label="Active" size="small" color="live" />
+            <Chip label="Active" size="small" color="active" />
           )}
           <Typography variant="body2Bold">
             {scheduled ? `from ${formatDay(activation.from)} until ${formatUntil(activation.until)}` : `until ${formatUntil(activation.until)}`}
@@ -433,7 +433,7 @@ export const ActivationField = (props: Props) => {
             <Button
               fullWidth
               variant="contained"
-              color="live"
+              color="active"
               disabled={busy || !extendUntil}
               onClick={() => extendUntil && onExtend(extendUntil)}
             >
@@ -452,7 +452,7 @@ export const ActivationField = (props: Props) => {
             <Button fullWidth variant="outlined" sx={{ bgcolor: '#fff' }} onClick={() => setStep(undefined)}>
               Keep
             </Button>
-            <Button fullWidth variant="contained" color="live" disabled={busy} onClick={onDeactivate}>
+            <Button fullWidth variant="contained" color="active" disabled={busy} onClick={onDeactivate}>
               Deactivate
             </Button>
           </Stack>
@@ -461,7 +461,7 @@ export const ActivationField = (props: Props) => {
       {code && !step && (
         <>
           {expiresWithinADay(activation.until) && (
-            <Typography variant="body2" sx={{ color: ui.liveInk, fontWeight: 500 }}>
+            <Typography variant="body2" sx={{ color: ui.activeInk, fontWeight: 500 }}>
               Ends {formatUntil(activation.until)}. Still up?
             </Typography>
           )}

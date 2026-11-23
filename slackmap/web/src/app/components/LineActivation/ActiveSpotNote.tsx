@@ -65,7 +65,7 @@ const SpotContaining = (props: { spot: ActiveSpot; anchors: number[][] }) => {
   const inside = polygons.some((p) => props.anchors.some((a) => booleanPointInPolygon(a, p)));
   if (!inside) return null;
   return (
-    <Typography variant="body2" sx={{ color: ui.liveInk, bgcolor: ui.liveTint, borderRadius: '12px', px: 1.5, py: 1 }}>
+    <Typography variant="body2" sx={{ color: ui.activeInk, bgcolor: ui.activeTint, borderRadius: '12px', px: 1.5, py: 1 }}>
       In an active spot,{' '}
       <Link component="button" variant="body2" onClick={() => navigate(`/spot/${props.spot.id}`)} sx={{ fontWeight: 600 }}>
         {data?.name || 'this spot'}

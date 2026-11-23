@@ -31,7 +31,7 @@ import { FAQ } from './FAQ';
 import { Profile } from './Profile';
 import { LatestChangesSection, ActiveNowSection, TopContributorsStrip } from './ActivitySection';
 import { CommunitiesSection } from './CommunitiesSection';
-import { LiveDot } from './PanelRow';
+import { ActiveDot } from './PanelRow';
 import { PanelInsetContext } from './panelInset';
 
 const expandedWidth = 268;
@@ -203,7 +203,7 @@ const CollapsedRail = (props: { onExpand: () => void; activeCount: number }) => 
       </ButtonBase>
       <Tooltip title="Activity" placement="right">
         <IconButton sx={item(tab === 'activity')} onClick={() => open('/')}>
-          <Badge badgeContent={props.activeCount} sx={{ '& .MuiBadge-badge': { bgcolor: ui.live, color: ui.onLive } }}>
+          <Badge badgeContent={props.activeCount} sx={{ '& .MuiBadge-badge': { bgcolor: ui.active, color: ui.onActive } }}>
             <SensorsIcon fontSize="small" />
           </Badge>
         </IconButton>
@@ -257,7 +257,7 @@ const MobileSheet = (props: { activeCount: number }) => {
           <Box sx={{ width: 36, height: 4, borderRadius: 2, bgcolor: ui.onBlueFillHover, mx: 'auto', mb: 1 }} />
           <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
             <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-              {tab === 'activity' && props.activeCount > 0 && <LiveDot />}
+              {tab === 'activity' && props.activeCount > 0 && <ActiveDot />}
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 {tab === 'communities'
                   ? 'Slackline communities'

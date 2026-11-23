@@ -23,11 +23,11 @@ export const palette: PaletteOptions = {
     dark: ui.fillHover,
     contrastText: ui.text,
   },
-  live: {
-    main: ui.live,
+  active: {
+    main: ui.active,
     dark: '#C62C78',
-    light: ui.liveTint,
-    contrastText: ui.onLive,
+    light: ui.activeTint,
+    contrastText: ui.onActive,
   },
   error: {
     main: ui.danger,

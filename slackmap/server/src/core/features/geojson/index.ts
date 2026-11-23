@@ -454,12 +454,12 @@ const activeFeatureOf = async (activation: FeatureActivation): Promise<Feature |
   };
 };
 
-// For partners: the live lines and spots with readable fields, as the map shows them.
+// For partners: the active lines and spots with readable fields, as the map shows them.
 export const refreshActiveGeoJsonFile = async () => {
   const now = Math.floor(Date.now() / 1000);
   const all = [...(await db.getAllActivations('line')), ...(await db.getAllActivations('spot'))];
-  const live = all.filter((a) => a.from <= now && a.until > now);
-  const features = (await Promise.all(live.map(activeFeatureOf))).filter(Boolean) as Feature[];
+  const active = all.filter((a) => a.from <= now && a.until > now);
+  const features = (await Promise.all(active.map(activeFeatureOf))).filter(Boolean) as Feature[];
   await writeToS3('geojson/active.geojson', { type: 'FeatureCollection', features });
 };
 

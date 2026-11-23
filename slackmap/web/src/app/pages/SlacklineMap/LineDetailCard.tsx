@@ -55,7 +55,7 @@ export const LineDetailCard = (props: Props) => {
       tags={
         lineDetails && (
           <>
-            {lineDetails.activation && lineDetails.activation.from <= Date.now() / 1000 && <FeatureTag label="Active" color="live" />}
+            {lineDetails.activation && lineDetails.activation.from <= Date.now() / 1000 && <FeatureTag label="Active" color="active" />}
             <FeatureTag label={capitalize(lineDetails.type) || 'Line'} dot={appColors.lineStrokeColor} />
             <FeatureTag
               label={`Updated ${format(new Date(lineDetails.lastModifiedDateTime ?? lineDetails.createdDateTime), 'MMM yyyy')}`}

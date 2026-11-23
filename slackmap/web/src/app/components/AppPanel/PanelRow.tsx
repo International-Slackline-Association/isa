@@ -7,10 +7,10 @@ import { ui } from 'styles/theme/ui';
 export const flagUrl = (countryCode: string) =>
   `https://hatscripts.github.io/circle-flags/flags/${countryCode.toLowerCase()}.svg`;
 
-export const LiveDot = () => (
+export const ActiveDot = () => (
   <Box
     component="span"
-    sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: ui.live, boxShadow: `0 0 0 4px ${ui.liveRing}`, flexShrink: 0 }}
+    sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: ui.active, boxShadow: `0 0 0 4px ${ui.activeRing}`, flexShrink: 0 }}
   />
 );
 
@@ -65,7 +65,7 @@ export const PanelRow = (props: {
   >
     {props.accent && (
       <Avatar sx={{ width: 28, height: 28, bgcolor: ui.onBlueFill }}>
-        <LiveDot />
+        <ActiveDot />
       </Avatar>
     )}
     {props.icon && (
