@@ -1,23 +1,22 @@
 import { GetParameterCommand } from '@aws-sdk/client-ssm';
 import { RSABSSA } from '@cloudflare/blindrsa-ts';
-import { createHash, createPrivateKey, createPublicKey } from 'node:crypto';
+import { KeyObject, constants, createHash, createPrivateKey, createPublicKey, privateDecrypt, publicEncrypt } from 'node:crypto';
 import { ssm } from '../../aws/clients';
 
 // RFC 9474.
 const suite = RSABSSA.SHA384.PSS.Randomized();
 const keyAlgorithm = { name: 'RSA-PSS', hash: 'SHA-384' };
 
-let keys: Promise<{ privateKey: CryptoKey; publicKey: CryptoKey }> | undefined;
+let keys: Promise<{ privateKey: KeyObject; publicKey: CryptoKey }> | undefined;
 const loadKeys = () =>
   (keys ??= (async () => {
     // Not passed as an environment variable: those are limited to 4 KB per function.
     const { Parameter } = await ssm.send(new GetParameterCommand({ Name: process.env.PASS_SIGNING_KEY_PARAMETER }));
-    const privatePem = createPrivateKey(Parameter!.Value!);
-    const pkcs8 = privatePem.export({ type: 'pkcs8', format: 'der' });
-    const spki = createPublicKey(privatePem).export({ type: 'spki', format: 'der' });
+    const privateKey = createPrivateKey(Parameter!.Value!);
+    const spki = createPublicKey(privateKey).export({ type: 'spki', format: 'der' });
     return {
-      // The library reads the key's parameters, so both must be extractable.
-      privateKey: await crypto.subtle.importKey('pkcs8', pkcs8, keyAlgorithm, true, ['sign']),
+      privateKey,
+      // The library reads the key's parameters, so it must be extractable.
       publicKey: await crypto.subtle.importKey('spki', spki, keyAlgorithm, true, ['verify']),
     };
   })().catch((error) => {
@@ -33,8 +32,15 @@ export const ensurePassKeys = async () => {
   await loadKeys();
 };
 
-export const signBlindedPass = async (blindedPass: Uint8Array) =>
-  suite.blindSign((await loadKeys()).privateKey, blindedPass);
+// RFC 9474 BlindSign with Node's native RSA: the library's pure-JS one takes about half a second per pass,
+// so a month's allowance runs past the API's timeout after the member's count was already raised.
+export const signBlindedPass = async (blindedPass: Uint8Array) => {
+  const { privateKey } = await loadKeys();
+  const raw = { key: privateKey, padding: constants.RSA_NO_PADDING };
+  const signature = privateDecrypt(raw, blindedPass);
+  if (!publicEncrypt(raw, signature).equals(blindedPass)) throw new Error('Pass signature failed its check');
+  return new Uint8Array(signature);
+};
 
 export const isPassValid = async (pass: Uint8Array, signature: Uint8Array) => {
   const { publicKey } = await loadKeys();
