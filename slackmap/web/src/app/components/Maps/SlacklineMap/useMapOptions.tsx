@@ -8,6 +8,7 @@ import LayersRoundedIcon from '@mui/icons-material/LayersRounded';
 import PentagonIcon from '@mui/icons-material/Pentagon';
 import SatelliteAltIcon from '@mui/icons-material/SatelliteAlt';
 import SignpostIcon from '@mui/icons-material/Signpost';
+import SensorsIcon from '@mui/icons-material/Sensors';
 import {
   Box,
   Dialog,
@@ -26,7 +27,7 @@ import { SlacklineFeatureIcon } from 'app/components/Icons/SlacklineFeatureIcon'
 import { useAppLocalStorage } from 'utils/hooks/useAppLocalStorage';
 import { spotTypeOptions } from 'utils/spotTypes';
 
-export type SelectedDisplayFeature = SlacklineMapFeatureType | 'all';
+export type SelectedDisplayFeature = SlacklineMapFeatureType | 'all' | 'rigged';
 export type SelectedMapStyle = 'default' | 'satellite' | 'outdoors' | 'streets';
 
 const features: {
@@ -53,6 +54,11 @@ const features: {
     key: 'guide',
     label: 'Access Guides',
     icon: <FollowTheSignsIcon fontSize="inherit" />,
+  },
+  {
+    key: 'rigged',
+    label: 'Rigged now',
+    icon: <SensorsIcon fontSize="inherit" />,
   },
 ];
 
@@ -97,7 +103,7 @@ export const useMapOptions = () => {
   const [selectedType, setSelectedType] = useState<SlacklineType | SpotType | 'none'>('none');
 
   const typeFilter =
-    selectedDisplayFeature === 'line'
+    selectedDisplayFeature === 'line' || selectedDisplayFeature === 'rigged'
       ? { label: 'Slackline Type', items: lineTypeFilterItems }
       : selectedDisplayFeature === 'spot'
         ? {
@@ -188,7 +194,7 @@ export const useMapOptions = () => {
                   label={feature.label}
                   checked={selectedDisplayFeature === feature.key}
                   onClick={() => {
-                    setSelectedDisplayFeature(feature.key as SlacklineMapFeatureType);
+                    setSelectedDisplayFeature(feature.key);
                     setSelectedType('none');
                   }}
                 />
@@ -299,7 +305,7 @@ export const useMapOptions = () => {
     MapOptionsComponent,
     selectedDisplayFeature,
     selectedLineType:
-      selectedDisplayFeature === 'line' && selectedType !== 'none'
+      (selectedDisplayFeature === 'line' || selectedDisplayFeature === 'rigged') && selectedType !== 'none'
         ? (selectedType as SlacklineType)
         : undefined,
     selectedSpotType:

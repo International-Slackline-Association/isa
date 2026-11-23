@@ -1,4 +1,5 @@
 import { DDBLineDetailTypes } from '../../../../core/db/entities/line/details/types';
+import { LineRig } from '../../../../core/db/entities/line/rig';
 import { FeatureCollection } from 'geojson';
 
 export const getLineDetailsResponse = (
@@ -7,7 +8,9 @@ export const getLineDetailsResponse = (
     canDelete: boolean;
     canEdit: boolean;
   },
+  rig?: LineRig | null,
 ) => {
+  const isRigged = rig && rig.until > Date.now() / 1000;
   return {
     id: item.lineId,
     geoJson: JSON.parse(item.geoJson) as FeatureCollection,
@@ -30,5 +33,7 @@ export const getLineDetailsResponse = (
     anchorImages: item.anchorImages,
     images: item.images,
     editorPermissions,
+    // Never the link hash.
+    rig: isRigged ? { until: rig.until, reportedAt: rig.reportedAt } : undefined,
   };
 };

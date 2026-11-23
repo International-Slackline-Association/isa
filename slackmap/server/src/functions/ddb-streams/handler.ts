@@ -4,6 +4,8 @@ import type { DynamoDBRecord, DynamoDBStreamEvent } from 'aws-lambda';
 import { groupDetailsDB } from '../../core/db/entities/group/details';
 import { guideDetailsDB } from '../../core/db/entities/guide/details';
 import { lineDetailsDB } from '../../core/db/entities/line/details';
+import { isLineRigItem, lineRigFromItem } from '../../core/db/entities/line/rig';
+import { refreshLineGeoJsonFiles } from '../../core/features/geojson';
 import { mapFeatureChangelogDB } from '../../core/db/entities/mapFeature/changelog';
 import { spotDetailsDB } from '../../core/db/entities/spot/details';
 import { logger } from '../../core/logger';
@@ -43,6 +45,12 @@ const processRecord = async (record: DynamoDBRecord) => {
   if (lineDetailsDB.converter.isItemMatching(keys)) {
     await processLineDetailsOperation(newItem, oldItem, eventName);
     console.log('Processed line details operation:', { keys, eventName });
+  }
+  if (isLineRigItem(keys)) {
+    // Reported, extended, taken down, or deleted by TTL after it ran out.
+    const { lineId } = lineRigFromItem(keys);
+    await refreshLineGeoJsonFiles({ lineIdToUpdate: lineId });
+    logger.info('Line rig changed', { lineId, eventName });
   }
   if (spotDetailsDB.converter.isItemMatching(keys)) {
     await processSpotDetailsOperation(newItem, oldItem, eventName);

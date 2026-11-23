@@ -95,7 +95,7 @@ Can's answers: Q2–Q5 and Q7 as recommended. Q6 accepted: **legally only proof 
 | Q6 | **Residual: CloudTrail keeps Cognito sign-in calls 90 days** (time, IP). A first-time user who signs in and reports minutes later is weakly linkable by someone with AWS account access. | Accept and say it in the doc. Passes are fetched at sign-in, so a report right after a first sign-in is the only case. |
 | Q7 | A fake rig blocks the line for others until its expiry (max 14 days). | Accept for v1. |
 
-### Q1 revisited: keep the log, cut only the fingerprint
+### Q1 revisited: keep the log, cut only the fingerprint (decided)
 
 By Can's rule (Q6), what must never exist is **proof**: a record that ties a report to a person. Timing alone is a guess. So the log keeps `isaId` for every other call; only the rig calls change:
 

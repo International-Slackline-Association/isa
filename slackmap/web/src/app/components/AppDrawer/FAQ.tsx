@@ -98,6 +98,22 @@ const sections: { title: string; items: { q: string; a: React.ReactNode }[] }[] 
         ),
       },
       {
+        q: 'How is reporting a line rigged anonymous?',
+        a: (
+          <>
+            While you are signed in, your browser gets a few anonymous passes from SlackMap. They are
+            blind-signed (the open standard{' '}
+            <Link href="https://www.rfc-editor.org/rfc/rfc9474" target="_blank" rel="noreferrer">
+              RFC 9474
+            </Link>
+            ): we sign them without seeing them, so we can later tell a pass is real but not whose it
+            was. A report carries one pass and never your account, so we learn only that a member sent
+            it. It gives you a manage link instead of tying the rig to you: whoever has the link can
+            extend it or take it down. The code is open source, so anyone can check this.
+          </>
+        ),
+      },
+      {
         q: 'Why do I sometimes see "Verify you are human"?',
         a: 'SlackMap is free for people, not for automated copying, so we check that a real browser is loading the map. Most visitors never see it.',
       },

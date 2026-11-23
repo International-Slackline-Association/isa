@@ -16,6 +16,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { AppDrawer } from './components/AppDrawer';
 import { ContributorAgreementDialog } from './components/ContributorAgreement';
 import { withErrorBoundry } from './components/ErrorBoundary';
+import { refillPasses } from './components/LineRig/passes';
 import { MaintenancePage } from './components/MaintenancePage';
 
 const CreateGroupPage = lazy(() => import('./pages/Create/Group').then((m) => ({ default: m.CreateGroupPage })));
@@ -56,6 +57,11 @@ export function App() {
       })
       .catch(() => dispatch(appActions.updateAuthState(AuthState.SigningOut)));
   }, [dispatch]);
+
+  // Passes are fetched whenever a member is signed in, ahead of any report.
+  useEffect(() => {
+    if (isSignedIn) refillPasses();
+  }, [isSignedIn]);
 
   useEffect(() => {
     if (authState === AuthState.SigningOut) {

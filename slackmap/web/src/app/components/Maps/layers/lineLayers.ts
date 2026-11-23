@@ -18,6 +18,8 @@ export const LineLayerIds = {
   linePoint: 'linePoint',
   lineLine: 'lineLine',
   lineLabel: 'lineLabel',
+  lineRiggedHalo: 'lineRiggedHalo',
+  linePointRiggedHalo: 'linePointRiggedHalo',
 } as const;
 
 export const linePointLayer = (opts: CommonOpts): CircleLayer => {
@@ -56,3 +58,24 @@ export const lineLabelLayer = (opts: CommonOpts): SymbolLayer => {
     },
   };
 };
+
+// Rigged now: an orange glow under the line, and under its point when zoomed out.
+const rigColor = appColors.riggedColor;
+
+export const riggedLineHaloLayer = (opts: CommonOpts): LineLayer => ({
+  id: LineLayerIds.lineRiggedHalo,
+  type: 'line',
+  minzoom: 12,
+  filter: opts.filter,
+  layout: { 'line-cap': 'round', visibility: opts.visible ? 'visible' : 'none' },
+  paint: { 'line-color': rigColor, 'line-width': 14, 'line-opacity': 0.45, 'line-blur': 4 },
+});
+
+export const riggedPointHaloLayer = (opts: CommonOpts): CircleLayer => ({
+  id: LineLayerIds.linePointRiggedHalo,
+  type: 'circle',
+  maxzoom: 13,
+  filter: opts.filter,
+  layout: { visibility: opts.visible ? 'visible' : 'none' },
+  paint: { 'circle-color': rigColor, 'circle-radius': 14, 'circle-opacity': 0.45, 'circle-blur': 0.6 },
+});

@@ -132,9 +132,16 @@ const refererOrigin = (referer?: string) => {
   }
 };
 
-export const createHandler = (lambdaName: string, routes: Record<string, Route>) => {
+// Anonymous routes never read the login, and their log lines leave out everything that could point
+// to the person: a report must not be matchable to the same browser's signed-in calls.
+export const createHandler = (
+  lambdaName: string,
+  routes: Record<string, Route>,
+  anonymousRoutes: Record<string, Route> = {},
+) => {
   logger.setLambdaName(lambdaName);
-  const compiled = compileRoutes(routes);
+  const compiled = compileRoutes({ ...routes, ...anonymousRoutes });
+  const anonymousKeys = new Set(Object.keys(anonymousRoutes));
 
   return async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const start = Date.now();
@@ -165,13 +172,13 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
           if (enforced && session !== 'valid') throw new Error(`SessionRequired: Open ${webDomain}`);
         }
         const body = parseBody(event);
-        user = await getUser(headers);
         const match = matchRoute(compiled, method, path);
         if (!match) {
           logger.info('Not found', { method, path });
           return json({ message: '404 Not Found' }, 404);
         }
         routeKey = match.key;
+        if (!anonymousKeys.has(match.key)) user = await getUser(headers);
         return await match.route({ method, path, params: match.params, headers, query, body, user });
       } catch (error) {
         const { status, code, errorMessage, isExpectedError } = parseExpectedError(error as Error);
@@ -187,6 +194,15 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
 
     const response = await respond();
     response.headers = { ...response.headers, ...responseHeaders(headers['origin']) };
+    if (routeKey && anonymousKeys.has(routeKey)) {
+      logger.info('Request', {
+        route: routeKey,
+        method,
+        status: response.statusCode,
+        latencyMs: Date.now() - start,
+      });
+      return response;
+    }
     // One line per request for usage analytics; the headers as a whole carry the client's IP.
     logger.info('Request', {
       route: routeKey ?? null,

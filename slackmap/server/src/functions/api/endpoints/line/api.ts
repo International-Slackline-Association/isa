@@ -31,12 +31,19 @@ export const getLineDetails = async (req: Request) => {
   if (!line) {
     throw new Error(`NotFound: Line ${req.params.id} not found`);
   }
-  const editPermission = await validateMapFeatureEditor(line.lineId, 'line', req.user?.isaId);
+  const [editPermission, rig] = await Promise.all([
+    validateMapFeatureEditor(line.lineId, 'line', req.user?.isaId),
+    db.getLineRig(line.lineId),
+  ]);
 
-  return getLineDetailsResponse(line, {
-    canDelete: canDeleteFeature(editPermission),
-    canEdit: Boolean(editPermission),
-  });
+  return getLineDetailsResponse(
+    line,
+    {
+      canDelete: canDeleteFeature(editPermission),
+      canEdit: Boolean(editPermission),
+    },
+    rig,
+  );
 };
 
 export const createLine = async (req: Request) => {

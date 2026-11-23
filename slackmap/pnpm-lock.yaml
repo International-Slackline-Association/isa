@@ -214,6 +214,9 @@ importers:
       '@aws-sdk/util-dynamodb':
         specifier: 3.996.9
         version: 3.996.9(@aws-sdk/client-dynamodb@3.1158.0)
+      '@cloudflare/blindrsa-ts':
+        specifier: 0.4.6
+        version: 0.4.6
       '@turf/turf':
         specifier: 7.4.0
         version: 7.4.0
@@ -248,6 +251,9 @@ importers:
 
   web:
     dependencies:
+      '@cloudflare/blindrsa-ts':
+        specifier: 0.4.6
+        version: 0.4.6
       '@emotion/react':
         specifier: 11.14.0
         version: 11.14.0(@types/react@19.3.0)(react@19.3.1)
@@ -574,6 +580,10 @@ packages:
   '@babel/types@7.29.11':
     resolution: {integrity: sha512-WCsemW40Cpc6gouC1SrY6PBaZ+oLRlEVY9XBvZBI7il/HyUrb2nJ505wE1MHEFyDZNnrWDEuy4jL50WVHfTTSQ==}
     engines: {node: '>=6.9.0'}
+
+  '@cloudflare/blindrsa-ts@0.4.6':
+    resolution: {integrity: sha512-n+CAo1hM78qkiouXB0Io1pPVBFKIaJqU7FqdCDNtBAB7q2bBpQOifv7Om3Jln/nx+IhjQAjlDjp8la3e9Yg9Bw==}
+    engines: {node: '>=24'}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -2747,6 +2757,9 @@ packages:
       '@types/node':
         optional: true
 
+  sjcl@1.0.9:
+    resolution: {integrity: sha512-dWM71tkSHxe7zEZj0/COjtJdmErIxp7UMp8a6D4xx8dTTtJLc4lFL+HAX8s6lvASyQQ2iYMHwa7rhhQq7MT5MA==}
+
   skmeans@0.9.7:
     resolution: {integrity: sha512-hNj1/oZ7ygsfmPZ7ZfN5MUBRoGg1gtpnImuJBgLO0ljQ67DtJuiQaiYdS4lUA6s0KCwnPhGivtC/WRwIZLkHyg==}
 
@@ -3412,6 +3425,10 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.29.13
       '@babel/helper-validator-identifier': 7.29.7
+
+  '@cloudflare/blindrsa-ts@0.4.6':
+    dependencies:
+      sjcl: 1.0.9
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -6201,6 +6218,8 @@ snapshots:
       '@img/sharp-win32-ia32': 0.35.5
       '@img/sharp-win32-x64': 0.35.5
       '@types/node': 24.19.2
+
+  sjcl@1.0.9: {}
 
   skmeans@0.9.7: {}
 

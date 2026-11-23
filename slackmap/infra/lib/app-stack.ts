@@ -31,6 +31,7 @@ import {
   isaUsers,
   isProd,
   namespace,
+  passSigningKeyParameter,
   sesIdentityArn,
   sessionsTableName,
   slackmapAdminIsaId,
@@ -185,6 +186,7 @@ export class AppStack extends Stack {
         dataAccess.signingKeyParameter,
       ),
       SESSION_PUBLIC_KEY: sessionPublicKey,
+      PASS_SIGNING_KEY: ssm.StringParameter.valueForStringParameter(this, passSigningKeyParameter),
       SESSION_KEY_PAIR_ID: sessionPublicKeyResource.publicKeyId,
     };
     for (const [name, value] of Object.entries(apiEnvironment)) apiFunction.addEnvironment(name, value);

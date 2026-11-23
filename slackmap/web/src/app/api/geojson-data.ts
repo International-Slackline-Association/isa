@@ -95,8 +95,13 @@ export const getSlacklineMapStats = async () => {
   const allPointsGeoJson = await getAllSlacklinePointsGeoJson();
   const featureStats = getSlacklineFeatureStats(allPointsGeoJson);
   const countryCount = await getCountrySlacklinePointsGeoJson();
+  const nowSeconds = Date.now() / 1000;
+  const riggedCount = allPointsGeoJson.features.filter(
+    (feature) => feature.properties?.ft === 'l' && feature.properties?.ru > nowSeconds,
+  ).length;
   return {
     ...featureStats,
+    riggedCount,
     countryCount: countryCount.features.length,
   };
 };

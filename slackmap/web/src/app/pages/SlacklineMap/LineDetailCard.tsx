@@ -22,6 +22,7 @@ import { FeatureMediaField } from 'app/components/FeatureDetailFields/MediaField
 import { OutdatedInfoField } from 'app/components/FeatureDetailFields/OutdatedInfoField';
 import { FeatureDetailRestrictionField } from 'app/components/FeatureDetailFields/RestrictionField';
 import { FeatureDetailSpecsField } from 'app/components/FeatureDetailFields/SpecsField';
+import { RigField } from 'app/components/LineRig/RigField';
 import { LoadingIndicator } from 'app/components/LoadingIndicator';
 import { format } from 'date-fns';
 import { appColors } from 'styles/theme/colors';
@@ -101,6 +102,12 @@ export const LineDetailCard = (props: Props) => {
             }
           />
           <CardContent component={Stack} spacing={2} sx={{}}>
+            <RigField
+              lineId={props.lineId}
+              lineName={lineDetails.name || 'this line'}
+              rig={lineDetails.rig}
+              onChanged={refetch}
+            />
             <FeatureDetailRestrictionField
               level={lineDetails.restrictionLevel}
               restrictionInfo={lineDetails.restrictionInfo}
