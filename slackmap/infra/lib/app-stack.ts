@@ -29,6 +29,7 @@ import {
   imagesBucketName,
   uploadsBucketName,
   isaUsers,
+  isProd,
   namespace,
   sesIdentityArn,
   sessionsTableName,
@@ -36,12 +37,13 @@ import {
   stage,
   tableName,
   tableStreamArn,
+  webDomain,
 } from './config';
 
 const projectRoot = path.join(__dirname, '../..');
 const sessionPublicKey = fs.readFileSync(path.join(__dirname, '../session-public-key.pem'), 'utf8');
 const serverRoot = path.join(projectRoot, 'server');
-const termsLink = '<https://slackmap.com/terms>; rel="terms-of-service"';
+const termsLink = `<https://${webDomain}/terms>; rel="terms-of-service"`;
 const sharpVersion: string = JSON.parse(
   fs.readFileSync(path.join(serverRoot, 'package.json'), 'utf8'),
 ).devDependencies.sharp;
@@ -70,6 +72,8 @@ export class AppStack extends Stack {
 
     const environment = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      SLACKMAP_DOMAIN: webDomain,
+      ...(isProd ? {} : { SLACKMAP_EMAIL_DISABLED: 'true' }),
       SLACKMAP_TABLE_NAME: tableName,
       ISA_USER_POOL_ID: isaUsers.userPoolId,
       SLACKMAP_CLIENT_ID: isaUsers.slackmapClientId,
@@ -189,9 +193,11 @@ export class AppStack extends Stack {
       table.grantReadWriteData(f);
       imagesBucket.grantReadWrite(f);
       applicationDataBucket.grantReadWrite(f);
-      f.addToRolePolicy(
-        new iam.PolicyStatement({ actions: ['ses:SendEmail'], resources: [sesIdentityArn] }),
-      );
+      if (isProd) {
+        f.addToRolePolicy(
+          new iam.PolicyStatement({ actions: ['ses:SendEmail'], resources: [sesIdentityArn] }),
+        );
+      }
     }
 
     const api = new apigateway.RestApi(this, 'Api', {
@@ -283,8 +289,16 @@ export class AppStack extends Stack {
         "function handler(event) { var r = event.request; if (r.uri.indexOf('.') === -1) { r.uri = '/index.html'; } return r; }",
       ),
     });
+    const noindex = isProd
+      ? undefined
+      : new cloudfront.ResponseHeadersPolicy(this, 'NoindexResponseHeaders', {
+          customHeadersBehavior: {
+            customHeaders: [{ header: 'X-Robots-Tag', value: 'noindex', override: true }],
+          },
+        });
     // /line/x reaches the API as /page/line/x.
     const pageBehavior: cloudfront.BehaviorOptions = {
+      responseHeadersPolicy: noindex,
       origin: new origins.RestApiOrigin(api, {
         originPath: `/${stage}/page`,
         customHeaders: { 'x-origin-secret': originSecret },
@@ -306,6 +320,7 @@ export class AppStack extends Stack {
       defaultBehavior: {
         origin: origins.S3BucketOrigin.withOriginAccessControl(webBucket),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        responseHeadersPolicy: noindex,
         functionAssociations: [
           { function: spaRewrite, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST },
         ],
@@ -436,6 +451,7 @@ export class AppStack extends Stack {
       },
     });
 
+    if (!isProd) return;
     const githubOidcProvider = `arn:aws:iam::${this.account}:oidc-provider/token.actions.githubusercontent.com`;
     new iam.Role(this, 'ErrorDigestRole', {
       roleName: errorDigest.roleName,

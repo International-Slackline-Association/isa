@@ -1,5 +1,6 @@
 import { SendEmailCommand } from '@aws-sdk/client-ses';
 import { ses } from '../../aws/clients';
+import { logger } from '../../logger';
 
 const isaAddress = 'slackmap@slacklineinternational.org';
 
@@ -11,6 +12,10 @@ export const sendDeleteRequestEmail = async (params: {
   featureUrl: string;
   reason: string;
 }) => {
+  if (process.env.SLACKMAP_EMAIL_DISABLED === 'true') {
+    logger.info('Email skipped', { featureUrl: params.featureUrl });
+    return;
+  }
   const ownerNote =
     params.ownerEmails.length > 0
       ? `You own this ${params.featureType}. If you agree, delete it from its menu on SlackMap. Reply to this email to answer the requester.`

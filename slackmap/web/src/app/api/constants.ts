@@ -1,7 +1,11 @@
+import { stages } from 'stages';
 import { countryISO2Mapping } from 'utils/countryCodes';
 
-export const apiBaseUrl = import.meta.env.DEV ? `${window.location.origin}/_api` : 'https://api.slackmap.com';
-export const dataBaseUrl = import.meta.env.DEV ? `${window.location.origin}/_data` : 'https://data.slackmap.com';
+export const stage = import.meta.env.VITE_APP_STAGE;
+export const { domain, webOrigins, uploadsIdentityPoolId } = stages[stage];
+export const apiBaseUrl = import.meta.env.DEV ? `${window.location.origin}/_api` : `https://api.${domain}`;
+export const dataBaseUrl = import.meta.env.DEV ? `${window.location.origin}/_data` : `https://data.${domain}`;
+export const imagesBaseUrl = `https://images.${domain}`;
 const baseAppDataUrl = dataBaseUrl;
 
 export const geoJsonURL = {

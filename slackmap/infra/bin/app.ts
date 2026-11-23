@@ -3,7 +3,7 @@ import { App, Stack, StackProps, Tags } from 'aws-cdk-lib';
 
 import { AppStack } from '../lib/app-stack';
 import { CdnLogsStack } from '../lib/cdn-logs-stack';
-import { env, namespace, stage, usEast1Env } from '../lib/config';
+import { env, isProd, namespace, stage, tableStreamArn, usEast1Env } from '../lib/config';
 import { DataStack } from '../lib/data-stack';
 
 const app = new App();
@@ -17,6 +17,7 @@ const tag = (stack: Stack, name: string) => {
 };
 const props = (extra: StackProps = {}): StackProps => ({ env, ...extra });
 
-tag(new DataStack(app, `${namespace}-data`, props({ terminationProtection: true })), 'data');
-tag(new AppStack(app, `${namespace}-app`, props()), 'app');
-tag(new CdnLogsStack(app, `${namespace}-cdn-logs`, { env: usEast1Env }), 'cdn-logs');
+tag(new DataStack(app, `${namespace}-data`, props({ terminationProtection: isProd })), 'data');
+// A new stage deploys its data stack first; the app stack needs the table's stream ARN from it.
+if (tableStreamArn) tag(new AppStack(app, `${namespace}-app`, props()), 'app');
+if (isProd) tag(new CdnLogsStack(app, `${namespace}-cdn-logs`, { env: usEast1Env }), 'cdn-logs');

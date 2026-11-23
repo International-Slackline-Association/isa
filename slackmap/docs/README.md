@@ -12,6 +12,7 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 
 - Before any change: [the vision](/slackmap/README.md): simplicity is the first principle
 - Running locally or deploying: [operating](operating.md)
+- Working on or with test.slackmap.com: [the test stage](test-stage.md): it differs from prod on purpose
 - What is set up by hand and what other apps rely on: [manual operations](manual-operations.md)
 - Querying or adding to the table: [table design](table-design.md)
 - Working on the communities map or groups: [communities](communities.md)

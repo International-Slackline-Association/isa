@@ -1,4 +1,5 @@
 import { appActions } from 'app/slices/app';
+import { imagesBaseUrl } from 'app/api/constants';
 
 export function showSuccessNotification(message: string) {
   return appActions.updateSnackbarNotification({
@@ -33,7 +34,7 @@ export const imageUrlFromS3Key = (s3Key?: string) => {
   if (!s3Key) {
     return undefined;
   }
-  return `https://images.slackmap.com/${s3Key}`;
+  return `${imagesBaseUrl}/${s3Key}`;
 };
 
 export const trimString = (str?: string, maxLength?: number) => {

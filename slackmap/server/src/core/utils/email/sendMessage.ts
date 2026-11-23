@@ -21,6 +21,10 @@ export const sendNewMessageEmail = async (params: {
   context_url: string;
   message: string;
 }) => {
+  if (process.env.SLACKMAP_EMAIL_DISABLED === 'true') {
+    logger.info('Email skipped', { contextUrl: params.context_url });
+    return;
+  }
   // Every value is user-written; a replacer function keeps '$' patterns literal.
   const values: Record<string, string> = {
     SENDER_NAME: params.from.username,

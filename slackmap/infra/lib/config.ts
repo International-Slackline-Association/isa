@@ -1,42 +1,60 @@
 export const env = { account: '387132903656', region: 'eu-central-1' };
 
 export const project = 'slackmap';
-export const stage = 'prod';
+
+const stages = {
+  prod: {
+    domain: 'slackmap.com',
+    // slackmap.com and *.slackmap.com, issued by hand.
+    certificate: 'arn:aws:acm:us-east-1:387132903656:certificate/e4def0fa-44e6-411b-89d0-d5223539966e',
+    // Set by the stream of the table in the data stack; changes only if the stream is recreated.
+    tableStreamArn:
+      'arn:aws:dynamodb:eu-central-1:387132903656:table/slackmap-prod-db/stream/2026-11-12T13:16:15.858',
+  },
+  test: {
+    domain: 'test.slackmap.com',
+    // test.slackmap.com and *.test.slackmap.com, issued by hand.
+    certificate: 'arn:aws:acm:us-east-1:387132903656:certificate/6da1b5c9-1f7c-487e-80e4-ce9ec49f88e5',
+    tableStreamArn: 'arn:aws:dynamodb:eu-central-1:387132903656:table/slackmap-test-db/stream/2026-11-23T15:16:28.282',
+  },
+};
+const given = process.env.STAGE;
+if (given !== 'prod' && given !== 'test') throw new Error('STAGE must be prod or test');
+export const stage = given;
+export const isProd = stage === 'prod';
 export const namespace = `${project}-${stage}`;
+const { domain, certificate, tableStreamArn: streamArn } = stages[stage];
 
+export const webDomain = domain;
 export const domains = {
-  web: ['slackmap.com', 'www.slackmap.com'],
-  api: 'api.slackmap.com',
-  data: 'data.slackmap.com',
-  images: 'images.slackmap.com',
+  web: isProd ? [domain, `www.${domain}`] : [domain],
+  api: `api.${domain}`,
+  data: `data.${domain}`,
+  images: `images.${domain}`,
 };
 
-// slackmap.com and *.slackmap.com, issued by hand.
-export const certificates = {
-  cloudfront: 'arn:aws:acm:us-east-1:387132903656:certificate/e4def0fa-44e6-411b-89d0-d5223539966e',
-};
+export const certificates = { cloudfront: certificate };
 
 export const tableName = `${namespace}-db`;
-// Set by the stream of the table in the data stack; changes only if the stream is recreated.
-export const tableStreamArn =
-  'arn:aws:dynamodb:eu-central-1:387132903656:table/slackmap-prod-db/stream/2026-11-12T13:16:15.858';
+export const tableStreamArn = streamArn;
 export const uploadsBucketName = `${namespace}-uploads`;
 export const imagesBucketName = `${namespace}-images`;
 export const applicationDataBucketName = `${namespace}-application-data`;
 
 // CloudFront delivers its access logs to CloudWatch only in us-east-1.
 export const usEast1Env = { account: env.account, region: 'us-east-1' };
-// Set by the distributions of the app stack; change only if a distribution is recreated.
+// Prod only. Set by the distributions of the app stack; change only if a distribution is recreated.
 export const distributionIds = { data: 'EWDMK7QRJ5I98', images: 'E1S62AITVZ4WPH' };
 export const cdnAccessLogGroupName = `${namespace}-cdn-access`;
 
 export const dataAccess = {
   // Off: cookies are issued and logged but not required. On: data. and the API turn away requests without one.
-  enforced: true,
+  // Off on test: prod's cookies, set for every slackmap.com host, reach test's hosts too under the same names.
+  enforced: isProd,
   turnstileSecretParameter: 'slackmap-turnstile-secret',
   signingKeyParameter: 'slackmap-session-signing-key',
   originSecretParameter: 'slackmap-origin-secret',
-  webOrigins: ['https://slackmap.com', 'https://www.slackmap.com'],
+  webOrigins: domains.web.map((d) => `https://${d}`),
 };
 export const sessionsTableName = `${namespace}-sessions`;
 

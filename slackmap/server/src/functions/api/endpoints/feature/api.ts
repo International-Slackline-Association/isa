@@ -24,6 +24,7 @@ import {
   verifyRequestClaims,
 } from '../../utils';
 import { deleteFeatureRequestSchema } from './schema';
+import { webUrl } from '../../../../core/domain';
 
 export const getFeatureChangelogs = async (
   req: Request<{ id: string; type: MapFeatureType }>,
@@ -94,8 +95,8 @@ const getFeatureItem = async (id: string, type: MapFeatureType) => {
 
 const featureUrl = (id: string, type: MapFeatureType) =>
   type === 'group'
-    ? `https://slackmap.com/communities/group/${id}`
-    : `https://slackmap.com/${type}/${id}`;
+    ? `${webUrl}/communities/group/${id}`
+    : `${webUrl}/${type}/${id}`;
 
 export const requestTemporaryEditorship = async (
   req: Request<{ id: string; type: MapFeatureType }>,

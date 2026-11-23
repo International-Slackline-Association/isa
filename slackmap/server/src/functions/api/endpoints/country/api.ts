@@ -10,11 +10,12 @@ import {
   destructPaginationQueryParam,
   jsonRoute,
 } from '../../utils';
+import { webUrl } from '../../../../core/domain';
 
 const featureUrl = (f: { id: string; type: MapFeatureType }) =>
   f.type === 'group'
-    ? `https://slackmap.com/communities/group/${f.id}`
-    : `https://slackmap.com/${f.type}/${f.id}`;
+    ? `${webUrl}/communities/group/${f.id}`
+    : `${webUrl}/${f.type}/${f.id}`;
 
 export const getCountryDetails = async (req: Request) => {
   const countryCode = req.params.code;

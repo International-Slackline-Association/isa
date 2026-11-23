@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { apiBaseUrl } from 'app/api/constants';
+import { apiBaseUrl, domain } from 'app/api/constants';
 
 // Public.
 const turnstileSiteKey = '0x4AAAAAAGDecDHSrTlBoDNO';
@@ -111,7 +111,7 @@ let failureShown = false;
 export const showSessionFailure = () => {
   if (failureShown) return;
   failureShown = true;
-  overlay("SlackMap couldn't start. Make sure cookies are allowed for slackmap.com, then reload the page.");
+  overlay(`SlackMap couldn't start. Make sure cookies are allowed for ${domain}, then reload the page.`);
 };
 
 const startSession = async () => {

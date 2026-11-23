@@ -1,7 +1,13 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
-// The live API and data, reached through localhost so the session cookie is localhost's own.
+import { isStage, stages } from './src/stages.ts';
+
+const stage = process.env.STAGE;
+if (!isStage(stage)) throw new Error('STAGE must be prod or test');
+const { domain } = stages[stage];
+
+// The stage's live API and data, reached through localhost so the session cookie is localhost's own.
 // The dev key gets a session without the browser check; `start` reads it from SSM.
 const proxy = (target: string, prefix: string) => ({
   target,
@@ -16,11 +22,12 @@ export default defineConfig({
   resolve: { tsconfigPaths: true },
   define: {
     global: 'window',
+    'import.meta.env.VITE_APP_STAGE': JSON.stringify(stage),
   },
   server: {
     proxy: {
-      '/_api': proxy('https://api.slackmap.com', '/_api'),
-      '/_data': proxy('https://data.slackmap.com', '/_data'),
+      '/_api': proxy(`https://api.${domain}`, '/_api'),
+      '/_data': proxy(`https://data.${domain}`, '/_data'),
     },
   },
 });

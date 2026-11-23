@@ -8,6 +8,7 @@ import { SlacklineType } from '../../../../core/types';
 import countriesJson from '../../../../../data/countryInfoDict.json';
 
 import { Request, Route } from '../../../http';
+import { imagesUrl, webUrl } from '../../../../core/domain';
 
 type Preview = { title: string; description: string; image?: string };
 type Image = { s3Key: string; isCover?: boolean };
@@ -32,7 +33,7 @@ const countryName = (code?: string) =>
 const coverImage = (...lists: (Image[] | undefined)[]) => {
   const images = lists.flatMap((list) => list ?? []);
   const image = images.find((i) => i.isCover) ?? images[0];
-  return image ? `https://images.slackmap.com/${image.s3Key}` : undefined;
+  return image ? `${imagesUrl}/${image.s3Key}` : undefined;
 };
 
 const joined = (...parts: (string | undefined)[]) => parts.filter(Boolean).join(' · ');
@@ -111,7 +112,7 @@ const escape = (text: string) =>
 const previewTags = (preview: Preview, url: string) => {
   const title = escape(`${preview.title} · SlackMap`);
   const description = escape(preview.description);
-  const image = escape(preview.image ?? 'https://slackmap.com/images/ogimage.png');
+  const image = escape(preview.image ?? `${webUrl}/images/ogimage.png`);
   return [
     `<meta name="description" content="${description}" />`,
     `<meta property="og:site_name" content="SlackMap" />`,
@@ -144,7 +145,7 @@ const page =
 
     // An unknown id keeps the default tags; the app shows that it does not exist.
     const body = preview
-      ? `${html.slice(0, start + startMarker.length)}\n    ${previewTags(preview, `https://slackmap.com${req.path.replace(/^\/page/, '')}`)}\n    ${html.slice(end)}`
+      ? `${html.slice(0, start + startMarker.length)}\n    ${previewTags(preview, `${webUrl}${req.path.replace(/^\/page/, '')}`)}\n    ${html.slice(end)}`
       : html;
     return {
       statusCode: 200,

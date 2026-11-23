@@ -2,6 +2,7 @@ import { UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { createHash, createPrivateKey, createPublicKey, sign, verify } from 'node:crypto';
 import { ddb } from '../../aws/clients';
 import { logger } from '../../logger';
+import { dataUrl, webDomain } from '../../domain';
 
 const tableName = process.env.SLACKMAP_SESSIONS_TABLE_NAME as string;
 const sessionSeconds = 12 * 60 * 60;
@@ -60,7 +61,7 @@ const verifyTurnstile = async (token: string, ip: string | undefined) => {
     'error-codes'?: string[];
   };
   const hostname = result.hostname ?? '';
-  const passed = result.success && (hostname === 'slackmap.com' || hostname.endsWith('.slackmap.com'));
+  const passed = result.success && (hostname === webDomain || hostname.endsWith(`.${webDomain}`));
   if (!passed) logger.warn('Browser check failed', { errorCodes: result['error-codes'], hostname });
   return passed;
 };
@@ -87,7 +88,7 @@ export const issueSession = async (token: unknown, headers: Record<string, strin
   const policy = JSON.stringify({
     Statement: [
       {
-        Resource: 'https://data.slackmap.com/*',
+        Resource: `${dataUrl}/*`,
         Condition: { DateLessThan: { 'AWS:EpochTime': expiresAt } },
       },
     ],
@@ -99,7 +100,7 @@ export const issueSession = async (token: unknown, headers: Record<string, strin
   };
   const cookies = cookieNames.map(
     (name) =>
-      `${name}=${values[name]}; Domain=slackmap.com; Path=/; Max-Age=${sessionSeconds}; Secure; HttpOnly; SameSite=Lax`,
+      `${name}=${values[name]}; Domain=${webDomain}; Path=/; Max-Age=${sessionSeconds}; Secure; HttpOnly; SameSite=Lax`,
   );
   return { cookies, expiresAt };
 };

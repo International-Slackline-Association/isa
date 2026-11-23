@@ -5,6 +5,7 @@ import { SessionState, checkSession } from '../core/features/session';
 import { logger } from '../core/logger';
 import { generateISAIdFromUsername } from '../core/utils';
 import { parseExpectedError } from '../core/utils/error';
+import { webDomain, webUrl } from '../core/domain';
 
 export type User = {
   isaId?: string;
@@ -32,7 +33,7 @@ export const json = (data: unknown, statusCode = 200): APIGatewayProxyResult => 
 
 const webOrigins = (process.env.WEB_ORIGINS ?? '').split(',');
 const enforced = process.env.DATA_ACCESS_ENFORCED === 'true';
-const termsLink = '<https://slackmap.com/terms>; rel="terms-of-service"';
+const termsLink = `<${webUrl}/terms>; rel="terms-of-service"`;
 
 // The web app sends its session cookie, so only its own origins are allowed, by name.
 const responseHeaders = (origin: string | undefined) => ({
@@ -151,7 +152,7 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
 
     const respond = async (): Promise<APIGatewayProxyResult> => {
       try {
-        if (enforced && !viaCloudFront) throw new Error('Forbidden: Use api.slackmap.com');
+        if (enforced && !viaCloudFront) throw new Error(`Forbidden: Use api.${webDomain}`);
         if (!isOpenPath(method, path)) {
           session = await checkSession(headers).catch((error: Error) => {
             if (enforced) throw error;
@@ -161,7 +162,7 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
           if (enforced && session === 'overLimit') {
             throw new Error('TooManyRequests: Session limit reached');
           }
-          if (enforced && session !== 'valid') throw new Error('SessionRequired: Open slackmap.com');
+          if (enforced && session !== 'valid') throw new Error(`SessionRequired: Open ${webDomain}`);
         }
         const body = parseBody(event);
         user = await getUser(headers);

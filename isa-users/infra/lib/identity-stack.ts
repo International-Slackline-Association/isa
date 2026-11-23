@@ -195,7 +195,12 @@ const clients: Omit<cognito.CfnUserPoolClientProps, 'userPoolId'>[] = [
   },
   {
     generateSecret: false,
-    callbackUrLs: ['http://localhost:5173', 'https://slackmap.com', 'https://www.slackmap.com'],
+    callbackUrLs: [
+      'http://localhost:5173',
+      'https://slackmap.com',
+      'https://www.slackmap.com',
+      'https://test.slackmap.com',
+    ],
     enablePropagateAdditionalUserContextData: false,
     idTokenValidity: 60,
     authSessionValidity: 3,
@@ -232,7 +237,12 @@ const clients: Omit<cognito.CfnUserPoolClientProps, 'userPoolId'>[] = [
     clientName: 'slackmap',
     allowedOAuthFlows: ['code'],
     explicitAuthFlows: ['ALLOW_REFRESH_TOKEN_AUTH'],
-    logoutUrLs: ['http://localhost:5173', 'https://slackmap.com', 'https://www.slackmap.com'],
+    logoutUrLs: [
+      'http://localhost:5173',
+      'https://slackmap.com',
+      'https://www.slackmap.com',
+      'https://test.slackmap.com',
+    ],
     accessTokenValidity: 60,
     refreshTokenValidity: 90,
     writeAttributes: ['email', 'family_name', 'name'],

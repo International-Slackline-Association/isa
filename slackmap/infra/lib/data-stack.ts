@@ -5,7 +5,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { applicationDataBucketName, imagesBucketName, namespace, tableName } from './config';
+import { applicationDataBucketName, imagesBucketName, isProd, namespace, tableName } from './config';
 
 export class DataStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -19,9 +19,9 @@ export class DataStack extends Stack {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       stream: dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
       timeToLiveAttribute: 'ddb_ttl',
-      pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: true },
-      deletionProtection: true,
-      removalPolicy: RemovalPolicy.RETAIN,
+      pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: isProd },
+      deletionProtection: isProd,
+      removalPolicy: isProd ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
     });
     table.addLocalSecondaryIndex({ indexName: 'LSI', sortKey: key('LSI') });
     table.addLocalSecondaryIndex({ indexName: 'LSI2', sortKey: key('LSI2') });
@@ -41,21 +41,25 @@ export class DataStack extends Stack {
       nonKeyAttributes: ['GSI_SK', 'GSI2', 'GSI2_SK'],
     });
 
-    const plan = new backup.BackupPlan(this, 'BackupPlan', {
-      backupPlanName: `${namespace}-monthly`,
-      backupVault: backup.BackupVault.fromBackupVaultName(this, 'DefaultVault', 'Default'),
-      backupPlanRules: [
-        new backup.BackupPlanRule({
-          ruleName: 'Monthly',
-          scheduleExpression: events.Schedule.cron({ minute: '0', hour: '5', day: '1' }),
-          deleteAfter: Duration.days(365),
-        }),
-      ],
-    });
-    plan.addSelection('Table', { resources: [backup.BackupResource.fromDynamoDbTable(table)] });
+    if (isProd) {
+      const plan = new backup.BackupPlan(this, 'BackupPlan', {
+        backupPlanName: `${namespace}-monthly`,
+        backupVault: backup.BackupVault.fromBackupVaultName(this, 'DefaultVault', 'Default'),
+        backupPlanRules: [
+          new backup.BackupPlanRule({
+            ruleName: 'Monthly',
+            scheduleExpression: events.Schedule.cron({ minute: '0', hour: '5', day: '1' }),
+            deleteAfter: Duration.days(365),
+          }),
+        ],
+      });
+      plan.addSelection('Table', { resources: [backup.BackupResource.fromDynamoDbTable(table)] });
+    }
 
     // Both are read through CloudFront only; their bucket policies live in the app stack with the distributions.
     // The web app reads them cross-origin.
+    // No autoDeleteObjects on test: its bucket policy would clash with the one the app stack sets on these buckets.
+    const removalPolicy = isProd ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY;
     const cors: s3.CorsRule[] = [
       { allowedMethods: [s3.HttpMethods.GET], allowedOrigins: ['*'], allowedHeaders: ['*'], maxAge: 3600 },
     ];
@@ -65,13 +69,13 @@ export class DataStack extends Stack {
       versioned: true,
       cors,
       lifecycleRules: [{ noncurrentVersionExpiration: Duration.days(365) }],
-      removalPolicy: RemovalPolicy.RETAIN,
+      removalPolicy,
     });
     new s3.Bucket(this, 'ApplicationDataBucket', {
       bucketName: applicationDataBucketName,
       cors,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      removalPolicy: RemovalPolicy.RETAIN,
+      removalPolicy,
     });
   }
 }
