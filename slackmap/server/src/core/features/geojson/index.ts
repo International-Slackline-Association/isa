@@ -3,6 +3,7 @@ import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { featureCollection } from '@turf/turf';
 import { s3 } from '../../aws/clients';
 import { db } from '../../db';
+import { FeatureActivation } from '../../db/entities/activation';
 import { DDBGroupDetailTypes } from '../../db/entities/group/details/types';
 import { GuideType, SlacklineType, SpotType } from '../../types';
 import countriesJson from '../../../../data/countryInfoDict.json';
@@ -10,6 +11,7 @@ import { Feature, FeatureCollection, Geometry, Point } from 'geojson';
 import zlib from 'zlib';
 
 import { logger } from '../../logger';
+import { webUrl } from '../../domain';
 
 import { guideTypeLabel } from '../guide';
 import { calculateCenterOfFeature, optimizeGeoJsonFeature } from './utils';
@@ -224,6 +226,7 @@ export const refreshLineGeoJsonFiles = async (
   const pointsGeoJSON = generatePointsGeoJson(mainGeoJSON);
   await writeToS3('geojson/lines/points.geojson', pointsGeoJSON);
   await refreshClusterPointsGeoJsonFiles({ linePoints: pointsGeoJSON });
+  await refreshActiveGeoJsonFile();
   return { mainGeoJSON, pointsGeoJSON, updatedLines };
 };
 
@@ -280,6 +283,7 @@ export const refreshSpotGeoJsonFiles = async (
   const pointsGeoJSON = generatePointsGeoJson(mainGeoJSON);
   await writeToS3('geojson/spots/points.geojson', pointsGeoJSON);
   await refreshClusterPointsGeoJsonFiles({ spotPoints: pointsGeoJSON });
+  await refreshActiveGeoJsonFile();
   return { mainGeoJSON, pointsGeoJSON, updatedSpots };
 };
 
@@ -418,6 +422,45 @@ const generatePointFeature = (feature: Feature) => {
     properties: feature.properties,
   };
   return newFeature;
+};
+
+const isoOf = (seconds: number) => new Date(seconds * 1000).toISOString();
+
+const activeFeatureOf = async (activation: FeatureActivation): Promise<Feature | undefined> => {
+  const { featureType, featureId } = activation;
+  const line = featureType === 'line' ? await db.getLineDetails(featureId) : undefined;
+  const details = line ?? (featureType === 'spot' ? await db.getSpotDetails(featureId) : undefined);
+  if (!details) return undefined;
+  const geometry = (JSON.parse(details.geoJson) as FeatureCollection).features[0]?.geometry as Geometry | undefined;
+  if (!geometry) return undefined;
+  return {
+    type: 'Feature',
+    geometry,
+    properties: {
+      id: featureId,
+      type: featureType,
+      name: details.name || null,
+      lineType: line?.type ?? null,
+      length: line?.length ?? null,
+      height: line?.height ?? null,
+      country: details.country,
+      activeFrom: isoOf(activation.from),
+      activeUntil: isoOf(activation.until),
+      activatedAt: isoOf(activation.activatedAt),
+      // Never who: an activation with a name only says it has one.
+      anonymous: !activation.activatedBy,
+      url: `${webUrl}/${featureType}/${featureId}`,
+    },
+  };
+};
+
+// For partners: the live lines and spots with readable fields, as the map shows them.
+export const refreshActiveGeoJsonFile = async () => {
+  const now = Math.floor(Date.now() / 1000);
+  const all = [...(await db.getAllActivations('line')), ...(await db.getAllActivations('spot'))];
+  const live = all.filter((a) => a.from <= now && a.until > now);
+  const features = (await Promise.all(live.map(activeFeatureOf))).filter(Boolean) as Feature[];
+  await writeToS3('geojson/active.geojson', { type: 'FeatureCollection', features });
 };
 
 const writeToS3 = async (key: string, geoJson: FeatureCollection) => {

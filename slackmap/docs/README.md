@@ -20,6 +20,7 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 - Answering a usage question: [usage analytics](usage-analytics.md)
 - Touching the browser check, the session cookie or the terms: [data access](data-access.md)
 - Touching activations, passes or the activation routes: [live lines](live-lines.md): an anonymous activation must never be tied to a person
+- Giving a partner the map data, or touching `/v1`: [partner data](partner-data.md)
 - Touching how the web app looks: [look and feel](look-and-feel.md): one coherent look, so a screen uses the theme's parts and never paints its own
 
 ## From higher scopes

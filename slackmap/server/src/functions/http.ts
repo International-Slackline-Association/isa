@@ -21,9 +21,13 @@ export type Request<Params extends Record<string, string> = Record<string, strin
   query: Record<string, string | undefined>;
   body: any;
   user?: User;
+  app?: App;
 };
 
 export type Route = (request: Request<any>) => Promise<APIGatewayProxyResult>;
+
+export type App = { clientId: string; scopes: string[] };
+export type AppRoute = { scope: string; route: Route };
 
 export const json = (data: unknown, statusCode = 200): APIGatewayProxyResult => ({
   statusCode,
@@ -71,7 +75,19 @@ const verifier = CognitoJwtVerifier.create({
   tokenUse: 'id',
 });
 
-// The API has no authorizer: a token that fails verification counts as no user.
+// API Gateway checks the scope on the /v1 resources and hands over the token's claims. Routes here match
+// case-insensitively, so /V1/session reaches this Lambda through /{proxy+}, which has no authorizer and no claims.
+const verifyApp = (event: APIGatewayProxyEvent, scope: string): App => {
+  const claims = event.requestContext?.authorizer?.claims as Record<string, unknown> | undefined;
+  const scopes = String(claims?.scope ?? '').split(' ').filter(Boolean);
+  // A user's access token never counts as an app, whatever its scopes.
+  if (!claims || claims['cognito:username'] || !scopes.includes(`${process.env.APP_SCOPE_SERVER}/${scope}`)) {
+    throw new Error(`Unauthorized: the ${process.env.APP_SCOPE_SERVER}/${scope} scope is required`);
+  }
+  return { clientId: String(claims.client_id), scopes };
+};
+
+// The routes under /{proxy+} have no authorizer: a token that fails verification counts as no user.
 const getUser = async (headers: Record<string, string | undefined>): Promise<User | undefined> => {
   const token = headers['authorization']?.split(' ')[1];
   if (!token) return undefined;
@@ -136,20 +152,27 @@ export const createHandler = (
   lambdaName: string,
   routes: Record<string, Route>,
   anonymousRoutes: Record<string, Route> = {},
+  appRoutes: Record<string, AppRoute> = {},
 ) => {
   logger.setLambdaName(lambdaName);
-  const compiled = compileRoutes({ ...routes, ...anonymousRoutes });
+  const compiled = compileRoutes({
+    ...routes,
+    ...anonymousRoutes,
+    ...Object.fromEntries(Object.entries(appRoutes).map(([key, { route }]) => [key, route])),
+  });
   const anonymousKeys = new Set(Object.keys(anonymousRoutes));
 
   return async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const start = Date.now();
     const method = event.httpMethod.toUpperCase();
-    const path = `/${event.pathParameters?.proxy ?? ''}`;
+    // The /v1 resources are not under /{proxy+}, so they carry no proxy parameter.
+    const path = event.pathParameters?.proxy !== undefined ? `/${event.pathParameters.proxy}` : event.path;
     const query = event.queryStringParameters ?? {};
     const headers = Object.fromEntries(
       Object.entries(event.headers ?? {}).map(([name, value]) => [name.toLowerCase(), value]),
     );
     let user: User | undefined;
+    let app: App | undefined;
     let routeKey: string | undefined;
     // Only CloudFront knows the secret; a call straight to execute-api does not have it.
     const viaCloudFront = headers['x-origin-secret'] === process.env.ORIGIN_SECRET;
@@ -157,11 +180,13 @@ export const createHandler = (
     // Known before anything can fail, so an anonymous call is never logged with the browser's fingerprint.
     const match = matchRoute(compiled, method, path);
     const anonymous = Boolean(match && anonymousKeys.has(match.key));
+    const appRoute = match ? appRoutes[match.key] : undefined;
 
     const respond = async (): Promise<APIGatewayProxyResult> => {
       try {
         if (enforced && !viaCloudFront) throw new Error(`Forbidden: Use api.${webDomain}`);
-        if (!isOpenPath(method, path)) {
+        if (appRoute) app = verifyApp(event, appRoute.scope);
+        else if (!isOpenPath(method, path)) {
           session = await checkSession(headers).catch((error: Error) => {
             if (enforced) throw error;
             logger.error('Session check failed', { reason: error.message });
@@ -178,8 +203,8 @@ export const createHandler = (
           return json({ message: '404 Not Found' }, 404);
         }
         routeKey = match.key;
-        if (!anonymous) user = await getUser(headers);
-        return await match.route({ method, path, params: match.params, headers, query, body, user });
+        if (!anonymous && !appRoute) user = await getUser(headers);
+        return await match.route({ method, path, params: match.params, headers, query, body, user, app });
       } catch (error) {
         const { status, code, errorMessage, isExpectedError } = parseExpectedError(error as Error);
         const message = errorMessage || 'Error occurred';
@@ -210,6 +235,7 @@ export const createHandler = (
       status: response.statusCode,
       latencyMs: Date.now() - start,
       isaId: user?.isaId,
+      appClientId: app?.clientId,
       origin: headers['origin'],
       referer: refererOrigin(headers['referer']),
       userAgent: headers['user-agent']?.slice(0, 256),

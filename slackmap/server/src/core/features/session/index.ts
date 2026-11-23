@@ -10,6 +10,8 @@ const sessionSeconds = 12 * 60 * 60;
 const callsPerSession = 600;
 // Generous, because mobile networks put many people behind one IP.
 const sessionsPerNetworkPerHour = 20;
+// A session also opens the API, so a partner cannot take sessions without end to sweep it.
+const sessionsPerAppPerDay = 24;
 const cookieNames = ['CloudFront-Policy', 'CloudFront-Signature', 'CloudFront-Key-Pair-Id'] as const;
 
 const privateKey = () => createPrivateKey(process.env.SESSION_SIGNING_KEY!);
@@ -66,24 +68,8 @@ const verifyTurnstile = async (token: string, ip: string | undefined) => {
   return passed;
 };
 
-export const issueSession = async (token: unknown, headers: Record<string, string | undefined>) => {
-  const ip = viewerIp(headers);
-  const now = Math.floor(Date.now() / 1000);
-  // Local dev, through its proxy, holds the origin secret instead of passing the check.
-  const isDev = Boolean(headers['x-dev-key']) && headers['x-dev-key'] === process.env.ORIGIN_SECRET;
-  if (!isDev) {
-    if (typeof token !== 'string' || !token) throw new Error('Validation: token is required');
-    if (!(await verifyTurnstile(token, ip))) throw new Error('Forbidden: Browser check failed');
-  }
-  if (ip && !isDev) {
-    const hour = Math.floor(now / 3600);
-    // Only sessions that passed count, so junk requests cannot lock out a shared network.
-    const key = `issue:${hash(process.env.ORIGIN_SECRET!, String(hour), network(ip))}:${hour}`;
-    if ((await count(key, (hour + 2) * 3600)) > sessionsPerNetworkPerHour) {
-      throw new Error('TooManyRequests: Too many sessions from this network');
-    }
-  }
-
+// The same cookies a browser gets, which data. checks by their signature alone.
+const signedCookies = (now: number) => {
   const expiresAt = now + sessionSeconds;
   const policy = JSON.stringify({
     Statement: [
@@ -102,7 +88,38 @@ export const issueSession = async (token: unknown, headers: Record<string, strin
     (name) =>
       `${name}=${values[name]}; Domain=${webDomain}; Path=/; Max-Age=${sessionSeconds}; Secure; HttpOnly; SameSite=Lax`,
   );
-  return { cookies, expiresAt };
+  return { cookies, values, expiresAt };
+};
+
+// A partner app, already let in by its scope: no browser check and no per-network limit.
+export const issueAppSession = async (clientId: string) => {
+  const now = Math.floor(Date.now() / 1000);
+  const day = Math.floor(now / 86400);
+  if ((await count(`app:${clientId}:${day}`, (day + 2) * 86400)) > sessionsPerAppPerDay) {
+    throw new Error('TooManyRequests: Too many sessions for this app today');
+  }
+  return signedCookies(now);
+};
+
+export const issueSession = async (token: unknown, headers: Record<string, string | undefined>) => {
+  const ip = viewerIp(headers);
+  const now = Math.floor(Date.now() / 1000);
+  // Local dev, through its proxy, holds the origin secret instead of passing the check.
+  const isDev = Boolean(headers['x-dev-key']) && headers['x-dev-key'] === process.env.ORIGIN_SECRET;
+  if (!isDev) {
+    if (typeof token !== 'string' || !token) throw new Error('Validation: token is required');
+    if (!(await verifyTurnstile(token, ip))) throw new Error('Forbidden: Browser check failed');
+  }
+  if (ip && !isDev) {
+    const hour = Math.floor(now / 3600);
+    // Only sessions that passed count, so junk requests cannot lock out a shared network.
+    const key = `issue:${hash(process.env.ORIGIN_SECRET!, String(hour), network(ip))}:${hour}`;
+    if ((await count(key, (hour + 2) * 3600)) > sessionsPerNetworkPerHour) {
+      throw new Error('TooManyRequests: Too many sessions from this network');
+    }
+  }
+
+  return signedCookies(now);
 };
 
 const parseCookies = (header: string | undefined) =>

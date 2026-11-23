@@ -10,7 +10,7 @@ export const stages = {
     // The public half of the stage's pass signing key (see passes in infra/lib/config.ts). It sits in the public
     // source so anyone can check every member is signed with the same key, which is what keeps passes anonymous.
     passes: {
-      perMonth: 10,
+      perMonth: 50,
       publicKey: `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtMDAxJxAFbyYGY3vkLnR
 PAu3UrpPm6AP80I+H9AbuAoS01NAr+9QVDil92ax0jgucZiH4FirnCW6dYcdScEB
@@ -28,7 +28,7 @@ CQIDAQAB
     uploadsIdentityPoolId: 'eu-central-1:a6c50e3f-113b-46bb-aa3a-4568454fb444',
     sessionRequired: false,
     passes: {
-      perMonth: 50,
+      perMonth: 100,
       publicKey: `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsNIHjSacurqOintBkvI5
 4DBlC0xfDB7zTfyb/TcOgIYD2F9YZMGyMtKL89vQCNUL9QyvDqC2oCjL43DUb7N4

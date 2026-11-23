@@ -1,5 +1,6 @@
 import { refreshGlobalContributorsStatsToS3 } from '../../core/features/contributors';
 import {
+  refreshActiveGeoJsonFile,
   refreshGroupGeoJsonFiles,
   refreshGuideGeoJsonFiles,
   refreshLineGeoJsonFiles,
@@ -25,6 +26,8 @@ const refreshStartedActivations = async () => {
     // Dated at the start, so a second run in the window rewrites the same entry.
     if (feature) await addActivatedChangelog(feature, activation.activatedBy, new Date(activation.from * 1000));
   }
+  // An activation that ends needs no write either, so the partners' file is rewritten every hour.
+  await refreshActiveGeoJsonFile();
   logger.info('Started activations refreshed', { count: started.length });
 };
 

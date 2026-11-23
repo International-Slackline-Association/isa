@@ -10,14 +10,14 @@ const stages = {
     // Set by the stream of the table in the data stack; changes only if the stream is recreated.
     tableStreamArn:
       'arn:aws:dynamodb:eu-central-1:387132903656:table/slackmap-prod-db/stream/2026-11-12T13:16:15.858',
-    passes: { signingKeyParameter: 'slackmap-pass-signing-key', perMonth: 10 },
+    passes: { signingKeyParameter: 'slackmap-pass-signing-key', perMonth: 50 },
   },
   test: {
     domain: 'test.slackmap.com',
     // test.slackmap.com and *.test.slackmap.com, issued by hand.
     certificate: 'arn:aws:acm:us-east-1:387132903656:certificate/6da1b5c9-1f7c-487e-80e4-ce9ec49f88e5',
     tableStreamArn: 'arn:aws:dynamodb:eu-central-1:387132903656:table/slackmap-test-db/stream/2026-11-23T15:16:28.282',
-    passes: { signingKeyParameter: 'slackmap-test-pass-signing-key', perMonth: 50 },
+    passes: { signingKeyParameter: 'slackmap-test-pass-signing-key', perMonth: 100 },
   },
 };
 const given = process.env.STAGE;
@@ -75,6 +75,13 @@ export const isaUsers = {
   serviceClientId: '5ok76eocc9lbkp6go3f2179ej2',
   serviceClientSecretParameter: 'slackmap-isa-users-client-secret',
 };
+
+// Endpoints for partner apps, each one OAuth scope granted to an app's client in isa-users' app list.
+// One pool serves both stages, so each stage has its own scope server.
+export const apiScopeServer = isProd ? 'slackmap' : 'slackmap-test';
+export const apiScopes = {
+  'data.read': 'POST /v1/session',
+} as const;
 
 // The error digest runs as a GitHub Actions workflow of this repo, signed in through
 // the account's GitHub OIDC provider (aws-platform, IsaShared).

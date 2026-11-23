@@ -29,6 +29,8 @@ import {
   imagesBucketName,
   uploadsBucketName,
   isaUsers,
+  apiScopeServer,
+  apiScopes,
   isProd,
   namespace,
   passes,
@@ -77,6 +79,7 @@ export class AppStack extends Stack {
       ...(isProd ? {} : { SLACKMAP_EMAIL_DISABLED: 'true' }),
       SLACKMAP_TABLE_NAME: tableName,
       ISA_USER_POOL_ID: isaUsers.userPoolId,
+      APP_SCOPE_SERVER: apiScopeServer,
       SLACKMAP_CLIENT_ID: isaUsers.slackmapClientId,
       SLACKMAP_APPLICATION_DATA_S3_BUCKET: applicationDataBucketName,
       SLACKMAP_IMAGES_S3_BUCKET: imagesBucketName,
@@ -230,6 +233,23 @@ export class AppStack extends Stack {
       },
     });
     api.root.addResource('{proxy+}').addMethod('ANY', new apigateway.LambdaIntegration(apiFunction));
+    new cognito.CfnUserPoolResourceServer(this, 'ApiScopeServer', {
+      userPoolId: isaUsers.userPoolId,
+      identifier: apiScopeServer,
+      name: apiScopeServer,
+      scopes: Object.entries(apiScopes).map(([scopeName, route]) => ({ scopeName, scopeDescription: route })),
+    });
+    // Only an access token carrying the endpoint's scope passes: a partner app's client, never a user.
+    const appAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'AppAuthorizer', {
+      cognitoUserPools: [cognito.UserPool.fromUserPoolId(this, 'IsaUserPool', isaUsers.userPoolId)],
+    });
+    for (const [scope, route] of Object.entries(apiScopes)) {
+      const [method, resourcePath] = route.split(' ');
+      api.root.resourceForPath(resourcePath).addMethod(method, new apigateway.LambdaIntegration(apiFunction), {
+        authorizer: appAuthorizer,
+        authorizationScopes: [`${apiScopeServer}/${scope}`],
+      });
+    }
 
     // Signed-in users upload pictures straight to the uploads bucket; the API resizes them into the
     // images bucket.

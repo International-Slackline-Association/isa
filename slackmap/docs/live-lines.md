@@ -28,7 +28,7 @@ People who do not need anonymity can activate with their name instead. The name 
 
 Activating is an extension of a line or spot that already exists. It can start on a later day, so people can activate early; until it starts it shows only on its card, not on the map or in the shared data. Creating a line stays the normal flow and says a line can be rigged there, not that anyone rigged it legally; only lines and spots on the map can be activated.
 
-This is the core idea: activations reach third parties that depend on knowing whether a line is actually rigged, as part of the line data they collect ([data access](data-access.md)). SlackMap is only the mediator; the person informs that the line is rigged, anonymously if they choose, without taking the responsibility for it. They support the safety of slacklining without involving themselves at all. Today aviation is the only place this information goes, but that may change, so it is never presented as aviation only.
+This is the core idea: activations reach third parties that depend on knowing whether a line is actually rigged, as part of the line data they collect ([data access](data-access.md)), or from its live file once they are partners ([partner data](partner-data.md)). SlackMap is only the mediator; the person informs that the line is rigged, anonymously if they choose, without taking the responsibility for it. They support the safety of slacklining without involving themselves at all. Today aviation is the only place this information goes, but that may change, so it is never presented as aviation only.
 
 Edge cases like a fake activation blocking a line until it expires are accepted, not designed around.
 

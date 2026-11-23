@@ -9,6 +9,7 @@ import { guideRoutes } from './endpoints/guide/api';
 import { lineRoutes } from './endpoints/line/api';
 import { meRoutes, requireAgreement } from './endpoints/me/api';
 import { pageRoutes } from './endpoints/page/api';
+import { partnerRoutes } from './endpoints/partner/api';
 import { activationRoutes, signedInActivationRoutes } from './endpoints/activation/api';
 import { sessionRoutes } from './endpoints/session/api';
 import { spotRoutes } from './endpoints/spot/api';
@@ -31,4 +32,5 @@ export const main = createHandler(
     ...meRoutes,
   },
   activationRoutes,
+  partnerRoutes,
 );

@@ -12,6 +12,6 @@ description: "What test.slackmap.com is for and why it differs from prod: user t
 - No email: no email flow is needed on test.
 - The session cookie is not required, so the web app skips the browser check too: on test it adds only friction. Both can only be tested on prod.
 - No CDN access logs and no error digest.
-- Its own pass signing key, so a test pass never works on prod, and 50 anonymous activations a month instead of 10: nobody minds on test.
+- Its own pass signing key, so a test pass never works on prod, and twice prod's anonymous activations a month: nobody minds on test.
 
 Its hosts nest under `test.slackmap.com`, so test's own cookies never reach prod.
