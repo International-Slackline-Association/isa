@@ -43,7 +43,7 @@ Standard: Privacy Pass (RFC 9576 architecture, 9578 issuance) with RSA blind sig
 |---|---|
 | **Timing**: pass at 14:02, rigger created at 14:03 | Passes fetched ahead and automatically on any sign-in; pass counts stored without time. A first-ever user who signs in and creates a rigger right away is linkable only by someone watching live, not afterwards. |
 | **The browser-check session cookie** (Turnstile, [data access](/slackmap/docs/data-access.md)) sent with both ISA-signed-in and rigger requests | Rigger API doesn't accept or log that cookie, or the anonymous context gets its own browser-check session. To settle in the deep dive. |
-| **The rigger links its own rigs** | Accepted: one pseudonym. Someone wanting more can make a fresh rigger with another pass. |
+| **The rigger links its own rigs** | Only while rigs are active: a rig forgets its rigger when it ends, and a rigger is deleted after 12 months without an active rig ([G14, G15](decisions.md#decided-by-can)). Backups still hold these links for their retention time. |
 | **IP** of the issuing and reporting requests match | Rig endpoint never logs or stores IPs; Turnstile called without `remoteip`. Optionally Oblivious HTTP ([D8](decisions.md#d8-how-hard-do-we-hide-the-ip)). |
 | **Login token or cookie** sent with the report | Rig calls go through a client that carries nothing from sign-in. |
 | **Rate-limit keys** derived from IP | Hash with a secret rotated daily. |

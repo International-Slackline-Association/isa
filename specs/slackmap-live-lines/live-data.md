@@ -8,7 +8,7 @@ Rigging extends an existing line ([G4](decisions.md#decided-by-can)): a few fiel
 |---|---|---|
 | rigged until | yes | expiry; the browser hides the rig once it passes |
 | reported at | yes | "reported 2 h ago" |
-| anonymous rigger id ([D2](decisions.md#d2-how-the-owner-edits-from-any-device-without-isa-knowing-who)) | **never** | owner-only update |
+| anonymous rigger id ([D2](decisions.md#d2-how-the-owner-edits-from-any-device-without-isa-knowing-who)), erased when the rig ends | **never** | owner-only update |
 | terms version accepted | no | licence |
 
 Nothing else ([G10](decisions.md#decided-by-can)).

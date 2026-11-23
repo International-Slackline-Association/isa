@@ -110,8 +110,10 @@ sequenceDiagram
     T-->>T: stream handler rewrites map files
     B->>R: extend / take down L
     R->>R: L.rig.rigger == R?
-    R->>T: update or clear L.rig
+    R->>T: extend: update L.rig · take down: clear L.rig, rigger id with it
 ```
+
+Expired rigs lose their rigger id on the next write or a daily cleanup ([G14](decisions.md#decided-by-can)); riggers without an active rig for 12 months are deleted ([G15](decisions.md#decided-by-can)).
 
 ## A5. A rig's life
 
@@ -121,8 +123,16 @@ stateDiagram-v2
     Rigged --> Rigged: rigger extends
     Rigged --> Ended: rigger takes it down
     Rigged --> Expired: until-time passes, map hides it
-    Ended --> [*]
-    Expired --> [*]
+    Ended --> [*]: rigger id erased
+    Expired --> [*]: rigger id erased
+```
+
+```mermaid
+stateDiagram-v2
+    [*] --> Active: created with a pass
+    Active --> Active: reports, extends
+    Active --> Deleted: 12 months without an active rig
+    Deleted --> [*]: passkey dead, keychain told to drop it where supported
 ```
 
 ---
@@ -185,7 +195,23 @@ flowchart TD
     O -- ignores --> Exp([Sunday 20:00: disappears by itself])
 ```
 
-## U5. Lost every device
+## U5. Device without passkeys
+
+```mermaid
+flowchart LR
+    A["Taps 'Report rigged'"] --> N["'Your device doesn't support<br/>anonymous reporting'"]
+```
+
+## U6. Coming back after a year
+
+```mermaid
+flowchart LR
+    A["Taps 'Report rigged', Face ID"] --> X["Rigger unknown (deleted after 12 months)"]
+    X --> S["Signed in? A stored pass creates<br/>a new rigger, one more Face ID"]
+    S --> Sh["Sheet: until  Today ▾"]
+```
+
+## U7. Lost every device
 
 ```mermaid
 flowchart LR

@@ -18,6 +18,9 @@ Each item: the question, the options, a recommendation. ⭐ = recommended. Chang
 | G10 | **No fields or UI for consumers' sake** (aviation or other). SlackMap serves slackliners; what others do with the data is not its concern. A rig is: rigged, until when, reported when. |
 | G11 | The owner must be able to edit **from any of their devices** (start on the laptop, end on the phone). |
 | G12 | **The rig belongs to an anonymous rigger passkey** ([D2](#d2-how-the-owner-edits-from-any-device-without-isa-knowing-who) C), created once with a blind pass. |
+| G13 | **No fallback for devices without passkeys** in v1: they see "your device doesn't support anonymous reporting". A second ownership path is added only if real users ask. |
+| G14 | **A rig forgets its rigger as soon as it ends** (taken down or expired). ISA never keeps which past rigs came from the same rigger. |
+| G15 | **A rigger is deleted after 12 months without an active rig.** Its passkey stops working; the user makes a new rigger with a new pass. Where the browser supports it, the app tells the keychain to drop the dead passkey. |
 
 ---
 
