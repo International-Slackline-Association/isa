@@ -1,3 +1,4 @@
+import SensorsIcon from '@mui/icons-material/Sensors';
 import React from 'react';
 
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -40,6 +41,8 @@ export const ChangelogActionIcon = (props: { type: MapFeatureChangelogAction }) 
       return <AdminPanelSettingsIcon fontSize="small" />;
     case 'updatedOwners':
       return <ChangeCircleIcon fontSize="small" />;
+    case 'activated':
+      return <SensorsIcon fontSize="small" />;
     default:
       return null;
   }

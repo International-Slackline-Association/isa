@@ -60,6 +60,9 @@ export const getGlobalActivityChangelogs = async (req: Request) => {
         case 'grantedTemporaryEditor':
           item.htmlText = `<b>${fullname}</b> has been granted temporary editor rights for the ${c.featureType} in <b>${c.countryName}</b>.`;
           break;
+        case 'activated':
+          item.htmlText = `<b>${fullname}</b> activated a ${c.featureType} in <b>${c.countryName}</b>.`;
+          break;
         case 'updatedOwners':
           item.htmlText = `<b>${fullname}</b> changed the owner of the ${c.featureType} in <b>${c.countryName}</b>.`;
           break;

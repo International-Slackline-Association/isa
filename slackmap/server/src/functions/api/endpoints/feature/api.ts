@@ -56,6 +56,9 @@ export const getFeatureChangelogs = async (
         case 'grantedTemporaryEditor':
           item.htmlText = `<b>${fullname}</b> has been granted temporary editor rights for the ${c.featureType}.`;
           break;
+        case 'activated':
+          item.htmlText = `<b>${fullname}</b> activated the ${c.featureType}.`;
+          break;
         case 'updatedOwners':
           item.htmlText = `<b>${fullname}</b> changed the owner of the ${c.featureType}.`;
           break;

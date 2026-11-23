@@ -1,7 +1,7 @@
 ---
 type: reference
 title: slackmap manual operations
-description: "What slackmap depends on that CDK does not manage, per stage: the slackmap.com and test.slackmap.com certificates, Cloudflare records and the Turnstile widget, SSM parameters (Mapbox tokens, the isa-users client secret, the Turnstile secret, the session signing key and the origin secret included), the pre-migration backup, the ISA account that administers groups, and the names other apps use."
+description: "What slackmap depends on that CDK does not manage, per stage: the slackmap.com and test.slackmap.com certificates, Cloudflare records and the Turnstile widget, SSM parameters (Mapbox tokens, the isa-users client secret, the Turnstile secret, the session and pass signing keys and the origin secret included), the pre-migration backup, the ISA account that administers groups, and the names other apps use."
 ---
 
 # Manual operations
@@ -17,6 +17,7 @@ Not managed by CDK. Every `slackmap-*` parameter serves both stages.
 | Turnstile widget `slackmap` | Cloudflare, Turnstile | Mode managed, hostname `slackmap.com` (covers its subdomains). Its site key is in [session.ts](/slackmap/web/src/app/session.ts). |
 | SSM `slackmap-turnstile-secret` | Parameter Store | The widget's secret. |
 | SSM `slackmap-session-signing-key` | Parameter Store | RSA-2048 private key signing the session cookies; its public half is [session-public-key.pem](/slackmap/infra/session-public-key.pem). Replace it only together with the pem, then deploy; it ends every open session. |
+| SSM `slackmap-pass-signing-key` | Parameter Store | RSA-2048 private key blind-signing the passes of anonymous activations; its public half is in [passes.ts](/slackmap/web/src/app/components/LineActivation/passes.ts). Replace it only together with that key, then deploy; unspent passes stop working. |
 | SSM `slackmap-origin-secret` | Parameter Store | Random value CloudFront sends to the API; `dev` sends it too, to get a session without the browser check. |
 | SSM `slackmap-geonames-api-username` | Parameter Store | GeoNames account for country lookups. |
 | SSM `slackmap-isa-users-client-secret` | Parameter Store | Secret of slackmap's client for the isa-users API; its client id is in [config](/slackmap/infra/lib/config.ts). |

@@ -161,6 +161,19 @@ export const addUpdatedOwnersChangelog = async (
   });
 };
 
+// Only an activation with the member's name: an anonymous one must never reach a record tied to a person.
+export const addActivatedChangelog = async (item: GenericMapFeatureItemType, userId: string, date: Date) => {
+  const feature = genericFeatureFromItem(item);
+  await db.putFeatureChangelog({
+    featureId: feature.id,
+    featureType: feature.type,
+    userId,
+    action: 'activated',
+    date: date.toISOString(),
+    country: feature.country,
+  });
+};
+
 export const addTemporaryEditorChangelogToFeature = async (
   featureId: string,
   featureType: MapFeatureType,

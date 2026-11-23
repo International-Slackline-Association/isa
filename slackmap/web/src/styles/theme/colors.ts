@@ -7,10 +7,12 @@ const red = '#FC3E3E';
 const magenta = '#1DDECE';
 const purple = '#9039A5';
 const mustard = '#CD9D3E';
+const orange = '#FF8A00';
 
 export const appColors = {
   slacklinePoint: slackmapGreen,
   lineStrokeColor: red,
+  activeColor: orange,
   guideFeaturesColor: muiColors.orange[400],
   spotFillColor: slackmapGreen,
   mainClusterColor: isaBlue,

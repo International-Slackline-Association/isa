@@ -1,7 +1,7 @@
 ---
 type: policy
 title: Folder convention
-description: Exact rules for where docs/ folders go, what they contain, naming, the README, docs vs specs, agent instruction files, edge cases, and lifecycle.
+description: Exact rules for where docs/ folders go, what they contain, naming, the README, docs being current, agent instruction files, edge cases, and lifecycle.
 related: [the-theory.md]
 ---
 
@@ -52,9 +52,9 @@ Folders never carry retrieval semantics: a doc is found through its own `descrip
 
 A reference to a specific file in the repo is a markdown link, never a bare path in backticks ([why](the-theory.md#scopes-not-levels)). Inside one scope's `docs/` folder the path is relative; anything outside it (another scope, the repo's `docs/`, a code file) is root-relative and starts with `/`; a link never stacks `../`. Agent instruction and context files link the same way, with the file's own folder in place of `docs/`. A file read from a copy outside the repo (a plugin's pointer to a sibling plugin) names repo-relative paths in backticks. A filename used as a kind, "every scope's `README.md`", code identifiers, glob patterns, placeholder and example paths, and the `@docs/README.md` import stay in backticks.
 
-## Docs vs specs
+## Docs are current
 
-`docs/` describes the system as it is today and is kept current. Point-in-time material (proposals, discussion notes, spec snapshots) lives in `specs/` (repo root) and carries no doc frontmatter.
+`docs/` describes the system as it is today and is kept current.
 
 ## Agent instruction files
 

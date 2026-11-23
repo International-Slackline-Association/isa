@@ -98,6 +98,22 @@ const sections: { title: string; items: { q: string; a: React.ReactNode }[] }[] 
         ),
       },
       {
+        q: 'How does activating a line anonymously work?',
+        a: (
+          <>
+            While you are signed in, your browser quietly gets a few anonymous passes. An anonymous activation uses
+            one of them and never your account, so SlackMap only learns that a member activated the line, never who.
+            You get a manage link to extend or deactivate it, and you can share it with your crew. You can also
+            activate with your name instead. SlackMap is open source and uses industry-standard methods: anyone can
+            check how it works on{' '}
+            <Link href="https://github.com/International-Slackline-Association/isa" target="_blank" rel="noreferrer">
+              GitHub
+            </Link>
+            .
+          </>
+        ),
+      },
+      {
         q: 'Why do I sometimes see "Verify you are human"?',
         a: 'SlackMap is free for people, not for automated copying, so we check that a real browser is loading the map. Most visitors never see it.',
       },

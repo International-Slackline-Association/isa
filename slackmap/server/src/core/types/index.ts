@@ -25,4 +25,5 @@ export type MapFeatureChangelogAction =
   | 'created'
   | 'updatedDetails'
   | 'updatedOwners'
-  | 'grantedTemporaryEditor';
+  | 'grantedTemporaryEditor'
+  | 'activated';

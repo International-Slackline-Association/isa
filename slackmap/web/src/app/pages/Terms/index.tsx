@@ -19,7 +19,7 @@ const P = (props: { children: React.ReactNode }) => (
 
 export const TermsPage = () => (
   <Box sx={{ height: '100vh', overflowY: 'auto', width: '100%' }}>
-    <Box sx={{ maxWidth: 720, margin: '0 auto', padding: { xs: '72px 16px 32px', lg: '32px 24px' } }}>
+    <Box sx={{ maxWidth: 720, margin: '0 auto', padding: { xs: '24px 16px 88px', lg: '32px 24px' } }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Terms of use and data use policy
       </Typography>

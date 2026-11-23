@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 import { Box, Stack } from '@mui/material';
 
 import { communityApi } from 'app/api/community-api';
+import { AddMenu } from 'app/components/AddMenu';
 import { getSlacklineGroupsGeoJsonOfCountry } from 'app/api/geojson-data';
 import { CommunityMap } from 'app/components/Maps/CommunityMap';
 import { parseMapFeature } from 'app/components/Maps/mapUtils';
@@ -12,7 +13,6 @@ import { FeatureCollection } from 'geojson';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 
 import { CommunityCountryDetailCard } from './CommunityCountryDetailCard';
-import { CreateCommunitySpeedDial } from './CreateCommunitySpeedDial';
 import { SlacklineGroupDetailCard } from './SlacklineGroupDetailCard';
 import { useActiveCommunityFeature } from './useCommunityFeature';
 
@@ -90,7 +90,7 @@ export function CommunitiesPage() {
           flexShrink: 0,
         }}
       >
-        <CreateCommunitySpeedDial />
+        <AddMenu />
         <CommunityMap
           onSelectedFeatureChange={onSelectedFeatureChange}
           activeCommunityFeature={activeFeature}

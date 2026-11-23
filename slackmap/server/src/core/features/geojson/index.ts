@@ -21,6 +21,8 @@ export const processLineGeoJson = (
     type?: SlacklineType;
     length?: number;
     country: string;
+    // Only for the map files; the line item's stored geoJson never carries it.
+    activation?: { until: number; activatedAt: number };
   },
 ): FeatureCollection => {
   const features: Feature[] = [];
@@ -36,6 +38,13 @@ export const processLineGeoJson = (
     }
     if (meta.country) {
       f.properties['c'] = meta.country;
+    }
+    if (meta.activation) {
+      f.properties['au'] = meta.activation.until;
+      f.properties['aa'] = meta.activation.activatedAt;
+    } else {
+      delete f.properties['au'];
+      delete f.properties['aa'];
     }
     features.push(f);
   }
@@ -161,7 +170,10 @@ export const refreshLineGeoJsonFiles = async (
   let updatedLines: Awaited<ReturnType<typeof db.getAllLines>> | undefined;
 
   if (opts.lineIdToUpdate) {
-    const line = await db.getLineDetails(opts.lineIdToUpdate);
+    const [line, activation] = await Promise.all([
+      db.getLineDetails(opts.lineIdToUpdate),
+      db.getLineActivation(opts.lineIdToUpdate),
+    ]);
     mainGeoJSON = await getFromS3('geojson/lines/all.geojson');
     mainGeoJSON.features = mainGeoJSON.features.filter(
       (f) => f.properties?.id !== opts.lineIdToUpdate,
@@ -172,6 +184,7 @@ export const refreshLineGeoJsonFiles = async (
         type: line.type,
         length: line.length,
         country: line.country,
+        activation: activation ?? undefined,
       });
       mainGeoJSON.features.push(...geoJson.features);
       updatedLines = [line];
@@ -182,6 +195,7 @@ export const refreshLineGeoJsonFiles = async (
       features: [],
     };
     updatedLines = await db.getAllLines();
+    const activations = new Map((await db.getAllLineActivations()).map((a) => [a.lineId, a]));
     for (const line of updatedLines) {
       if (line) {
         const geoJson = processLineGeoJson(JSON.parse(line.geoJson), {
@@ -189,6 +203,7 @@ export const refreshLineGeoJsonFiles = async (
           type: line.type,
           length: line.length,
           country: line.country,
+          activation: activations.get(line.lineId),
         });
         for (const feature of geoJson.features) {
           mainGeoJSON.features.push(feature);

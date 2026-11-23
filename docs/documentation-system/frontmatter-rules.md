@@ -4,7 +4,7 @@ title: Frontmatter rules
 description: >-
   Rules for frontmatter fields, status, writing a description, one type per
   file, where index and notes files live, notes items, and links between
-  explanation, policy and specs.
+  explanation and policy.
 ---
 
 # Frontmatter rules
@@ -16,4 +16,4 @@ Why: [derivable or theory](the-theory.md#derivable-or-theory). The fields and ty
 3. One `type` per file. A file that needs two is two files. Frontmatter is authoritative over folder names.
 4. `index` is only for `README.md`. `notes` is one flat file per scope, `docs/notes.md`.
 5. A `notes` item is one line, deleted when it lands or graduates into another type; the file lists what is open, not history. If work cannot proceed without the answer, it is not a note but an undecided sentence in the explanation.
-6. An `explanation` holds the whys, including decisions and the rejections the human chose to record, and links the `policy`s it justifies. A decision that needs a frozen, dated record gets one in `specs/`, linked from the explanation.
+6. An `explanation` holds the whys, including decisions and the rejections the human chose to record, and links the `policy`s it justifies.

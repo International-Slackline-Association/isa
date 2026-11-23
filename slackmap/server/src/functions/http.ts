@@ -132,9 +132,14 @@ const refererOrigin = (referer?: string) => {
   }
 };
 
-export const createHandler = (lambdaName: string, routes: Record<string, Route>) => {
+export const createHandler = (
+  lambdaName: string,
+  routes: Record<string, Route>,
+  anonymousRoutes: Record<string, Route> = {},
+) => {
   logger.setLambdaName(lambdaName);
-  const compiled = compileRoutes(routes);
+  const compiled = compileRoutes({ ...routes, ...anonymousRoutes });
+  const anonymousKeys = new Set(Object.keys(anonymousRoutes));
 
   return async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const start = Date.now();
@@ -149,6 +154,9 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
     // Only CloudFront knows the secret; a call straight to execute-api does not have it.
     const viaCloudFront = headers['x-origin-secret'] === process.env.ORIGIN_SECRET;
     let session: SessionState | undefined;
+    // Known before anything can fail, so an anonymous call is never logged with the browser's fingerprint.
+    const match = matchRoute(compiled, method, path);
+    const anonymous = Boolean(match && anonymousKeys.has(match.key));
 
     const respond = async (): Promise<APIGatewayProxyResult> => {
       try {
@@ -165,13 +173,12 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
           if (enforced && session !== 'valid') throw new Error(`SessionRequired: Open ${webDomain}`);
         }
         const body = parseBody(event);
-        user = await getUser(headers);
-        const match = matchRoute(compiled, method, path);
         if (!match) {
           logger.info('Not found', { method, path });
           return json({ message: '404 Not Found' }, 404);
         }
         routeKey = match.key;
+        if (!anonymous) user = await getUser(headers);
         return await match.route({ method, path, params: match.params, headers, query, body, user });
       } catch (error) {
         const { status, code, errorMessage, isExpectedError } = parseExpectedError(error as Error);
@@ -187,6 +194,15 @@ export const createHandler = (lambdaName: string, routes: Record<string, Route>)
 
     const response = await respond();
     response.headers = { ...response.headers, ...responseHeaders(headers['origin']) };
+    if (anonymous) {
+      logger.info('Request', {
+        route: match!.key,
+        method,
+        status: response.statusCode,
+        latencyMs: Date.now() - start,
+      });
+      return response;
+    }
     // One line per request for usage analytics; the headers as a whole carry the client's IP.
     logger.info('Request', {
       route: routeKey ?? null,

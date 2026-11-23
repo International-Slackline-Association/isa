@@ -13,9 +13,10 @@ import { getCurrentUser, signOut } from 'aws-amplify/auth';
 import { Hub } from 'aws-amplify/utils';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-import { AppDrawer } from './components/AppDrawer';
+import { AppPanel } from './components/AppPanel';
 import { ContributorAgreementDialog } from './components/ContributorAgreement';
 import { withErrorBoundry } from './components/ErrorBoundary';
+import { refillPasses } from './components/LineActivation/passes';
 import { MaintenancePage } from './components/MaintenancePage';
 
 const CreateGroupPage = lazy(() => import('./pages/Create/Group').then((m) => ({ default: m.CreateGroupPage })));
@@ -58,6 +59,10 @@ export function App() {
   }, [dispatch]);
 
   useEffect(() => {
+    if (isSignedIn) refillPasses();
+  }, [isSignedIn]);
+
+  useEffect(() => {
     if (authState === AuthState.SigningOut) {
       signOut();
     }
@@ -78,7 +83,7 @@ export function App() {
         <MaintenancePage />
       ) : (
         <BrowserRouter>
-          <AppDrawer>
+          <AppPanel>
             <Suspense fallback={null}>
               <Routes>
                 <Route path="/" element={<SlacklineMapPage />} />
@@ -105,7 +110,7 @@ export function App() {
                 <Route path="*" element={<SlacklineMapPage />} />
               </Routes>
             </Suspense>
-          </AppDrawer>
+          </AppPanel>
 
           <ContributorAgreementDialog />
           <NotificationSnackbar />

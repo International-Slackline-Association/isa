@@ -18,6 +18,8 @@ export const LineLayerIds = {
   linePoint: 'linePoint',
   lineLine: 'lineLine',
   lineLabel: 'lineLabel',
+  lineActiveHalo: 'lineActiveHalo',
+  linePointActiveHalo: 'linePointActiveHalo',
 } as const;
 
 export const linePointLayer = (opts: CommonOpts): CircleLayer => {
@@ -56,3 +58,23 @@ export const lineLabelLayer = (opts: CommonOpts): SymbolLayer => {
     },
   };
 };
+
+const activeColor = appColors.activeColor;
+
+export const activeLineHaloLayer = (opts: CommonOpts): LineLayer => ({
+  id: LineLayerIds.lineActiveHalo,
+  type: 'line',
+  minzoom: 12,
+  filter: opts.filter,
+  layout: { 'line-cap': 'round', visibility: opts.visible ? 'visible' : 'none' },
+  paint: { 'line-color': activeColor, 'line-width': 14, 'line-opacity': 0.45, 'line-blur': 4 },
+});
+
+export const activePointHaloLayer = (opts: CommonOpts): CircleLayer => ({
+  id: LineLayerIds.linePointActiveHalo,
+  type: 'circle',
+  maxzoom: 13,
+  filter: opts.filter,
+  layout: { visibility: opts.visible ? 'visible' : 'none' },
+  paint: { 'circle-color': activeColor, 'circle-radius': 14, 'circle-opacity': 0.45, 'circle-blur': 0.6 },
+});

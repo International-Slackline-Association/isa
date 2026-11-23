@@ -5,7 +5,7 @@ export const MapTermsNote = () => (
     sx={{
       position: 'absolute',
       zIndex: 1,
-      bottom: 4,
+      bottom: { xs: 60, lg: 4 },
       left: 4,
       paddingX: 0.75,
       borderRadius: 1,

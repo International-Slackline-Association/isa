@@ -9,17 +9,17 @@ import { getSlacklinePointFeaturesOfCountry } from 'app/api/geojson-data';
 import { GetGuideDetailsAPIResponse } from 'app/api/guide-api';
 import { GetLineDetailsAPIResponse } from 'app/api/line-api';
 import { GetSpotDetailsAPIResponse } from 'app/api/spot-api';
+import { AddMenu } from 'app/components/AddMenu';
 import { SlacklineMap } from 'app/components/Maps/SlacklineMap';
 import { mapUrlSearchParams, parseMapFeature } from 'app/components/Maps/mapUtils';
 import { WelcomeTutorial } from 'app/components/Tutorials/WelcomeTutorial';
 import { appActions } from 'app/slices/app';
-import { selectLastMapLocation } from 'app/slices/app/selectors';
+import { selectHighlightedFeature, selectLastMapLocation } from 'app/slices/app/selectors';
 import { FeatureCollection } from 'geojson';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 
 import { ActivityDetailCard } from './ActivityDetailCard';
 import { CountryDetailCard } from './CountryDetailCard';
-import { CreateFeatureSpeedDial } from './CreateSpeedDial';
 import { GuideDetailCard } from './GuideDetailCard';
 import { LineDetailCard } from './LineDetailCard';
 import { SpotDetailCard } from './SpotDetailCard';
@@ -47,6 +47,7 @@ export function SlacklineMapPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const lastMapLocation = useSelector(selectLastMapLocation);
+  const panelHighlightedFeature = useSelector(selectHighlightedFeature);
 
   const { isDesktop } = useMediaQuery();
 
@@ -170,14 +171,14 @@ export function SlacklineMapPage() {
           flexShrink: 0,
         }}
       >
-        <CreateFeatureSpeedDial />
+        <AddMenu />
         <SlacklineMap
           onSelectedFeatureChange={onSelectedFeatureChange}
           onMapMoveEnd={onMapMoveEnd}
           initialViewState={mapUrlSearchParams.parse(searchParams) || lastMapLocation}
           activeSlacklineFeature={activeFeature}
           activeSlacklineFeatureGeoJson={activeFeatureGeoJson}
-          highlightedSlacklineFeature={highlightedFeature}
+          highlightedSlacklineFeature={highlightedFeature ?? panelHighlightedFeature}
         />
       </Box>
 

@@ -14,6 +14,7 @@ export interface AppState {
     longitude: number;
     zoom: number;
   };
+  highlightedFeature?: { id: string; type: SlacklineMapFeatureType };
 }
 export type SnackbarNotification = {
   message: string;
