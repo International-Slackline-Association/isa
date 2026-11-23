@@ -83,6 +83,8 @@ Locally (`dev` against the test stage API after deploy), then on `test.slackmap.
 
 ## Open questions
 
+Can's answers: Q2–Q5 and Q7 as recommended. Q6 accepted: **legally only proof counts; a correlation is a smart guess that doesn't hold up officially, and the report stays anonymous.** Edge cases like Q7 are fine to leave. Q1: keep analytics and debugging; see below.
+
 | # | Question | Recommendation |
 |---|---|---|
 | Q1 | **The request log's `isaId`.** Keep it and anonymity is broken by timing. | Drop `isaId` from all log lines (request and error); log `signedIn: true/false`. Loses "signed-in users per week"; that analytics line changes. |
@@ -92,3 +94,14 @@ Locally (`dev` against the test stage API after deploy), then on `test.slackmap.
 | Q5 | **Map file lost update** on parallel changes (existing for lines; rigs add writes). | Accept for v1: card always right; expiry, the next change or the weekly rebuild repairs the map. |
 | Q6 | **Residual: CloudTrail keeps Cognito sign-in calls 90 days** (time, IP). A first-time user who signs in and reports minutes later is weakly linkable by someone with AWS account access. | Accept and say it in the doc. Passes are fetched at sign-in, so a report right after a first sign-in is the only case. |
 | Q7 | A fake rig blocks the line for others until its expiry (max 14 days). | Accept for v1. |
+
+### Q1 revisited: keep the log, cut only the fingerprint
+
+By Can's rule (Q6), what must never exist is **proof**: a record that ties a report to a person. Timing alone is a guess. So the log keeps `isaId` for every other call; only the rig calls change:
+
+| Rig call log line | Keeps | Drops |
+|---|---|---|
+| request line + state-change line | route, status, latency, line id, outcome | user agent, ASN, country, origin, referer, session state, any `isaId` |
+
+- Analytics and debugging of everything else stay as they are.
+- What remains is timing: "X was signed in around then". Stripping more buys little, since the table's 35-day point-in-time recovery holds the exact time of every write anyway.
