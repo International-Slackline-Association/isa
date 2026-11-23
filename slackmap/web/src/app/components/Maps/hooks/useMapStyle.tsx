@@ -5,6 +5,8 @@ import { Projection } from 'mapbox-gl';
 import { SelectedMapStyle } from '../SlacklineMap/useMapOptions';
 import { mapStyles } from '../constants';
 
+export const SATELLITE_MIN_ZOOM = 10;
+
 export const useMapStyle = (
   zoomLevel?: number,
   opts?: {
@@ -14,7 +16,7 @@ export const useMapStyle = (
   const pickStyle = (style?: SelectedMapStyle, zoomLevel?: number) => {
     switch (style) {
       case 'default':
-        if (!zoomLevel || zoomLevel < 10) {
+        if (!zoomLevel || zoomLevel < SATELLITE_MIN_ZOOM) {
           return mapStyles.dark;
         }
         return mapStyles.satelliteStreets;

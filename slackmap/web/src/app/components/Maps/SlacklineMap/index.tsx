@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import {
   AttributionControl,
   GeolocateControl,
   MapGeoJSONFeature,
+  Source,
   NavigationControl,
   Map as ReactMapGL,
   ViewState,
@@ -19,19 +20,21 @@ import { MapTermsNote } from '../Components/TermsNote';
 import { MapImage } from '../Components/MapImage';
 import { MapDataLoadingIndicator } from '../Components/MapDataLoadingIndicator';
 import { MapLoadingPlaceholder } from '../Components/MapLoadingPlaceholder';
-import { MAPBOX_TOKEN, defaultMapSettings, defaultMapViewState } from '../constants';
+import { MAPBOX_TOKEN, defaultMapSettings, defaultMapViewState, mapStyles } from '../constants';
 import { useActiveFeature } from '../hooks/useActiveFeature';
 import { useActiveFeatureGeoJson } from '../hooks/useActiveFeatureGeoJson';
 import { useHighlightedFeature } from '../hooks/useHighlightedFeature';
 import { useHoveredFeature } from '../hooks/useHoveredFeature';
 import { useMapEvents } from '../hooks/useMapEvents';
-import { useMapStyle } from '../hooks/useMapStyle';
+import { SATELLITE_MIN_ZOOM, useMapStyle } from '../hooks/useMapStyle';
 import { useSelectedFeature } from '../hooks/useSelectedFeature';
 import { useZoomToUserLocationOnMapLoad } from '../hooks/useZoomToUserLocation';
 import { cursorInteractableLayerIds, isMouseHoverableLayer } from '../layers';
 import { SlacklineMapSourceIds, SlacklineMapSources } from '../sources/slacklineMapSources';
 import { MapFeatureEntity } from '../types';
 import { GeocoderControl } from './geocoderControl';
+import { TILT_MIN_PITCH, TiltControl } from './TiltControl';
+import { TopoLayers } from './TopoLayers';
 import { useMapOptions } from './useMapOptions';
 import { mapControlsSx } from 'styles/theme/panelTheme';
 
@@ -62,6 +65,13 @@ export const SlacklineMap = (props: Props) => {
   const { mapStyle, projection } = useMapStyle(zoomLevel, {
     style: selectedMapStyle,
   });
+
+  // 3D only where the map shows satellite: there is no use for terrain zoomed out.
+  const is3d =
+    mapStyle === mapStyles.satelliteStreets &&
+    zoomLevel !== undefined &&
+    zoomLevel >= SATELLITE_MIN_ZOOM;
+  const [tilted, setTilted] = useState(false);
 
   const { hoveredFeature, setHoveredMapboxFeature, setHoveredFeature } = useHoveredFeature(mapRef);
   const { selectedFeature, setSelectedFeature, setSelectedMapboxFeature } =
@@ -167,16 +177,37 @@ export const SlacklineMap = (props: Props) => {
         onMoveEnd={props.onMapMoveEnd}
         onMouseMove={onMouseMove}
         cursor={cursor}
+        onPitch={(e) => setTilted(e.viewState.pitch > TILT_MIN_PITCH)}
         onZoom={(e) => {
           setZoomLevel(e.viewState.zoom);
         }}
         ref={mapRef}
         projection={projection}
+        maxPitch={is3d ? 85 : 0}
+        pitchWithRotate={is3d}
+        terrain={is3d ? { source: 'mapbox-dem', exaggeration: 1.2 } : undefined}
       >
+        {/* Always mounted: removing it before terrain lets go of it errors, and unused it loads no tiles. */}
+        <Source
+          id="mapbox-dem"
+          type="raster-dem"
+          url="mapbox://mapbox.mapbox-terrain-dem-v1"
+          tileSize={512}
+          maxzoom={14}
+        />
+        {is3d && tilted && <TopoLayers />}
         <GeolocateControl position="bottom-right" />
         <AttributionControl compact customAttribution="International Slackline Association" />
-        <NavigationControl position="bottom-right" showCompass={false} />
-        {MapStyleControl}
+        {/* The navigation control reads its options only when added; remounting the group keeps the stack's order. */}
+        <Fragment key={is3d ? '3d' : '2d'}>
+          <NavigationControl
+            position="bottom-right"
+            showCompass={is3d}
+            visualizePitch={is3d}
+          />
+          {MapStyleControl}
+          {is3d && <TiltControl />}
+        </Fragment>
         <GeocoderControl
           mapboxAccessToken={MAPBOX_TOKEN}
           position="top-left"

@@ -104,8 +104,11 @@ export const useActivePointPulse = (map: MapboxMap | undefined) => {
     let frame = 0;
     const tick = (time: number) => {
       const t = (time % 1600) / 1600;
-      map.setPaintProperty(LineLayerIds.linePointActiveHalo, 'circle-radius', 8 + t * 18);
-      map.setPaintProperty(LineLayerIds.linePointActiveHalo, 'circle-opacity', 0.45 * (1 - t));
+      // Mid style change the halo layer is gone, and a paint change on it throws.
+      if (map.getLayer(LineLayerIds.linePointActiveHalo)) {
+        map.setPaintProperty(LineLayerIds.linePointActiveHalo, 'circle-radius', 8 + t * 18);
+        map.setPaintProperty(LineLayerIds.linePointActiveHalo, 'circle-opacity', 0.45 * (1 - t));
+      }
       frame = requestAnimationFrame(tick);
     };
     // Every paint change redraws the map and keeps it from going idle, so the pulse runs only while a
