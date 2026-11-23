@@ -6,6 +6,7 @@ import { SpotLayerIds } from './spotLayers';
 
 export const cursorInteractableLayerIds = [
   LineLayerIds.linePoint,
+  LineLayerIds.linePointActive,
   LineLayerIds.lineLine,
   LineLayerIds.lineLabel,
   SpotLayerIds.spotPoint,

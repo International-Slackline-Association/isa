@@ -1,6 +1,6 @@
 import { useSessionReady } from 'app/session';
 import React, { useEffect } from 'react';
-import { Layer, Source } from 'react-map-gl/mapbox';
+import { Layer, Source, useMap } from 'react-map-gl/mapbox';
 
 import { SlacklineType, SpotType } from '@server/core/types';
 import { geoJsonURL } from 'app/api/constants';
@@ -21,6 +21,8 @@ import {
   linePointLayer,
   activeLineHaloLayer,
   activePointHaloLayer,
+  activePointLayer,
+  useActivePointPulse,
 } from '../layers/lineLayers';
 import { spotPointLayer, spotPolygonLayer, spotPolygonOutlineLayer } from '../layers/spotLayers';
 
@@ -58,6 +60,8 @@ export const SlacklineMapSources = (props: {
     const timer = setInterval(() => setNowSeconds(Math.floor(Date.now() / 1000)), 60_000);
     return () => clearInterval(timer);
   }, []);
+  const { current: map } = useMap();
+  useActivePointPulse(map?.getMap());
   const activeFilterExpr = ['>', ['to-number', ['get', 'au'], 0], nowSeconds];
 
   const options = {
@@ -196,6 +200,12 @@ export const SlacklineMapSources = (props: {
           {...linePointLayer({
             visible: options.lines,
             filter: ['all', countryFilterExpr || true, lineFilterExpr || true],
+          })}
+        />
+        <Layer
+          {...activePointLayer({
+            visible: options.lines,
+            filter: ['all', activeFilterExpr, countryFilterExpr || true, lineTypeFilterExpr || true],
           })}
         />
       </Source>
