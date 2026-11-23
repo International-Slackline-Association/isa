@@ -1,14 +1,20 @@
 # Decisions
 
-Each item: the question, the options, a recommendation. Mark your pick by changing **Status** to *Decided: …*. ⭐ = recommended.
+Each item: the question, the options, a recommendation. ⭐ = recommended. Change **Status** to *Decided: …* when you pick.
 
-## Already given by Can
+## Decided by Can
 
 | # | Decision |
 |---|---|
 | G1 | Lines only. |
 | G2 | A real human (a slackliner) stands behind each live report. |
 | G3 | ISA must be technically unable to know who reported. Liability is the reason: "we cannot know", not "we promise not to look". |
+| G4 | **Only lines already on the map can be rigged.** Creating a line stays the normal flow; it says "a line can be rigged here", not that anyone rigged it legally. Rigging is an extension of the line. |
+| G5 | **Only whoever first reported a rig can update or take it down.** Nobody else, and no code to share by hand. |
+| G6 | **Anonymity uses a blind-signed pass** (industry standard, kept simple). A pass is also reassuring to users: something they can read about. |
+| G7 | **Reminder before expiry = "add to calendar" button + banner on the line card.** Nothing sent by ISA. |
+| G8 | **No burner accounts.** Nobody signs in to a second account. |
+| G9 | UI: Claude wireframes first from the current app, Can reviews. [Wireframes](wireframes.html). |
 
 ---
 
@@ -18,24 +24,23 @@ The [data-access doc](/slackmap/docs/data-access.md) says *no safety-critical us
 
 | Option | Effect |
 |---|---|
-| ⭐ A. Community awareness first | Clause stays. Map layer + public live file. Aviation reaches it later only through a partner licence, partner carries the use. |
-| B. Aviation feed from day one | Clause is reversed. Liability changes; Swiss law (Art. 100 OR) can't exclude gross negligence anyway. Realistically needs a lawyer. |
+| ⭐ A. Community awareness first | Clause stays. Aviation reaches it later only through a partner licence, partner carries the use. |
+| B. Aviation feed from day one | Clause reversed; liability changes; realistically needs a lawyer. |
 
-Why A: most rigs will never be reported, and "no live line here" shown to a pilot invites false confidence. Ship it as unverified, timestamped community information.
+Why A: most rigs will never be reported; "no live line here" shown to a pilot invites false confidence.
 
 **Status:** open
 
-## D2. How does a report prove "a real member" without identity?
+## D2. How owner-only works without identity
 
-| Option | Proves | ISA can link? | Cost |
-|---|---|---|---|
-| A. No account, Turnstile only | a human, not a bot | no | lowest; anyone can report, not only slackliners |
-| ⭐ B. Blind-signed passes + burner ID on the device | a real ISA member | no, by the maths | medium; standard (Privacy Pass, RFC 9576–9578), libraries exist |
-| C. Zero-knowledge group proof (Semaphore-style) | same as B, plus "one per member per line" | no | high; overkill |
-| D. Passes handed out by groups or at festivals | someone vouched | no | low tech, heavy organising |
-| ✗ E. Burner accounts in the ISA user pool | an email inbox | **yes**: the pool keeps the account; burners get made from the same browser and IP | high; spam route into a pool other apps rely on |
+G3 + G5: ISA can't know who the owner is, so the owner must hold something. It can be invisible.
 
-B is your burner idea done so it holds: the burner is a key unlocked by a pass, not an account. See [anonymity](anonymity.md).
+| Option | Effect |
+|---|---|
+| ⭐ A. A random **rig key** made by the phone when reporting, kept in the browser; ISA stores only its hash | User never sees it. Update / take down from that phone just works. Another phone can't. |
+| B. A as default, plus "move to another phone" as a QR | For crews or a second device. More UI. |
+
+Sub-question: phone lost or browser data cleared → the rig can't be ended by anyone and runs to its expiry. Acceptable?
 
 **Status:** open
 
@@ -43,92 +48,79 @@ B is your burner idea done so it holds: the burner is a key unlocked by a pass, 
 
 | Option | Effect |
 |---|---|
-| ⭐ A. Everyone, behind the same Turnstile check as the map | Simplest, consistent with today. Land managers and police see rigs too, whoever reported. |
-| B. Signed-in users only | Hides rigs from casual readers, not from a determined one with a free account. |
-| C. Partners only | No public map layer; defeats the community purpose. |
+| ⭐ A. Everyone, behind the same browser check as the map | Simplest, consistent with today. Land managers and police see rigs too, whoever reported. |
+| B. Signed-in users only | Hides from casual readers only. |
 
 **Status:** open
 
-## D4. Opt-in attribution?
+## D4. Can someone report while signed out?
+
+The pass is fetched while signed in; reporting itself needs no login.
 
 | Option | Effect |
 |---|---|
-| ⭐ A. All live reports anonymous | One path. Simplicity principle. |
-| B. Anonymous by default, may report as yourself | Named reports could count as more trusted; two paths to build and keep. |
+| ⭐ A. Must be signed in to report (passes fetched in the background then) | One flow. The report itself still goes out without the login. |
+| B. A member with passes left may report while signed out | Same security, more states to explain. |
 
 **Status:** open
 
-## D5. Lines not yet on the map
-
-| Option | Effect |
-|---|---|
-| ⭐ A. Allowed, through the normal add-line flow (two points, length) — then rig it | One path for geometry. The new archive line is created by the burner, so it carries no editor either. |
-| B. Only lines already on the map | Simplest, but new lines never get reported live. |
-
-Sub-question: an anonymously created archive line has no editor. Who may edit it later?
-
-**Status:** open
-
-## D6. Who may mark a rig down?
-
-| Option | Effect |
-|---|---|
-| ⭐ A. Only the burner that rigged it, or expiry. Others' "it's gone" turns it *unconfirmed* | A false "up" costs little; a false "down" can endanger a pilot. Add easily, remove carefully. |
-| B. Anyone | Trolls can wipe real obstacles. |
-
-**Status:** open
-
-## D7. Expiry
+## D5. Expiry
 
 | Question | Recommendation |
 |---|---|
-| Take-down time required? | yes |
-| Presets | today (default) / weekend / 1 week / custom |
-| Maximum | 14 days, extendable |
-| After the take-down time | *unconfirmed*; *expired* after 48 h without a "still up" |
+| Expiry required? | yes |
+| Presets | today (default) / weekend / 1 week / pick a date |
+| Maximum | 14 days; owner can extend |
+| At expiry | rig disappears from the map (browser hides it by time; no job needed) |
+| Banner | from 24 h before expiry, to the owner's phone only |
 
 **Status:** open
 
-## D8. Lost burner
-
-Phone lost, burner key gone, rig still "up".
+## D6. Rig history
 
 | Option | Effect |
 |---|---|
-| ⭐ A. No recovery; expiry ends it. Optional export as QR or passphrase for crews and second devices | Recovery would need identity. |
-| B. Recovery through the ISA account | Breaks G3. |
+| ⭐ A. v1 keeps only the current rig on the line | Simplest. |
+| B. Keep past rigs ("rigged 12× this year") | Nice, more data and UI. Later. |
 
 **Status:** open
 
-## D9. How hard do we hide the IP?
-
-The pass hides *who*; the IP of a request could still point to a household.
-
-| Option | Effect |
-|---|---|
-| ⭐ A. Never store or log IPs on the anonymous endpoints; don't pass the IP to Turnstile | ISA holds nothing. A court can't force what doesn't exist. |
-| B. A plus Oblivious HTTP (RFC 9458) through a third-party relay | ISA never even *sees* the IP. Needs a relay operator. |
-
-**Status:** open
-
-## D10. Pass allowance
-
-How many passes a member gets, and when they're fetched.
+## D7. Pass allowance
 
 | Recommendation | Why |
 |---|---|
-| e.g. 5 per month, fetched automatically in the background whenever a member is signed in | Caps spam. Fetching ahead breaks the timing link "passes at 14:02, report at 14:03". |
+| e.g. 5 passes per month, fetched automatically whenever a member is signed in; each new rig costs one; extend and take down cost none (the rig key proves it) | Caps spam; fetching ahead breaks the timing link "passes at 14:02, report at 14:03". |
+
+**Status:** open
+
+## D8. How hard do we hide the IP?
+
+| Option | Effect |
+|---|---|
+| ⭐ A. Never store or log IPs on the anonymous endpoint; don't pass the IP to Turnstile | ISA holds nothing; a court can't force what doesn't exist. |
+| B. A plus Oblivious HTTP (RFC 9458) through a third-party relay | ISA never even sees the IP. Needs a relay operator. |
+
+**Status:** open
+
+## D9. What shows publicly on a rig?
+
+| Field | Recommendation |
+|---|---|
+| "Rigged", until when | yes |
+| Reported how long ago | yes ("reported 2 h ago") |
+| Marked for aircraft y/n | yes |
+| Who | **never** |
 
 **Status:** open
 
 ## Later, not v1
 
 - Pushing to openAIP / paragliding apps / national registers; partner licence for aviation.
-- Offering the ~7000 archived highlines as static "possible obstacle" data, arguably more honest for aviation than the live layer.
-- Reminders before take-down time (web push).
-- Reputation of a burner ("its reports are usually confirmed").
+- Offering the ~7000 archived highlines as static "possible obstacle" data.
+- Others confirming "still up" / "it's gone".
+- Rig history (D6 B).
 
 ## To check outside the code
 
-- Swiss rule: obstacles above 25 m above ground (outside built-up areas) must be reported to FOCA/BAZL. Does it apply to highlines? Reporting to SlackMap must never be presented as fulfilling it.
+- Swiss rule: obstacles above 25 m above ground (outside built-up areas) reportable to FOCA/BAZL. Applies to highlines? Reporting to SlackMap must never be presented as fulfilling it.
 - Who maintains the live layer long term (README: contributors stand behind their work).

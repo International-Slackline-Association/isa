@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live lines wireframes</title>
+<style>
+  :root {
+    --blue: #4187C5; --green: #42C842; --red: #FC3E3E; --live: #FF8A00;
+    --ink: #222; --muted: #6b6b6b; --line: #dcdcdc; --bg: #f3f3f1; --paper: #fff;
+    --warn-bg: #fff6e5; --warn: #b26a00; --new: #7a3cff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { max-width: 1200px; margin: 0 auto; padding: 24px 16px 8px; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  header p { margin: 4px 0; color: var(--muted); max-width: 760px; }
+  .key { display: inline-flex; gap: 6px; align-items: center; margin-right: 14px; font-size: 12px; color: var(--muted); }
+  .key i { display: inline-block; width: 12px; height: 12px; border: 2px dashed var(--new); border-radius: 3px; }
+  section { max-width: 1200px; margin: 0 auto; padding: 18px 16px; }
+  section > h2 { font-size: 16px; margin: 0 0 4px; }
+  section > p { margin: 0 0 14px; color: var(--muted); max-width: 760px; }
+  .row { display: flex; flex-wrap: wrap; gap: 22px; }
+  figure { margin: 0; width: 300px; max-width: 100%; }
+  figcaption { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  figcaption b { color: var(--ink); }
+
+  .phone { width: 300px; max-width: 100%; height: 600px; background: var(--paper); border: 1px solid #bbb; border-radius: 26px; padding: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.06); position: relative; overflow: hidden; }
+  .screen { position: relative; height: 100%; border-radius: 18px; overflow: hidden; background: var(--paper); border: 1px solid #eee; }
+  .new { outline: 2px dashed var(--new); outline-offset: 2px; border-radius: 6px; }
+
+  /* map */
+  .map { position: absolute; inset: 0; background:
+      radial-gradient(circle at 30% 30%, #e6efe2 0 20%, transparent 21%),
+      radial-gradient(circle at 75% 65%, #e3ece0 0 25%, transparent 26%),
+      repeating-linear-gradient(35deg, #edf1ea 0 18px, #f2f5ef 18px 36px); }
+  .search { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 62%; height: 30px; background: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,.2); font-size: 11px; color: #999; padding: 7px 10px; }
+  .fab { position: absolute; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 20px; }
+  .fab.add { right: 14px; bottom: 30px; background: var(--blue); }
+  .fab.layers { left: 14px; bottom: 30px; background: var(--blue); font-size: 13px; }
+  .fab.act { left: 66px; bottom: 34px; width: 36px; height: 36px; background: #fff; color: var(--blue); font-size: 13px; border: 1px solid #ddd; }
+  .legend { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 9px; color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000; }
+  .legend span { margin: 0 3px; }
+  .legend .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 2px; vertical-align: middle; }
+  svg.lines { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pulse { animation: pulse 1.6s ease-in-out infinite; transform-origin: center; }
+  @keyframes pulse { 0%,100% { opacity: .15; } 50% { opacity: .55; } }
+  @media (prefers-reduced-motion: reduce) { .pulse { animation: none; opacity: .35; } }
+
+  /* card */
+  .mapstrip { height: 120px; position: relative; overflow: hidden; }
+  .card { position: absolute; top: 120px; left: 0; right: 0; bottom: 0; background: #fff; overflow: hidden; padding: 0 12px; }
+  .ch { display: flex; align-items: center; gap: 10px; padding: 10px 0 8px; }
+  .av { width: 32px; height: 32px; border-radius: 50%; background: var(--red); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+  .ch .t { flex: 1; } .ch .t b { display: block; font-size: 13px; } .ch .t small { color: var(--muted); font-size: 10px; }
+  .ch .ic { color: var(--muted); font-size: 14px; letter-spacing: 6px; }
+  .img { height: 70px; background: repeating-linear-gradient(45deg, #eee 0 8px, #f6f6f6 8px 16px); border-radius: 4px; display: grid; place-items: center; color: #aaa; font-size: 11px; margin-bottom: 8px; }
+  .field { display: flex; gap: 8px; padding: 7px 0; border-bottom: 1px solid #eee; font-size: 11px; }
+  .field .fi { width: 18px; color: var(--muted); text-align: center; }
+  .field .fb { flex: 1; } .field .fb b { font-size: 11.5px; } .field .fb div { color: var(--muted); }
+  .ok { color: var(--green); font-weight: 600; } .warnc { color: var(--warn); }
+  .ghost { height: 9px; background: #eee; border-radius: 3px; margin: 5px 0; }
+
+  .rig { border-radius: 8px; padding: 9px 10px; margin: 6px 0 8px; font-size: 11.5px; }
+  .rig.idle { background: #f6f7f9; border: 1px solid #e4e6ea; }
+  .rig.live { background: #fff3e6; border: 1px solid #ffcf99; }
+  .rig .top { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+  .badge { background: var(--live); color: #fff; font-size: 9px; font-weight: 800; letter-spacing: .5px; padding: 2px 6px; border-radius: 10px; }
+  .rig .sub { color: var(--muted); margin-top: 3px; }
+  .btns { display: flex; gap: 6px; margin-top: 8px; }
+  .btn { flex: 1; text-align: center; padding: 7px 6px; border-radius: 4px; font-weight: 600; font-size: 11px; border: 1px solid var(--blue); color: var(--blue); background: #fff; }
+  .btn.pri { background: var(--blue); color: #fff; }
+  .btn.live { background: var(--live); border-color: var(--live); color: #fff; }
+  .btn.dis { border-color: #ccc; color: #aaa; }
+  .alert { background: var(--warn-bg); border: 1px solid #f3c57a; color: var(--warn); border-radius: 6px; padding: 8px 10px; font-size: 11px; margin: 6px 0; }
+
+  /* sheets / dialogs */
+  .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.38); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 14px 14px 0 0; padding: 12px 14px 14px; font-size: 12px; }
+  .sheet .grab { width: 34px; height: 4px; background: #ccc; border-radius: 2px; margin: 0 auto 10px; }
+  .dialog { position: absolute; left: 14px; right: 14px; top: 50%; transform: translateY(-50%); background: #fff; border-radius: 6px; padding: 14px; font-size: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+  .sheet h3, .dialog h3 { margin: 0 0 8px; font-size: 14px; }
+  .lbl { font-size: 10.5px; color: var(--muted); margin: 10px 0 4px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip { border: 1px solid #ccc; border-radius: 14px; padding: 4px 9px; font-size: 11px; }
+  .chip.on { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .input { border: 1px solid #ccc; border-radius: 4px; padding: 6px 8px; font-size: 12px; }
+  .switch { display: flex; justify-content: space-between; align-items: center; }
+  .tog { width: 30px; height: 16px; border-radius: 8px; background: #ccc; position: relative; }
+  .tog::after { content: ""; position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #fff; top: 2px; left: 2px; }
+  .tog.on { background: var(--blue); } .tog.on::after { left: 16px; }
+  .anon { display: flex; gap: 8px; background: #eef4fb; border-radius: 6px; padding: 8px; font-size: 11px; margin-top: 12px; color: #2d5d88; }
+  .actions { display: flex; justify-content: flex-end; gap: 14px; margin-top: 14px; font-weight: 700; color: var(--blue); font-size: 12px; text-transform: uppercase; }
+  ul.tight { margin: 6px 0; padding-left: 16px; } ul.tight li { margin: 4px 0; }
+  .link { color: var(--blue); text-decoration: underline; }
+  .opts { display: flex; gap: 8px; flex-wrap: wrap; }
+  .opt { border-radius: 6px; padding: 6px; text-align: center; font-size: 10px; width: 52px; }
+  .opt .o { font-size: 16px; } .opt.on { border: 2px solid var(--blue); color: var(--blue); }
+  .note { max-width: 760px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-top: 14px; font-size: 13px; }
+  .note h3 { margin: 0 0 6px; font-size: 13px; }
+  .note ul { margin: 0; padding-left: 18px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>SlackMap live lines: wireframes</h1>
+  <p>Built on the current app: the map page, the line detail card (<code>LineDetailCard</code>), the layer dialog (<code>useMapOptions</code>) and MUI dialogs. Phone size, since rigging happens at the spot. On desktop the card is the right-hand panel, same content.</p>
+  <p><span class="key"><i></i> new</span> Everything without a dashed outline already exists today.</p>
+</header>
+
+<!-- ============ 1. MAP ============ -->
+<section>
+  <h2>1. The map</h2>
+  <p>Archive lines are already red (<code>lineStrokeColor</code>), so "rigged" needs to stand apart from red. Two variants to pick from.</p>
+  <div class="row">
+    <figure>
+      <div class="phone"><div class="screen">
+        <div class="map"></div>
+        <svg class="lines" viewBox="0 0 280 580">
+          <line x1="40" y1="120" x2="90" y2="150" stroke="#FC3E3E" stroke-width="3"/>
+          <line x1="180" y1="90" x2="230" y2="110" stroke="#FC3E3E" stroke-width="3"/>
+          <line x1="60" y1="330" x2="120" y2="300" stroke="#FC3E3E" stroke-width="3"/>
+          <line x1="200" y1="400" x2="240" y2="440" stroke="#FC3E3E" stroke-width="3"/>
+          <!-- live: halo -->
+          <line class="pulse" x1="120" y1="220" x2="190" y2="250" stroke="#FF8A00" stroke-width="14" stroke-linecap="round"/>
+          <line x1="120" y1="220" x2="190" y2="250" stroke="#FC3E3E" stroke-width="3"/>
+          <rect x="138" y="196" width="34" height="14" rx="7" fill="#FF8A00"/>
+          <text x="155" y="206" font-size="8" font-weight="800" fill="#fff" text-anchor="middle" font-family="system-ui">LIVE</text>
+        </svg>
+        <div class="search">Search location...</div>
+        <div class="fab add">+</div><div class="fab layers">≡</div><div class="fab act">⌕</div>
+        <div class="legend new" style="left:20px;right:20px">
+          <span><i class="dot" style="background:#FC3E3E"></i>7012 lines</span>
+          <span><i class="dot" style="background:#FF8A00"></i>3 rigged now</span>
+          <span><i class="dot" style="background:#42C842"></i>1702 spots</span>
+        </div>
+      </div></div>
+      <figcaption><b>A. Same red line + orange pulsing halo + "LIVE" tag.</b> Reads as "this line, now active". The line keeps its identity; the halo is the state. Pulse stops for users who turn off motion.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone"><div class="screen">
+        <div class="map"></div>
+        <svg class="lines" viewBox="0 0 280 580">
+          <line x1="40" y1="120" x2="90" y2="150" stroke="#FC3E3E" stroke-width="3" opacity=".55"/>
+          <line x1="180" y1="90" x2="230" y2="110" stroke="#FC3E3E" stroke-width="3" opacity=".55"/>
+          <line x1="60" y1="330" x2="120" y2="300" stroke="#FC3E3E" stroke-width="3" opacity=".55"/>
+          <line x1="200" y1="400" x2="240" y2="440" stroke="#FC3E3E" stroke-width="3" opacity=".55"/>
+          <line x1="120" y1="220" x2="190" y2="250" stroke="#FF8A00" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="120" cy="220" r="5" fill="#FF8A00" stroke="#fff" stroke-width="2"/>
+          <circle cx="190" cy="250" r="5" fill="#FF8A00" stroke="#fff" stroke-width="2"/>
+        </svg>
+        <div class="search">Search location...</div>
+        <div class="fab add">+</div><div class="fab layers">≡</div><div class="fab act">⌕</div>
+        <div class="legend" style="left:20px;right:20px">
+          <span><i class="dot" style="background:#FC3E3E"></i>7012 lines</span>
+          <span><i class="dot" style="background:#FF8A00"></i>3 rigged now</span>
+          <span><i class="dot" style="background:#42C842"></i>1702 spots</span>
+        </div>
+      </div></div>
+      <figcaption><b>B. Rigged lines turn orange and thick, with anchor dots; archive lines dim a little.</b> Stronger, calmer (no motion), but changes the look of the whole map.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone"><div class="screen">
+        <div class="map" style="background:repeating-linear-gradient(35deg,#e9ede6 0 30px,#eef2eb 30px 60px)"></div>
+        <svg class="lines" viewBox="0 0 280 580">
+          <g fill="#FC3E3E"><circle cx="60" cy="140" r="4"/><circle cx="74" cy="150" r="4"/><circle cx="200" cy="120" r="4"/><circle cx="90" cy="330" r="4"/><circle cx="210" cy="420" r="4"/><circle cx="220" cy="300" r="4"/><circle cx="40" cy="250" r="4"/></g>
+          <circle class="pulse" cx="150" cy="235" r="13" fill="#FF8A00"/>
+          <circle cx="150" cy="235" r="5" fill="#FF8A00" stroke="#fff" stroke-width="2"/>
+        </svg>
+        <div class="search">Search location...</div>
+        <div class="fab add">+</div><div class="fab layers">≡</div><div class="fab act">⌕</div>
+        <div class="legend" style="left:20px;right:20px">
+          <span><i class="dot" style="background:#FC3E3E"></i>7012 lines</span>
+          <span><i class="dot" style="background:#FF8A00"></i>3 rigged now</span>
+        </div>
+      </div></div>
+      <figcaption><b>Zoomed out (below zoom 13 lines are points today).</b> A rigged line's point gets the same orange treatment, so it's findable from a country view. Applies to A or B.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone"><div class="screen">
+        <div class="map"></div>
+        <div class="scrim"></div>
+        <div class="dialog" style="top:44%">
+          <b style="font-size:12px">Features</b>
+          <div style="border-top:1px solid #ddd;margin:6px 0"></div>
+          <div style="font-size:11px;margin-bottom:6px">Display</div>
+          <div class="opts">
+            <div class="opt on"><div class="o">▦</div>All</div>
+            <div class="opt"><div class="o">⟋</div>Lines</div>
+            <div class="opt"><div class="o">⬠</div>Spots</div>
+            <div class="opt"><div class="o">⚑</div>Guides</div>
+            <div class="opt new" style="color:var(--live)"><div class="o">◉</div>Rigged now</div>
+          </div>
+          <div style="border-top:1px solid #ddd;margin:8px 0"></div>
+          <div style="font-size:11px">Filter &nbsp; <span class="input" style="font-size:10px">Slackline Type ▾</span></div>
+          <div style="border-top:1px solid #ddd;margin:8px 0"></div>
+          <b style="font-size:12px">Map</b> <span style="font-size:10px;color:#888">(Settings are saved in your browser)</span>
+          <div style="font-size:11px;margin-top:6px;color:#888">Style: Default · Satellite · Outdoors · Streets</div>
+        </div>
+      </div></div>
+      <figcaption><b>Layer dialog: one more Display option, "Rigged now".</b> Shows only rigged lines, everything else hidden. Fits the existing pattern; the slackline type filter still works on it.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ 2. LINE CARD ============ -->
+<section>
+  <h2>2. The line card</h2>
+  <p>One new field, <b>Rig status</b>, right under the title and cover image, above Restrictions: the first thing you see. It has three states.</p>
+  <div class="row">
+    <figure>
+      <div class="phone"><div class="screen">
+        <div class="mapstrip map"></div>
+        <div class="card">
+          <div class="ch"><div class="av">L</div><div class="t"><b>Twin Peaks Highline</b><small>Last updated: 04 Aug 2026</small></div><div class="ic">✕ ⋮</div></div>
+          <div class="img">cover image</div>
+          <div class="rig idle new">
+            <div class="top">Not reported as rigged</div>
+            <div class="sub">Rigging it now? Let others know. Anonymous.</div>
+            <div class="btns"><div class="btn pri">Report rigged</div></div>
+          </div>
+          <div class="field"><div class="fi">⚠</div><div class="fb"><b>Restrictions</b><div>None known</div></div></div>
+          <div class="field"><div class="fi">↔</div><div class="fb"><b>Specs</b> <span class="ok">Measured ✓</span><div>Type: Highline · Length: 85m · Height: 120m</div></div></div>
+          <div class="field"><div class="fi">✎</div><div class="fb"><b>Description</b><div class="ghost"></div><div class="ghost" style="width:70%"></div></div></div>
+        </div>
+      </div></div>
+      <figcaption><b>Not rigged.</b> Signed out, the button reads "Sign in to report rigged" and opens the existing sign-in dialog.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone"><div class="screen">
+        <div class="mapstrip map"><svg class="lines" viewBox="0 0 280 120"><line class="pulse" x1="80" y1="60" x2="200" y2="70" stroke="#FF8A00" stroke-width="14" stroke-linecap="round"/><line x1="80" y1="60" x2="200" y2="70" stroke="#FC3E3E" stroke-width="3"/></svg></div>
+        <div class="card">
+          <div class="ch"><div class="av">L</div><div class="t"><b>Twin Peaks Highline</b><small>Last updated: 04 Aug 2026</small></div><div class="ic">✕ ⋮</div></div>
+          <div class="img">cover image</div>
+          <div class="rig live new">
+            <div class="top"><span class="badge">RIGGED</span> until Sat 29 Nov, 20:00</div>
+            <div class="sub">Reported 2 h ago · Marked for aircraft: yes · Height 120 m</div>
+          </div>
+          <div class="field"><div class="fi">⚠</div><div class="fb"><b>Restrictions</b><div>None known</div></div></div>
+          <div class="field"><div class="fi">↔</div><div class="fb"><b>Specs</b> <span class="ok">Measured ✓</span><div>Type: Highline · Length: 85m · Height: 120m</div></div></div>
+          <div class="field"><div class="fi">✎</div><div class="fb"><b>Description</b><div class="ghost"></div></div></div>
+        </div>
+      </div></div>
+      <figcaption><b>Rigged, seen by anyone else.</b> No buttons: only whoever reported it can change it. Never shows who.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone"><div class="screen">
+        <div class="mapstrip map"><svg class="lines" viewBox="0 0 280 120"><line class="pulse" x1="80" y1="60" x2="200" y2="70" stroke="#FF8A00" stroke-width="14" stroke-linecap="round"/><line x1="80" y1="60" x2="200" y2="70" stroke="#FC3E3E" stroke-width="3"/></svg></div>
+        <div class="card">
+          <div class="ch"><div class="av">L</div><div class="t"><b>Twin Peaks Highline</b><small>Last updated: 04 Aug 2026</small></div><div class="ic">✕ ⋮</div></div>
+          <div class="img">cover image</div>
+          <div class="rig live new">
+            <div class="top"><span class="badge">RIGGED</span> until Sat 29 Nov, 20:00</div>
+            <div class="sub">Reported from this phone · 2 h ago</div>
+            <div class="btns"><div class="btn">Extend</div><div class="btn live">Taken down</div></div>
+          </div>
+          <div class="field"><div class="fi">⚠</div><div class="fb"><b>Restrictions</b><div>None known</div></div></div>
+          <div class="field"><div class="fi">↔</div><div class="fb"><b>Specs</b> <span class="ok">Measured ✓</span><div>Type: Highline · Length: 85m · Height: 120m</div></div></div>
+        </div>
+      </div></div>
+      <figcaption><b>Rigged, on the phone that reported it.</b> The browser knows (the rig key is in its storage); the server is never asked "is this mine?".</figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone"><div class="screen">
+        <div class="mapstrip map"><svg class="lines" viewBox="0 0 280 120"><line class="pulse" x1="80" y1="60" x2="200" y2="70" stroke="#FF8A00" stroke-width="14" stroke-linecap="round"/><line x1="80" y1="60" x2="200" y2="70" stroke="#FC3E3E" stroke-width="3"/></svg></div>
+        <div class="card">
+          <div class="ch"><div class="av">L</div><div class="t"><b>Twin Peaks Highline</b><small>Last updated: 04 Aug 2026</small></div><div class="ic">✕ ⋮</div></div>
+          <div class="img">cover image</div>
+          <div class="rig live new">
+            <div class="top"><span class="badge">RIGGED</span> until tomorrow, 20:00</div>
+            <div class="alert" style="margin:8px 0 0">Expires tomorrow and disappears from the map. Still up?</div>
+            <div class="btns"><div class="btn pri">Extend</div><div class="btn live">Taken down</div></div>
+          </div>
+          <div class="field"><div class="fi">⚠</div><div class="fb"><b>Restrictions</b><div>None known</div></div></div>
+          <div class="field"><div class="fi">↔</div><div class="fb"><b>Specs</b><div>Type: Highline · Length: 85m</div></div></div>
+        </div>
+      </div></div>
+      <figcaption><b>Owner, 24 h before expiry.</b> The banner reminder. The calendar event (next section) is what brings them back to see it.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ 3. REPORTING ============ -->
+<section>
+  <h2>3. Reporting a rig</h2>
+  <p>Three steps the first time, two after. Everything technical (pass, rig key, sending without the login) is invisible.</p>
+  <div class="row">
+    <figure>
+      <div class="phone"><div class="screen">
+        <div class="mapstrip map"></div><div class="card"><div class="ch"><div class="av">L</div><div class="t"><b>Twin Peaks Highline</b></div></div></div>
+        <div class="scrim"></div>
+        <div class="dialog new">
+          <h3>Reporting is anonymous</h3>
+          <ul class="tight">
+            <li><b>SlackMap cannot know it was you.</b> Not "won't tell": the report reaches us without your account.</li>
+            <li>We only learn that <i>a</i> SlackMap member sent it, through an anonymous pass your phone got in advance.</li>
+            <li>Only this phone can extend it or take it down.</li>
+            <li>People nearby may still guess who rigs here. We can't protect against that.</li>
+          </ul>
+          <div class="link" style="font-size:11px">How this works (open standard, Privacy Pass)</div>
+          <div class="actions"><span>Got it</span></div>
+        </div>
+      </div></div>
+      <figcaption><b>First time only.</b> The reassurance. The link opens an FAQ entry in the drawer (where the FAQ already lives).</figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone"><div class="screen">
+        <div class="mapstrip map"></div><div class="card"><div class="ch"><div class="av">L</div><div class="t"><b>Twin Peaks Highline</b></div></div></div>
+        <div class="scrim"></div>
+        <div class="sheet new">
+          <div class="grab"></div>
+          <h3>Report Twin Peaks Highline rigged</h3>
+          <div class="lbl">Rigged until</div>
+          <div class="chips"><span class="chip on">Today 20:00</span><span class="chip">Sunday</span><span class="chip">1 week</span><span class="chip">Pick date…</span></div>
+          <div class="lbl">Height above ground (m)</div>
+          <div class="input">120</div>
+          <div class="lbl">&nbsp;</div>
+          <div class="switch"><span>Marked for aircraft (balls / flags)</span><span class="tog on"></span></div>
+          <div class="anon">🔒 <span>Sent anonymously. By reporting you accept the <span class="link">terms</span>.</span></div>
+          <div class="btns" style="margin-top:12px"><div class="btn">Cancel</div><div class="btn live">Report rigged</div></div>
+        </div>
+      </div></div>
+      <figcaption><b>The sheet.</b> Defaults filled, so it's one tap if nothing changes. Height prefilled from the line. Max 14 days.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone"><div class="screen">
+        <div class="mapstrip map"></div><div class="card"><div class="ch"><div class="av">L</div><div class="t"><b>Twin Peaks Highline</b></div></div></div>
+        <div class="scrim"></div>
+        <div class="dialog new">
+          <h3>✓ Rigged until today, 20:00</h3>
+          <div>It's on the map now. Others see when it was reported, never who.</div>
+          <div class="btns" style="margin-top:12px"><div class="btn pri">📅 Add reminder to calendar</div></div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:6px">A calendar event 1 day before it expires, on your phone only. SlackMap sends nothing.</div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:8px">Only this phone can extend or take it down. If you lose it, the rig ends at its expiry.</div>
+          <div class="actions"><span>Done</span></div>
+        </div>
+      </div></div>
+      <figcaption><b>Done.</b> The calendar button downloads a calendar event (.ics) for the day before expiry; it opens the line card.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone"><div class="screen">
+        <div class="mapstrip map"></div><div class="card"><div class="ch"><div class="av">L</div><div class="t"><b>Twin Peaks Highline</b></div></div></div>
+        <div class="scrim"></div>
+        <div class="sheet new">
+          <div class="grab"></div>
+          <h3>Extend until</h3>
+          <div class="chips"><span class="chip">Tomorrow</span><span class="chip on">Sunday</span><span class="chip">1 week</span><span class="chip">Pick date…</span></div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:8px">Your calendar reminder won't move. Add a new one after extending.</div>
+          <div class="btns" style="margin-top:12px"><div class="btn">Cancel</div><div class="btn pri">Extend</div></div>
+        </div>
+      </div></div>
+      <figcaption><b>Extend.</b> "Taken down" is a confirm dialog (the existing one): "Mark as taken down? It disappears from the map."</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="note">
+    <h3>Questions these screens raise</h3>
+    <ul>
+      <li><b>Map look:</b> A (halo + LIVE tag) or B (orange line, archive dims)?</li>
+      <li><b>Rig status position:</b> above Restrictions, as drawn, or lower in the card?</li>
+      <li><b>"Rigged now" in the layer dialog:</b> worth it in v1?</li>
+      <li><b>Where "my rigs" live:</b> today you find your rig by opening its line. A small "Your rigs" list in the drawer would help with several; skipped here for simplicity.</li>
+      <li><b>Wording:</b> "Report rigged" / "Taken down" / "RIGGED": your call; these are placeholders.</li>
+      <li><b>Explainer tone:</b> the four bullets in section 3 are the anonymity promise. They must stay true to <a href="anonymity.md">anonymity.md</a>.</li>
+    </ul>
+  </div>
+</section>
+
+</body>
+</html>
