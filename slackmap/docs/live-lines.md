@@ -1,12 +1,12 @@
 ---
 type: explanation
 title: "Live lines"
-description: "Line activations (a line rigged now) and anonymous activation: why they exist, the vocabulary, the liability promise, proof versus guesses, blind-signed passes, manage links, activating with a name, what activation routes may log, existing lines only, third parties and the mediator role, reminders."
+description: "Line activations (a line rigged) and anonymous activation: why they exist, the vocabulary, the liability promise, proof versus guesses, blind-signed passes, manage links, activating with a name, what activation routes may log, existing lines only, third parties and the mediator role, reminders."
 ---
 
 # Live lines
 
-People did not put rigged lines on SlackMap because most lines are rigged unofficially, and nobody wants to be officially associated with one. Activating a line says it is rigged now, until a date; deactivating says it is down. It only works if activating cannot be tied to the person.
+People did not put rigged lines on SlackMap because most lines are rigged unofficially, and nobody wants to be officially associated with one. Activating a line says it is rigged, until a date; deactivating says it is down. It only works if activating cannot be tied to the person.
 
 **Activation** is the one word, in the UI and the code alike, so the terminology stays in sync: activate, extend, deactivate. Not "rig" or "report".
 
@@ -25,7 +25,7 @@ People who do not need anonymity can activate with their name instead. The name 
 
 ## What an activation is
 
-Activating is an extension of a line that already exists. Creating a line stays the normal flow and says a line can be rigged there, not that anyone rigged it legally; only lines on the map can be activated.
+Activating is an extension of a line that already exists. It can start on a later day, so people can activate early; until it starts it shows only on its line card, not on the map or in the shared data. Creating a line stays the normal flow and says a line can be rigged there, not that anyone rigged it legally; only lines on the map can be activated.
 
 This is the core idea: activations reach third parties that depend on knowing whether a line is actually rigged, as part of the line data they collect ([data access](data-access.md)). SlackMap is only the mediator; the person informs that the line is rigged, anonymously if they choose, without taking the responsibility for it. They support the safety of slacklining without involving themselves at all. Today aviation is the only place this information goes, but that may change, so it is never presented as aviation only.
 

@@ -10,12 +10,14 @@ const stages = {
     // Set by the stream of the table in the data stack; changes only if the stream is recreated.
     tableStreamArn:
       'arn:aws:dynamodb:eu-central-1:387132903656:table/slackmap-prod-db/stream/2026-11-12T13:16:15.858',
+    passes: { signingKeyParameter: 'slackmap-pass-signing-key', perMonth: 5 },
   },
   test: {
     domain: 'test.slackmap.com',
     // test.slackmap.com and *.test.slackmap.com, issued by hand.
     certificate: 'arn:aws:acm:us-east-1:387132903656:certificate/6da1b5c9-1f7c-487e-80e4-ce9ec49f88e5',
     tableStreamArn: 'arn:aws:dynamodb:eu-central-1:387132903656:table/slackmap-test-db/stream/2026-11-23T15:16:28.282',
+    passes: { signingKeyParameter: 'slackmap-test-pass-signing-key', perMonth: 50 },
   },
 };
 const given = process.env.STAGE;
@@ -23,7 +25,7 @@ if (given !== 'prod' && given !== 'test') throw new Error('STAGE must be prod or
 export const stage = given;
 export const isProd = stage === 'prod';
 export const namespace = `${project}-${stage}`;
-const { domain, certificate, tableStreamArn: streamArn } = stages[stage];
+const { domain, certificate, tableStreamArn: streamArn, passes: stagePasses } = stages[stage];
 
 export const webDomain = domain;
 export const domains = {
@@ -58,7 +60,7 @@ export const dataAccess = {
 };
 export const sessionsTableName = `${namespace}-sessions`;
 
-export const passSigningKeyParameter = 'slackmap-pass-signing-key';
+export const passes = stagePasses;
 
 export const geonamesUsernameParameter = 'slackmap-geonames-api-username';
 export const sesIdentityArn =

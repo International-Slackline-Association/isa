@@ -4,7 +4,14 @@ import { INDEX_NAMES, KEY_FIELDS, TABLE_NAME, recursiveQuery } from '../../../ut
 
 // Epoch seconds. The hash of the manage link's code is the only proof of ownership and never leaves the table.
 // activatedBy only when the member chose to activate with their name; an anonymous one never has it.
-export type LineActivation = { lineId: string; until: number; activatedAt: number; linkHash: string; activatedBy?: string };
+export type LineActivation = {
+  lineId: string;
+  from: number;
+  until: number;
+  activatedAt: number;
+  linkHash: string;
+  activatedBy?: string;
+};
 
 const skGsi = 'lineActivation';
 
@@ -12,6 +19,7 @@ const key = (lineId: string) => ({ [KEY_FIELDS.PK]: `line:${lineId}`, [KEY_FIELD
 
 const toActivation = (item: Record<string, any>): LineActivation => ({
   lineId: (item[KEY_FIELDS.PK] as string).slice('line:'.length),
+  from: item.from ?? item.activatedAt,
   until: item.until,
   activatedAt: item.activatedAt,
   linkHash: item.linkHash,
@@ -49,6 +57,7 @@ const putLineActivation = async (activation: LineActivation, now: number) => {
       Item: {
         ...key(activation.lineId),
         [KEY_FIELDS.GSI_SK]: `line:${activation.lineId}`,
+        from: activation.from,
         until: activation.until,
         activatedAt: activation.activatedAt,
         linkHash: activation.linkHash,

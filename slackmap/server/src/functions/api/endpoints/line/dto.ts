@@ -36,7 +36,7 @@ export const getLineDetailsResponse = (
     editorPermissions,
     // Never the link hash.
     activation: isActive
-      ? { until: activation.until, activatedAt: activation.activatedAt, activatedBy: activatedByName }
+      ? { from: activation.from, until: activation.until, activatedAt: activation.activatedAt, activatedBy: activatedByName }
       : undefined,
   };
 };

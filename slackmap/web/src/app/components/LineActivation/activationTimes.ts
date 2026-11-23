@@ -8,28 +8,62 @@ const endOfDay = (date: Date) => {
   end.setHours(23, 59, 0, 0);
   return Math.floor(end.getTime() / 1000);
 };
-const inDays = (days: number) => {
-  const date = new Date();
+const startOfDay = (date: Date) => {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  return Math.floor(start.getTime() / 1000);
+};
+const addDays = (base: Date, days: number) => {
+  const date = new Date(base);
   date.setDate(date.getDate() + days);
-  return endOfDay(date);
+  return date;
 };
+const daysToSaturday = () => (6 - new Date().getDay() + 7) % 7;
 
-export const untilPresets = () => {
-  const daysToSunday = (7 - new Date().getDay()) % 7;
-  const presets = [
-    { label: 'Today', until: inDays(0) },
-    { label: 'Tomorrow', until: inDays(1) },
-    ...(daysToSunday > 1 ? [{ label: 'Sunday', until: inDays(daysToSunday) }] : []),
-    { label: '1 week', until: inDays(7) },
+export const startPresets = () => [
+  { label: 'Now', from: undefined },
+  { label: 'Tomorrow', from: startOfDay(addDays(new Date(), 1)) },
+  ...(daysToSaturday() > 1 ? [{ label: 'Saturday', from: startOfDay(addDays(new Date(), daysToSaturday())) }] : []),
+];
+
+export const untilPresets = (from?: number) => {
+  const base = from ? new Date(from * 1000) : new Date();
+  if (from) {
+    return [
+      { label: 'Same day', until: endOfDay(base) },
+      { label: 'Next day', until: endOfDay(addDays(base, 1)) },
+      { label: '1 week', until: endOfDay(addDays(base, 6)) },
+    ];
+  }
+  const daysToSunday = (7 - base.getDay()) % 7;
+  return [
+    { label: 'Today', until: endOfDay(base) },
+    { label: 'Tomorrow', until: endOfDay(addDays(base, 1)) },
+    ...(daysToSunday > 1 ? [{ label: 'Sunday', until: endOfDay(addDays(base, daysToSunday)) }] : []),
+    { label: '1 week', until: endOfDay(addDays(base, 7)) },
   ];
-  return presets;
 };
 
+export const startFromDateInput = (value: string) => startOfDay(new Date(`${value}T00:00`));
 export const untilFromDateInput = (value: string) => endOfDay(new Date(`${value}T00:00`));
-export const dateInputBounds = () => ({
-  min: format(new Date(), 'yyyy-MM-dd'),
-  max: format(new Date(Date.now() + (maxActivationDays - 1) * day * 1000), 'yyyy-MM-dd'),
+export const dateInputBounds = (from?: number) => {
+  const base = from ? new Date(from * 1000) : new Date();
+  return {
+    min: format(base, 'yyyy-MM-dd'),
+    max: format(addDays(base, maxActivationDays - 1), 'yyyy-MM-dd'),
+  };
+};
+export const startInputBounds = () => ({
+  min: format(addDays(new Date(), 1), 'yyyy-MM-dd'),
+  max: format(addDays(new Date(), maxActivationDays), 'yyyy-MM-dd'),
 });
+
+export const formatDay = (seconds: number) => {
+  const days = Math.round((startOfDay(new Date(seconds * 1000)) - startOfDay(new Date())) / day);
+  if (days === 0) return 'today';
+  if (days === 1) return 'tomorrow';
+  return format(new Date(seconds * 1000), 'EEE d MMM');
+};
 
 export const formatUntil = (until: number) => {
   const date = new Date(until * 1000);

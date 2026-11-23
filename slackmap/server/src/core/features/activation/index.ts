@@ -25,7 +25,7 @@ const loadKeys = () =>
     throw error;
   }));
 
-export const passesPerMonth = 5;
+export const passesPerMonth = Number(process.env.PASSES_PER_MONTH);
 export const maxActivationDays = 14;
 
 // Loaded before a member's count is raised, so a key failure never costs them passes.
@@ -51,10 +51,21 @@ export const passCountExpiry = (now: Date) =>
 // Public, so it is kept to the hour: an activation's exact time could be matched to other timed records.
 export const activatedAtHour = (now: Date) => Math.floor(now.getTime() / 3_600_000) * 3600;
 
-export const validateActivationUntil = (until: number, now: Date) => {
+const day = 24 * 3600;
+
+export const activationStart = (requested: number | undefined, now: Date) => {
+  const nowSeconds = Math.floor(now.getTime() / 1000);
+  if (requested === undefined || requested <= nowSeconds) return activatedAtHour(now);
+  if (requested > nowSeconds + maxActivationDays * day) {
+    throw new Error(`Validation: from must be within ${maxActivationDays} days`);
+  }
+  return requested;
+};
+
+export const validateActivationEnd = (from: number, until: number, now: Date) => {
   const nowSeconds = now.getTime() / 1000;
-  if (!(until > nowSeconds)) throw new Error('Validation: until must be in the future');
-  if (until > nowSeconds + maxActivationDays * 24 * 3600) {
-    throw new Error(`Validation: until must be within ${maxActivationDays} days`);
+  if (!(until > nowSeconds) || !(until > from)) throw new Error('Validation: until must be after the start and in the future');
+  if (until > Math.max(from, nowSeconds) + maxActivationDays * day) {
+    throw new Error(`Validation: an activation lasts at most ${maxActivationDays} days`);
   }
 };

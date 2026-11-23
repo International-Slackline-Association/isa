@@ -86,12 +86,13 @@ const call = (method: string, lineId: string, body: unknown, opts: { named?: boo
 export class NoPassError extends Error {}
 
 // Only a pass fetched earlier: fetching one around an activation would make the two one moment.
-export const activateAnonymously = async (lineId: string, until: number) => {
+export const activateAnonymously = async (lineId: string, until: number, from?: number) => {
   const pass: Pass | undefined = takePass();
   if (!pass) throw new NoPassError();
   const code = toBase64Url(crypto.getRandomValues(new Uint8Array(16)));
   try {
-    const result = (await call('POST', lineId, { until, ...pass, linkHash: await sha256Hex(code) })) as {
+    const result = (await call('POST', lineId, { from, until, ...pass, linkHash: await sha256Hex(code) })) as {
+      from: number;
       until: number;
       activatedAt: number;
     };
@@ -104,9 +105,10 @@ export const activateAnonymously = async (lineId: string, until: number) => {
   }
 };
 
-export const activateWithName = async (lineId: string, until: number) => {
+export const activateWithName = async (lineId: string, until: number, from?: number) => {
   const code = toBase64Url(crypto.getRandomValues(new Uint8Array(16)));
-  const result = (await call('POST', lineId, { until, linkHash: await sha256Hex(code) }, { named: true })) as {
+  const result = (await call('POST', lineId, { from, until, linkHash: await sha256Hex(code) }, { named: true })) as {
+    from: number;
     until: number;
     activatedAt: number;
   };

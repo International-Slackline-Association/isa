@@ -304,7 +304,7 @@ export const slides: {
     drawing: <LiveSlide />,
     text: (
       <>
-        Activating says: <b>this line is rigged right now</b>, until the day you pick.
+        Activating says: <b>this line is rigged</b>, from now or a day you pick, until the day you pick.
       </>
     ),
   },

@@ -1,25 +1,13 @@
-import { apiBaseUrl } from 'app/api/constants';
+import { apiBaseUrl, passes as stagePasses } from 'app/api/constants';
 import { ensureSession } from 'app/session';
 import { fetchAuthSession } from 'aws-amplify/auth';
-
-// The public half of the pass signing key (SSM slackmap-pass-signing-key). It sits in the public source so
-// anyone can check every member is signed with the same key, which is what keeps passes anonymous.
-const passPublicKey = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtMDAxJxAFbyYGY3vkLnR
-PAu3UrpPm6AP80I+H9AbuAoS01NAr+9QVDil92ax0jgucZiH4FirnCW6dYcdScEB
-j2cTKrvztEWbwPDSoFv6/7YvBfbuVQfiltdYh0irGG0uu1DTzc3U1yKboRAhpa8c
-6jmGSbxrPZBzjRJNoIzzSkvBO4qNDwi1R6g23mFcjdDHtLca4tWtXKJM3NCXPF4m
-N/kWoF+TCFmHupIoka9E61SNbk3FNitVsmFDTEAXi2BUdNvyphCh6REyr/PYOsQh
-3xpcTXSufZqRV9VrL1qmHZzQ23EHL9vQEzHMsZah/v4cUpkTU7ql5tU1nuzVqIts
-CQIDAQAB
------END PUBLIC KEY-----`;
 
 export type Pass = { pass: string; signature: string };
 
 const storageKey = 'app.activationPasses';
 // Fetched once a month, the month's whole allowance in one go: a refill after every use would put a
 // signed-in call right after each activation, and the two would be one moment again.
-const keepStored = 5;
+const keepStored = stagePasses.perMonth;
 const fetchedMonthKey = 'app.activationPassesMonth';
 const quotaKey = 'app.activationPassQuota';
 export type PassQuota = { used: number; limit: number; month: string };
@@ -68,7 +56,7 @@ export const returnPass = (pass: Pass) => writePasses([pass, ...readPasses()]);
 export const hasPass = () => readPasses().length > 0;
 
 const publicKey = async () => {
-  const der = Uint8Array.from(atob(passPublicKey.replace(/-----[^-]+-----|\s/g, '')), (c) => c.charCodeAt(0));
+  const der = Uint8Array.from(atob(stagePasses.publicKey.replace(/-----[^-]+-----|\s/g, '')), (c) => c.charCodeAt(0));
   return crypto.subtle.importKey('spki', der, { name: 'RSA-PSS', hash: 'SHA-384' }, true, ['verify']);
 };
 

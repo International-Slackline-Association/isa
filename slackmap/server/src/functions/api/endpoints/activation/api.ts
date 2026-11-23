@@ -11,7 +11,8 @@ import {
   passCountExpiry,
   passesPerMonth,
   signBlindedPass,
-  validateActivationUntil,
+  activationStart,
+  validateActivationEnd,
 } from '../../../../core/features/activation';
 import { logger } from '../../../../core/logger';
 
@@ -25,8 +26,9 @@ const bytes = z.string().max(2048).transform((value, ctx) => {
 });
 const linkHash = z.string().regex(/^[0-9a-f]{64}$/);
 const passesSchema = z.object({ blindedPasses: z.array(bytes).min(1).max(passesPerMonth) });
-const activateSchema = z.object({ until: z.number().int(), pass: bytes, signature: bytes, linkHash });
-const activateNamedSchema = z.object({ until: z.number().int(), linkHash });
+const window = { from: z.number().int().optional(), until: z.number().int() };
+const activateSchema = z.object({ ...window, pass: bytes, signature: bytes, linkHash });
+const activateNamedSchema = z.object({ ...window, linkHash });
 const extendSchema = z.object({ until: z.number().int(), code: z.string().min(16).max(128) });
 const deactivateSchema = z.object({ code: z.string().min(16).max(128) });
 
@@ -79,7 +81,8 @@ const activateAnonymously = async (req: Request<{ id: string }>) => {
   const lineId = req.params.id;
   const body = validateApiPayload(req.body, activateSchema);
   const now = new Date();
-  validateActivationUntil(body.until, now);
+  const from = activationStart(body.from, now);
+  validateActivationEnd(from, body.until, now);
   if (!(await isPassValid(body.pass, body.signature))) throw new Error('Forbidden: Invalid pass');
   await ensureLineCanBeActivated(lineId, now);
 
@@ -87,10 +90,10 @@ const activateAnonymously = async (req: Request<{ id: string }>) => {
     if (isConditionFailed(error)) throw new Error('Forbidden: Pass already used');
     throw error;
   });
-  const activation = { lineId, until: body.until, activatedAt: activatedAtHour(now), linkHash: body.linkHash };
+  const activation = { lineId, from, until: body.until, activatedAt: activatedAtHour(now), linkHash: body.linkHash };
   await saveActivation(activation, true);
-  logger.info('line activated', { lineId, until: activation.until });
-  return { until: activation.until, activatedAt: activation.activatedAt };
+  logger.info('line activated', { lineId, from, until: activation.until });
+  return { from, until: activation.until, activatedAt: activation.activatedAt };
 };
 
 const activateWithName = async (req: Request<{ id: string }>) => {
@@ -98,20 +101,23 @@ const activateWithName = async (req: Request<{ id: string }>) => {
   const lineId = req.params.id;
   const body = validateApiPayload(req.body, activateNamedSchema);
   const now = new Date();
-  validateActivationUntil(body.until, now);
+  const from = activationStart(body.from, now);
+  validateActivationEnd(from, body.until, now);
   const line = await ensureLineCanBeActivated(lineId, now);
 
   const activation = {
     lineId,
+    from,
     until: body.until,
     activatedAt: activatedAtHour(now),
     linkHash: body.linkHash,
     activatedBy: isaId,
   };
   await saveActivation(activation, false);
-  await addActivatedChangelog(line, isaId, now);
-  logger.info('line activated with name', { lineId, until: activation.until, userId: isaId });
-  return { until: activation.until, activatedAt: activation.activatedAt };
+  // Dated at the start, the same entry the hourly job writes; a later start is written by that job.
+  if (from <= now.getTime() / 1000) await addActivatedChangelog(line, isaId, new Date(from * 1000));
+  logger.info('line activated with name', { lineId, from, until: activation.until, userId: isaId });
+  return { from, until: activation.until, activatedAt: activation.activatedAt };
 };
 
 const wrongLink = (error: unknown) => {
@@ -122,7 +128,9 @@ const wrongLink = (error: unknown) => {
 const extendActivation = async (req: Request<{ id: string }>) => {
   const lineId = req.params.id;
   const body = validateApiPayload(req.body, extendSchema);
-  validateActivationUntil(body.until, new Date());
+  const current = await db.getLineActivation(lineId);
+  if (!current) throw new Error('Forbidden: This link does not manage a current activation');
+  validateActivationEnd(current.from, body.until, new Date());
   await db.extendLineActivation(lineId, hashOf(body.code), body.until, nowSeconds()).catch(wrongLink);
   logger.info('activation extended', { lineId, until: body.until });
   return { until: body.until };

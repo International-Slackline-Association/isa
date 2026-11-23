@@ -31,7 +31,7 @@ import {
   isaUsers,
   isProd,
   namespace,
-  passSigningKeyParameter,
+  passes,
   sesIdentityArn,
   sessionsTableName,
   slackmapAdminIsaId,
@@ -151,6 +151,14 @@ export class AppStack extends Stack {
       schedule: events.Schedule.cron({ minute: '0', hour: '2', weekDay: 'MON' }),
       targets: [new targets.LambdaFunction(cronFunction)],
     });
+    new events.Rule(this, 'HourlyActivationStarts', {
+      schedule: events.Schedule.rate(Duration.hours(1)),
+      targets: [
+        new targets.LambdaFunction(cronFunction, {
+          event: events.RuleTargetInput.fromObject({ job: 'activationStarts' }),
+        }),
+      ],
+    });
 
     // Disposable, so outside the data stack and without a stream.
     const sessionsTable = new dynamodb.Table(this, 'SessionsTable', {
@@ -186,14 +194,15 @@ export class AppStack extends Stack {
         dataAccess.signingKeyParameter,
       ),
       SESSION_PUBLIC_KEY: sessionPublicKey,
-      PASS_SIGNING_KEY_PARAMETER: passSigningKeyParameter,
+      PASS_SIGNING_KEY_PARAMETER: passes.signingKeyParameter,
+      PASSES_PER_MONTH: String(passes.perMonth),
       SESSION_KEY_PAIR_ID: sessionPublicKeyResource.publicKeyId,
     };
     for (const [name, value] of Object.entries(apiEnvironment)) apiFunction.addEnvironment(name, value);
     apiFunction.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ['ssm:GetParameter'],
-        resources: [`arn:aws:ssm:${this.region}:${this.account}:parameter/${passSigningKeyParameter}`],
+        resources: [`arn:aws:ssm:${this.region}:${this.account}:parameter/${passes.signingKeyParameter}`],
       }),
     );
 

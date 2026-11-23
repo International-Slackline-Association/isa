@@ -35,7 +35,11 @@ import {
   dateInputBounds,
   expiresWithinADay,
   formatActivatedAgo,
+  formatDay,
   formatUntil,
+  startFromDateInput,
+  startInputBounds,
+  startPresets,
   untilFromDateInput,
   untilPresets,
 } from './activationTimes';
@@ -45,7 +49,7 @@ import { hasPass, passQuota, refillSettled } from './passes';
 interface Props {
   lineId: string;
   lineName: string;
-  activation?: { until: number; activatedAt: number; activatedBy?: string };
+  activation?: { from: number; until: number; activatedAt: number; activatedBy?: string };
   onChanged: () => void;
 }
 
@@ -72,36 +76,51 @@ const ModePill = (props: { mode: ActivationMode; onChange: () => void }) => (
   </Stack>
 );
 
-const UntilChips = (props: { after?: number; value?: number; onPick: (until: number) => void }) => {
-  const presets = untilPresets().filter((p) => !props.after || p.until > props.after);
+const chipSx = (selected: boolean, color: string, onColor: string) => ({
+  fontWeight: 600,
+  bgcolor: selected ? color : '#fff',
+  color: selected ? onColor : 'text.primary',
+  '&&:hover': { bgcolor: selected ? color : ui.fillHover },
+});
+
+const DateChip = (props: { bounds: { min: string; max: string }; onPick: (value: string) => void }) => (
+  <Box
+    component="label"
+    sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1.25, height: 32, borderRadius: 999, bgcolor: '#fff', color: 'text.secondary' }}
+  >
+    <CalendarMonthOutlinedIcon sx={{ fontSize: 16 }} />
+    <Box
+      component="input"
+      type="date"
+      {...props.bounds}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => e.target.value && props.onPick(e.target.value)}
+      sx={{ border: 0, font: 'inherit', fontSize: 13, color: 'text.primary', bgcolor: 'transparent', width: 120 }}
+    />
+  </Box>
+);
+
+const StartChips = (props: { value?: number; onPick: (from?: number) => void }) => (
+  <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.75 }}>
+    {startPresets().map((p) => (
+      <Chip
+        key={p.label}
+        label={p.label}
+        onClick={() => props.onPick(p.from)}
+        sx={chipSx(props.value === p.from, ui.blue, ui.onBlue)}
+      />
+    ))}
+    <DateChip bounds={startInputBounds()} onPick={(value) => props.onPick(startFromDateInput(value))} />
+  </Stack>
+);
+
+const UntilChips = (props: { from?: number; after?: number; value?: number; onPick: (until: number) => void }) => {
+  const presets = untilPresets(props.from).filter((p) => !props.after || p.until > props.after);
   return (
     <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.75 }}>
       {presets.map((p) => (
-        <Chip
-          key={p.label}
-          label={p.label}
-          onClick={() => props.onPick(p.until)}
-          sx={{
-            fontWeight: 600,
-            bgcolor: props.value === p.until ? ui.live : '#fff',
-            color: props.value === p.until ? ui.onLive : 'text.primary',
-            '&&:hover': { bgcolor: props.value === p.until ? ui.live : ui.fillHover },
-          }}
-        />
+        <Chip key={p.label} label={p.label} onClick={() => props.onPick(p.until)} sx={chipSx(props.value === p.until, ui.live, ui.onLive)} />
       ))}
-      <Box
-        component="label"
-        sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1.25, height: 32, borderRadius: 999, bgcolor: '#fff', color: 'text.secondary' }}
-      >
-        <CalendarMonthOutlinedIcon sx={{ fontSize: 16 }} />
-        <Box
-          component="input"
-          type="date"
-          {...dateInputBounds()}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => e.target.value && props.onPick(untilFromDateInput(e.target.value))}
-          sx={{ border: 0, font: 'inherit', fontSize: 13, color: 'text.primary', bgcolor: 'transparent', width: 120 }}
-        />
-      </Box>
+      <DateChip bounds={dateInputBounds(props.from)} onPick={(value) => props.onPick(untilFromDateInput(value))} />
     </Stack>
   );
 };
@@ -141,9 +160,11 @@ export const ActivationField = (props: Props) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [mode, setMode] = useState<ActivationMode>('anonymous');
   const [step, setStep] = useState<Step>();
+  const [from, setFrom] = useState<number>();
   const [until, setUntil] = useState<number>();
   const [busy, setBusy] = useState(false);
   const [doneUntil, setDoneUntil] = useState<number>();
+  const [doneFrom, setDoneFrom] = useState<number>();
 
   useEffect(() => {
     consumeManageLinkFromUrl(props.lineId);
@@ -186,6 +207,7 @@ export const ActivationField = (props: Props) => {
   const onChoose = (chosen: ActivationMode) => {
     setMode(chosen);
     setDialogOpen(false);
+    setFrom(undefined);
     setUntil(untilPresets()[0].until);
     setStep('until');
   };
@@ -194,8 +216,11 @@ export const ActivationField = (props: Props) => {
     run(async () => {
       if (!until) return;
       const result =
-        mode === 'named' ? await activateWithName(props.lineId, until) : await activateAnonymously(props.lineId, until);
+        mode === 'named'
+          ? await activateWithName(props.lineId, until, from)
+          : await activateAnonymously(props.lineId, until, from);
       setCode(manageCodeFor(props.lineId, result));
+      setDoneFrom(result.from);
       setDoneUntil(result.until);
       // The card reloads on onChanged and would drop this step, so it reloads when the step is closed.
       setStep('done');
@@ -258,10 +283,20 @@ export const ActivationField = (props: Props) => {
         {dialog}
         <Section>
           <ModePill mode={mode} onChange={() => setDialogOpen(true)} />
+          <Typography variant="subtitle1">Starts</Typography>
+          <StartChips
+            value={from}
+            onPick={(picked) => {
+              setFrom(picked);
+              setUntil(untilPresets(picked)[0].until);
+            }}
+          />
           <Typography variant="subtitle1">Up until when?</Typography>
-          <UntilChips value={until} onPick={setUntil} />
+          <UntilChips from={from} value={until} onPick={setUntil} />
           <Typography variant="body2" color="text.secondary">
-            {until ? `Gone from the map after ${formatUntil(until)}.` : 'Pick a day, up to 14 days.'}
+            {until
+              ? `${from ? `On the map from ${formatDay(from)}, gone` : 'Gone from the map'} after ${formatUntil(until)}.`
+              : 'Pick a day, up to 14 days.'}
           </Typography>
           <Stack direction="row" spacing={1}>
             <Button fullWidth variant="outlined" sx={{ bgcolor: '#fff' }} onClick={() => setStep(undefined)}>
@@ -291,9 +326,14 @@ export const ActivationField = (props: Props) => {
             <CheckIcon sx={{ color: ui.onLive }} />
           </Box>
           <Box>
-            <Typography variant="h5">Active until {formatUntil(doneUntil)}</Typography>
+            <Typography variant="h5">
+              {doneFrom && doneFrom > Date.now() / 1000
+                ? `Starts ${formatDay(doneFrom)}, until ${formatUntil(doneUntil)}`
+                : `Active until ${formatUntil(doneUntil)}`}
+            </Typography>
             <Typography variant="body2" color="text.secondary">
-              On the map within a minute{mode === 'named' ? ', with your name' : ', anonymously'}.
+              {doneFrom && doneFrom > Date.now() / 1000 ? 'On the map when it starts' : 'On the map within a minute'}
+              {mode === 'named' ? ', with your name' : ', anonymously'}.
             </Typography>
           </Box>
         </Stack>
@@ -335,12 +375,20 @@ export const ActivationField = (props: Props) => {
     );
   }
 
+  const scheduled = activation.from > Date.now() / 1000;
+
   return (
     <Section live>
       <Box>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <Chip label="Active" size="small" color="live" />
-          <Typography variant="body2Bold">until {formatUntil(activation.until)}</Typography>
+          {scheduled ? (
+            <Chip label="Scheduled" size="small" sx={{ bgcolor: ui.blue, color: ui.onBlue, fontWeight: 600 }} />
+          ) : (
+            <Chip label="Active" size="small" color="live" />
+          )}
+          <Typography variant="body2Bold">
+            {scheduled ? `from ${formatDay(activation.from)} until ${formatUntil(activation.until)}` : `until ${formatUntil(activation.until)}`}
+          </Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
           Activated {formatActivatedAgo(activation.activatedAt)}
@@ -351,7 +399,7 @@ export const ActivationField = (props: Props) => {
       {code && step === 'extend' && (
         <>
           <Typography variant="subtitle1">Extend until?</Typography>
-          <UntilChips after={activation.until} onPick={onExtend} />
+          <UntilChips from={scheduled ? activation.from : undefined} after={activation.until} onPick={onExtend} />
           <Button variant="outlined" sx={{ bgcolor: '#fff' }} onClick={() => setStep(undefined)}>
             Cancel
           </Button>

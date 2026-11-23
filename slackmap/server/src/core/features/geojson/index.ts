@@ -22,7 +22,7 @@ export const processLineGeoJson = (
     length?: number;
     country: string;
     // Only for the map files; the line item's stored geoJson never carries it.
-    activation?: { until: number; activatedAt: number };
+    activation?: { from: number; until: number; activatedAt: number };
   },
 ): FeatureCollection => {
   const features: Feature[] = [];
@@ -39,7 +39,8 @@ export const processLineGeoJson = (
     if (meta.country) {
       f.properties['c'] = meta.country;
     }
-    if (meta.activation) {
+    // The hourly job rewrites the files when one starts.
+    if (meta.activation && meta.activation.from <= Date.now() / 1000) {
       f.properties['au'] = meta.activation.until;
       f.properties['aa'] = meta.activation.activatedAt;
     } else {

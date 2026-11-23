@@ -2,7 +2,7 @@ import { stages } from 'stages';
 import { countryISO2Mapping } from 'utils/countryCodes';
 
 export const stage = import.meta.env.VITE_APP_STAGE;
-export const { domain, webOrigins, uploadsIdentityPoolId, sessionRequired } = stages[stage];
+export const { domain, webOrigins, uploadsIdentityPoolId, sessionRequired, passes } = stages[stage];
 export const apiBaseUrl = import.meta.env.DEV ? `${window.location.origin}/_api` : `https://api.${domain}`;
 export const dataBaseUrl = import.meta.env.DEV ? `${window.location.origin}/_data` : `https://data.${domain}`;
 export const imagesBaseUrl = `https://images.${domain}`;
