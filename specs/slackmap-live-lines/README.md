@@ -27,5 +27,6 @@ Rigging is an **extension of an existing line**: a few fields on the line (rigge
 | [flows.md](flows.md) | Flowcharts: big picture, the rigger's flow, a rig's life, the pass |
 | [anonymity.md](anonymity.md) | What we protect from whom, how the pass works, every place identity could leak |
 | [live-data.md](live-data.md) | The fields, how they reach the map, consumer formats, aviation facts |
+| [implementation.md](implementation.md) | The build plan from the code, and its open questions |
 
 Point-in-time material per the [folder convention](/docs/documentation-system/folder-convention.md#docs-vs-specs): when it is built, the whys go into [slackmap's docs](/slackmap/docs/README.md) and this folder stays a snapshot.
