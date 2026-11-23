@@ -1,16 +1,16 @@
 import React, { ChangeEventHandler, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
+  Box,
   Button,
   IconButton,
   ImageList,
   ImageListItem,
   ImageListItemBar,
   Stack,
-  Typography,
 } from '@mui/material';
 
 import { selectUserInfo } from 'app/slices/app/selectors';
@@ -126,7 +126,7 @@ export const S3ImageList = (props: Props) => {
   }, [images]);
 
   return (
-    <ImageList variant="standard" cols={1} sx={{ width: '100%' }}>
+    <ImageList variant="standard" cols={1} gap={8} sx={{ width: '100%', m: 0, '& .MuiImageListItem-root': { borderRadius: '12px', overflow: 'hidden' } }}>
       {images
         .filter((i) => i.s3Key)
         .map((item) => (
@@ -148,7 +148,7 @@ export const S3ImageList = (props: Props) => {
                       size="small"
                       onClick={() => makeCoverPhotoClicked(item.id!)}
                     >
-                      Set as Cover Photo
+                      Set as cover
                     </Button>
                   )}
 
@@ -163,17 +163,28 @@ export const S3ImageList = (props: Props) => {
 
       {images.length < (props.maxPhotoCount ?? 4) && (
         <>
-          <label htmlFor={`upload-photo-${props.htmlId}`}>
-            <Button
-              startIcon={<AddPhotoAlternateIcon />}
-              variant="outlined"
-              sx={{ pointerEvents: 'none' }}
-            >
-              <Typography variant="body2">
-                {isUploadingImage ? 'Uploading...' : 'Select Photo'}
-              </Typography>
-            </Button>
-          </label>
+          <Box
+            component="label"
+            htmlFor={`upload-photo-${props.htmlId}`}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              height: 64,
+              borderRadius: '12px',
+              bgcolor: 'neutral.main',
+              color: 'text.secondary',
+              fontSize: 14,
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'background-color 120ms',
+              '&:hover': { bgcolor: 'neutral.dark', color: 'text.primary' },
+            }}
+          >
+            <AddPhotoAlternateOutlinedIcon fontSize="small" />
+            {isUploadingImage ? 'Uploading…' : 'Add a photo'}
+          </Box>
           <input
             id={`upload-photo-${props.htmlId}`}
             type="file"

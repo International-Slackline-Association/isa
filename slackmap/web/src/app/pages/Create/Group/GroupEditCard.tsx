@@ -1,26 +1,24 @@
-import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button';
 import {
   Alert,
+  Box,
   MenuItem,
   Stack,
   StandardTextFieldProps,
   TextField,
   Typography,
 } from '@mui/material';
-import Avatar from '@mui/material/Avatar';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 
 import { isaMemberTypeLabel } from 'app/pages/Communities/GroupsManifestText';
 import { FormikProps, useFormik } from 'formik';
 
-import { EditingTextFieldHeader } from '../Line/LineEditCard';
+import { CancelEditButton, EditingTextFieldHeader } from '../Line/LineEditCard';
 import { GroupDetailsForm, groupLinkFields } from './types';
 import { cleanGroupValues, validateGroupValues } from './validations';
 
 interface Props {
+  // Whether the drawing on the map differs from the saved or empty one.
+  mapChanged?: boolean;
   initialValues?: GroupDetailsForm;
   mapErrors?: string[];
   onSubmit: (values: ReturnType<typeof cleanGroupValues>) => void;
@@ -41,28 +39,13 @@ export const GroupEditCard = (props: Props) => {
   });
 
   return (
-    <Card
-      sx={{
-        boxShadow: 'none',
-        border: 'none',
-        height: '100%',
-        width: '100%',
-        overflow: 'scroll',
-      }}
-    >
-      <CardHeader
-        avatar={
-          <Avatar sx={{ backgroundColor: (t) => t.palette.primary.main }}>
-            <AddIcon />
-          </Avatar>
-        }
-        title={
-          <Typography variant="h5">
-            {isCreateMode ? 'Add a Slackline Group' : 'Edit Slackline Group'}
+    <Box component="form" onSubmit={formik.handleSubmit} sx={{ display: 'flex', flexDirection: 'column', height: '100%', bgcolor: 'background.paper' }}>
+      <Box sx={{ px: 2, pt: 2, pb: 1.25 }}>
+        <Typography variant="h4" component="h1">
+            {isCreateMode ? 'Add a slackline group' : 'Edit slackline group'}
           </Typography>
-        }
-      />
-      <CardContent component={Stack} spacing={1}>
+      </Box>
+      <Stack spacing={1.5} sx={{ flex: 1, overflowY: 'auto', px: 2, pb: 2, scrollbarWidth: 'thin' }}>
         <Stack spacing={1}>
           {props.mapErrors?.map((e) => (
             <Alert key={e} severity="error">
@@ -70,7 +53,7 @@ export const GroupEditCard = (props: Props) => {
             </Alert>
           ))}
         </Stack>
-        <form onSubmit={formik.handleSubmit}>
+        <>
           <Stack spacing={1}>
             <EditingTextFieldHeader>Details</EditingTextFieldHeader>
             <EditingTextField formik={formik} field={'name'} label={'Name of the group'} required />
@@ -106,20 +89,20 @@ export const GroupEditCard = (props: Props) => {
               </>
             )}
 
-            <Button
-              color="primary"
-              variant="contained"
-              fullWidth
-              type="submit"
-              disabled={props.disableSubmit}
-              loading={props.isSubmitting}
-            >
-              Submit
-            </Button>
           </Stack>
-        </form>
-      </CardContent>
-    </Card>
+        </>
+      </Stack>
+      <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end', px: 2, py: 1.25, borderTop: (t) => `1px solid ${t.palette.divider}` }}>
+        <CancelEditButton
+          noun="group"
+          isCreateMode={isCreateMode}
+          hasChanges={formik.dirty || Boolean(props.mapChanged)}
+        />
+        <Button variant="contained" type="submit" disabled={props.disableSubmit} loading={props.isSubmitting}>
+          Save
+        </Button>
+      </Stack>
+    </Box>
   );
 };
 

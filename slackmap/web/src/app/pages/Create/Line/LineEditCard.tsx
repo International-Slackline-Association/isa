@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
 
-import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button';
 import {
   Alert,
+  Box,
   Checkbox,
   FormControlLabel,
   MenuItem,
@@ -12,16 +12,14 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import Avatar from '@mui/material/Avatar';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 
 import { SlacklineRestrictionLevel, SlacklineType } from '@server/core/types';
 import { S3ImageList, S3PhotoMeta } from 'app/components/ImageList';
 import { useFormik } from 'formik';
 
 import { LineDetailsForm } from './types';
+import { useLocation, useNavigate } from 'react-router';
+import { useConfirmDialog } from 'app/components/Dialogs/useConfirmDialog';
 
 const lineTypes: { value: SlacklineType; label: string }[] = [
   {
@@ -77,6 +75,8 @@ export const restrictionSelectOptions: {
   },
 ];
 interface Props {
+  // Whether the drawing on the map differs from the saved or empty one.
+  mapChanged?: boolean;
   initialValues?: LineDetailsForm;
   mapErrors?: string[];
   onSubmit: (values: LineDetailsForm) => void;
@@ -128,26 +128,11 @@ export const LineEditCard = (props: Props) => {
   });
 
   return (
-    <Card
-      sx={{
-        boxShadow: 'none',
-        border: 'none',
-        height: '100%',
-        width: '100%',
-        overflow: 'scroll',
-      }}
-    >
-      <CardHeader
-        avatar={
-          <Avatar sx={{ backgroundColor: (t) => t.palette.primary.main }}>
-            <AddIcon />
-          </Avatar>
-        }
-        title={
-          <Typography variant="h5">{isCreateMode ? 'Create New Line' : 'Edit Line'}</Typography>
-        }
-      />
-      <CardContent component={Stack} spacing={1} sx={{}}>
+    <Box component="form" onSubmit={formik.handleSubmit} sx={{ display: 'flex', flexDirection: 'column', height: '100%', bgcolor: 'background.paper' }}>
+      <Box sx={{ px: 2, pt: 2, pb: 1.25 }}>
+        <Typography variant="h4" component="h1">{isCreateMode ? 'Add a line' : 'Edit line'}</Typography>
+      </Box>
+      <Stack spacing={1.5} sx={{ flex: 1, overflowY: 'auto', px: 2, pb: 2, scrollbarWidth: 'thin' }}>
         <Stack spacing={1}>
           {props.mapErrors?.map((e) => (
             <Alert key={e} severity="error">
@@ -155,7 +140,7 @@ export const LineEditCard = (props: Props) => {
             </Alert>
           ))}
         </Stack>
-        <form onSubmit={formik.handleSubmit}>
+        <>
           <Stack spacing={1}>
             <EditingTextFieldHeader>Specs</EditingTextFieldHeader>
 
@@ -183,7 +168,7 @@ export const LineEditCard = (props: Props) => {
 
             <FormControlLabel
               control={<Checkbox />}
-              label="Is Accurately Measured?"
+              label="Accurately measured"
               checked={formik.values.isMeasured}
               name="isMeasured"
               onChange={formik.handleChange}
@@ -201,31 +186,31 @@ export const LineEditCard = (props: Props) => {
             <EditingTextField
               formik={formik}
               field={'anchorsInfo'}
-              label={'Anchor Information'}
+              label={'Anchors'}
               multiline
             />
             <EditingTextField
               formik={formik}
               field={'gearInfo'}
-              label={'Gear Information'}
+              label={'Gear'}
               multiline
             />
             <EditingTextField
               formik={formik}
               field={'accessInfo'}
-              label={'Access Information'}
+              label={'Access'}
               multiline
             />
             <EditingTextField
               formik={formik}
               field={'contactInfo'}
-              label={'Contact Information'}
+              label={'Contact'}
               multiline
             />
             <EditingTextField
               formik={formik}
               field={'extraInfo'}
-              label={'Extra Information'}
+              label={'Additional details'}
               multiline
             />
 
@@ -237,7 +222,7 @@ export const LineEditCard = (props: Props) => {
               formik={formik}
               select
               field="restrictionLevel"
-              label="Restriction Level"
+              label="Restriction level"
               required
             >
               <MenuItem value={''}></MenuItem>
@@ -251,13 +236,13 @@ export const LineEditCard = (props: Props) => {
             <EditingTextField
               formik={formik}
               field={'restrictionInfo'}
-              label={'Restriction Details'}
+              label={'Restriction details'}
               multiline
               placeholder="Don't forget to add your contact info for people to reach you"
             />
 
             <EditingTextFieldHeader subHeader="Upload your anchor photos to document your line. Max 5 photos. All the photos are publicly viewable.">
-              Anchor Photos
+              Anchor photos
             </EditingTextFieldHeader>
 
             <S3ImageList
@@ -269,7 +254,7 @@ export const LineEditCard = (props: Props) => {
             />
 
             <EditingTextFieldHeader subHeader="Upload your line photos. Max 3 images. All the photos are publicly viewable.">
-              Line Photos
+              Line photos
             </EditingTextFieldHeader>
 
             <S3ImageList
@@ -279,20 +264,57 @@ export const LineEditCard = (props: Props) => {
               htmlId="line-images"
             />
 
-            <Button
-              color="primary"
-              variant="contained"
-              fullWidth
-              type="submit"
-              disabled={props.disableSubmit}
-              loading={props.isSubmitting}
-            >
-              Submit
-            </Button>
           </Stack>
-        </form>
-      </CardContent>
-    </Card>
+        </>
+      </Stack>
+      <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end', px: 2, py: 1.25, borderTop: (t) => `1px solid ${t.palette.divider}` }}>
+        <CancelEditButton
+          noun="line"
+          isCreateMode={isCreateMode}
+          hasChanges={formik.dirty || Boolean(props.mapChanged)}
+        />
+        <Button variant="contained" type="submit" disabled={props.disableSubmit} loading={props.isSubmitting}>
+          Save
+        </Button>
+      </Stack>
+    </Box>
+  );
+};
+
+export const CancelEditButton = (props: { hasChanges: boolean; isCreateMode: boolean; noun: string }) => {
+  const navigate = useNavigate();
+  const { pathname, search } = useLocation();
+  const { ConfirmDialog, showConfirmDialog } = useConfirmDialog();
+  const backTo = pathname.endsWith('/edit')
+    ? pathname.slice(0, -'/edit'.length)
+    : pathname.startsWith('/communities')
+      ? '/communities'
+      : '/';
+  const leave = () => navigate({ pathname: backTo, search });
+
+  return (
+    <>
+      <ConfirmDialog />
+      <Button
+        variant="outlined"
+        onClick={() =>
+          props.hasChanges
+            ? showConfirmDialog({
+                title: props.isCreateMode ? `Discard this ${props.noun}?` : 'Discard your changes?',
+                description: props.isCreateMode
+                  ? `What you drew and wrote for this ${props.noun} will be lost.`
+                  : 'Your edits will be lost. The saved version stays as it was.',
+                confirmText: 'Discard',
+                cancelText: 'Keep editing',
+                destructive: true,
+                onConfirm: leave,
+              })
+            : leave()
+        }
+      >
+        Cancel
+      </Button>
+    </>
   );
 };
 
@@ -300,16 +322,16 @@ export const EditingTextFieldHeader = (props: { children: ReactNode; subHeader?:
   const { children, subHeader } = props;
 
   return (
-    <>
-      <Typography variant="h5" sx={{ color: (t) => t.palette.primary.main }}>
+    <Box sx={{ pt: 1.5 }}>
+      <Typography variant="h6" component="h2">
         {children}
       </Typography>
       {subHeader && (
-        <Typography variant="caption" sx={{ color: (t) => t.palette.text.primary }}>
+        <Typography variant="caption" component="p" sx={{ color: 'text.secondary', mt: 0.25 }}>
           {subHeader}
         </Typography>
       )}
-    </>
+    </Box>
   );
 };
 

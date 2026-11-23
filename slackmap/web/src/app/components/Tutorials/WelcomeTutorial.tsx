@@ -32,9 +32,9 @@ const Item = (props: { color: string; label: string }) => {
 const TutorialPage = (props: { img: string; title: string; children: React.ReactNode }) => {
   return (
     <Stack
-      spacing={4}
+      spacing={2.5}
       sx={{
-        height: { xs: '66vh', lg: '75vh' },
+        maxHeight: { xs: '60vh', lg: '62vh' },
         overflowY: 'scroll',
       }}
     >
@@ -43,11 +43,12 @@ const TutorialPage = (props: { img: string; title: string; children: React.React
         style={{
           maxWidth: '100%',
           objectFit: 'contain',
+          borderRadius: 12,
         }}
         alt={''}
       />
-      <Stack spacing={2} sx={{ px: 4, alignItems: 'center', textAlign: 'center' }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+      <Stack spacing={1.5} sx={{ px: 2, alignItems: 'center', textAlign: 'center' }}>
+        <Typography variant="h5">
           {props.title}
         </Typography>
         {props.children}
@@ -60,7 +61,7 @@ export const welcomeTutorialPages = [
   <TutorialPage
     key={'tutorial-0'}
     img={'/images/tutorials/map-features.png'}
-    title={'Try the Interactable Map'}
+    title={'Explore the map'}
   >
     <Stack spacing={1} direction={'row'} sx={{ alignItems: 'center' }}>
       <Item color={appColors.lineStrokeColor} label={'Slacklines'} />
@@ -78,8 +79,8 @@ export const welcomeTutorialPages = [
   </TutorialPage>,
   <TutorialPage
     key={'tutorial-1'}
-    img={'/images/tutorials/feature-types.png'}
-    title={'Add Your Features'}
+    img={'/images/tutorials/feature-types.svg'}
+    title={'Add what you know'}
   >
     <Stack spacing={2} direction={'row'} sx={{ alignItems: 'center' }}>
       <Avatar sx={{ bgcolor: appColors.lineStrokeColor }}>
@@ -97,16 +98,6 @@ export const welcomeTutorialPages = [
       <b>- Spots</b> are the areas that are slacklining zones. <br /> <br />
       <b>- Access Guides</b> are the visual helpers, like access trails, camping spot, parking lots,
       etc.
-    </Typography>
-  </TutorialPage>,
-  <TutorialPage
-    key={'tutorial-2'}
-    img={'/images/tutorials/map-settings.png'}
-    title={'Change Settings'}
-  >
-    <Typography variant="subtitle2">
-      You can change the map style, show/hide features, and filter the slacklines by their types
-      from the map settings.
     </Typography>
   </TutorialPage>,
 ];

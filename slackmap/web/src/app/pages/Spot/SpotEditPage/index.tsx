@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-import { Box, Stack } from '@mui/material';
 
 import { spotApi } from 'app/api/spot-api';
 import { DrawableMap } from 'app/components/Maps/SlacklineMap/DrawableMap';
@@ -10,6 +9,7 @@ import { SpotEditCard } from 'app/pages/Create/Spot/SpotEditCard';
 import { SpotDetailsForm } from 'app/pages/Create/Spot/types';
 import { validateSpotFeatures } from 'app/pages/Create/Spot/validations';
 import { Feature, FeatureCollection } from 'geojson';
+import { FeatureFormLayout } from 'app/components/FeatureFormLayout';
 
 export function SpotEditPage() {
   const { spotId } = useParams();
@@ -58,59 +58,47 @@ export function SpotEditPage() {
   };
 
   return (
-    <Stack
-      direction={{ xs: 'column', lg: 'row' }}
-      sx={{
-        minHeight: '100%',
-      }}
-    >
-      <Box
-        sx={{
-          height: { xs: '50vh', lg: '100vh' },
-          width: { xs: '100%', lg: '67%' },
-          position: 'relative',
-        }}
-      >
-        {spotDetails?.geoJson && (
-          <DrawableMap
-            drawControls={{
-              polygon: true,
-              line_string: false,
-              trash: true,
-            }}
-            onDrawingFeaturesChanged={onDrawingFeaturesChanged}
-            drawControlStyles={drawControlStyles('spot')}
-            drawingFeatures={spotDetails.geoJson.features as Feature[]}
-          />
-        )}
-      </Box>
-
-      <Box
-        sx={{
-          flex: 1,
-          height: { xs: 'auto', lg: '100vh' },
-        }}
-      >
-        {spotDetails && (
-          <SpotEditCard
-            mapErrors={mapErrors}
-            onSubmit={onDetailsSubmit}
-            disableSubmit={features.length === 0 || mapErrors.length > 0}
-            isSubmitting={isSaving}
-            initialValues={{
-              accessInfo: spotDetails.accessInfo,
-              description: spotDetails.description,
-              types: spotDetails.types,
-              name: spotDetails.name,
-              contactInfo: spotDetails.contactInfo,
-              extraInfo: spotDetails.extraInfo,
-              restrictionInfo: spotDetails.restrictionInfo,
-              restrictionLevel: spotDetails.restrictionLevel,
-              images: spotDetails.images,
-            }}
-          />
-        )}
-      </Box>
-    </Stack>
+    <FeatureFormLayout
+      map={
+        <>
+          {spotDetails?.geoJson && (
+            <DrawableMap
+              drawControls={{
+                polygon: true,
+                line_string: false,
+                trash: true,
+              }}
+              onDrawingFeaturesChanged={onDrawingFeaturesChanged}
+              drawControlStyles={drawControlStyles('spot')}
+              drawingFeatures={spotDetails.geoJson.features as Feature[]}
+            />
+          )}
+        </>
+      }
+      form={
+        <>
+          {spotDetails && (
+            <SpotEditCard
+              mapChanged={JSON.stringify(features) !== JSON.stringify(spotDetails.geoJson.features)}
+              mapErrors={mapErrors}
+              onSubmit={onDetailsSubmit}
+              disableSubmit={features.length === 0 || mapErrors.length > 0}
+              isSubmitting={isSaving}
+              initialValues={{
+                accessInfo: spotDetails.accessInfo,
+                description: spotDetails.description,
+                types: spotDetails.types,
+                name: spotDetails.name,
+                contactInfo: spotDetails.contactInfo,
+                extraInfo: spotDetails.extraInfo,
+                restrictionInfo: spotDetails.restrictionInfo,
+                restrictionLevel: spotDetails.restrictionLevel,
+                images: spotDetails.images,
+              }}
+            />
+          )}
+        </>
+      }
+    />
   );
 }

@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import { Box } from '@mui/material';
+
+import { PopupDialog } from './PopupDialog';
 
 interface Props {
   title: string;
@@ -17,29 +14,9 @@ export const useInfoDialog = () => {
   const [dialogProps, setDialogProps] = useState<Props | null>(null);
 
   const InfoDialog: React.FC = () => (
-    <Dialog
-      open={isOpen}
-      onClose={() => {
-        setIsOpen(false);
-      }}
-      sx={{
-        backdropFilter: 'blur(2px)',
-      }}
-    >
-      <DialogTitle> {dialogProps?.title}</DialogTitle>
-      <DialogContent>
-        <DialogContentText component="div">{dialogProps?.description}</DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button
-          onClick={() => {
-            setIsOpen(false);
-          }}
-        >
-          Dismiss
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <PopupDialog open={isOpen} onClose={() => setIsOpen(false)} title={dialogProps?.title} width={560}>
+      <Box sx={{ color: 'text.secondary', fontSize: 14 }}>{dialogProps?.description}</Box>
+    </PopupDialog>
   );
 
   const showInfoDialog = (props: Props) => {

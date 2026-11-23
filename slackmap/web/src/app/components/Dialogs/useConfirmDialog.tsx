@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+
+import { PopupDialog } from './PopupDialog';
 
 interface Props {
   title: string;
   description: string;
   confirmText?: string;
+  cancelText?: string;
+  destructive?: boolean;
   onConfirm: () => void;
 }
 
@@ -19,38 +18,29 @@ export const useConfirmDialog = () => {
   const [dialogProps, setDialogProps] = useState<Props | null>(null);
 
   const ConfirmDialog: React.FC = () => (
-    <Dialog
+    <PopupDialog
       open={isOpen}
-      onClose={() => {
-        setIsOpen(false);
-      }}
-      sx={{
-        backdropFilter: 'blur(2px)',
-      }}
-    >
-      <DialogTitle> {dialogProps?.title}</DialogTitle>
-      <DialogContent>
-        <DialogContentText>{dialogProps?.description}</DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button
-          onClick={() => {
-            setIsOpen(false);
-          }}
-        >
-          {'Cancel'}
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => {
-            setIsOpen(false);
-            dialogProps?.onConfirm();
-          }}
-        >
-          {dialogProps?.confirmText || 'Confirm'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      onClose={() => setIsOpen(false)}
+      title={dialogProps?.title}
+      description={dialogProps?.description}
+      actions={
+        <>
+          <Button variant="outlined" onClick={() => setIsOpen(false)}>
+            {dialogProps?.cancelText || 'Cancel'}
+          </Button>
+          <Button
+            variant="contained"
+            color={dialogProps?.destructive ? 'error' : 'primary'}
+            onClick={() => {
+              setIsOpen(false);
+              dialogProps?.onConfirm();
+            }}
+          >
+            {dialogProps?.confirmText || 'Confirm'}
+          </Button>
+        </>
+      }
+    />
   );
 
   const showConfirmDialog = (props: Props) => {

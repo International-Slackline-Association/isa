@@ -66,7 +66,7 @@ export const CountryHistoryField = (props: Props) => {
   };
 
   return (
-    <FeatureDetailFieldLayout icon={<HistoryIcon />} header={'History'} noDivider>
+    <FeatureDetailFieldLayout icon={<HistoryIcon />} header={'History'}>
       {!changelogs ? (
         isFetching ? (
           <LoadingIndicator />

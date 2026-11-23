@@ -1,13 +1,10 @@
 import { useState } from 'react';
+
+import { Button, Stack } from '@mui/material';
+
 import { Carousel } from 'app/components/Carousel';
-
-import { Button, Dialog, DialogActions, Slide, SlideProps } from '@mui/material';
-
+import { PopupDialog } from 'app/components/Dialogs/PopupDialog';
 import { useCarouselIndex } from 'utils/hooks/useCarouselIndex';
-
-function SlideTransition(props: SlideProps) {
-  return <Slide {...props} direction="up" />;
-}
 
 interface Props {
   pages: React.JSX.Element[];
@@ -25,30 +22,16 @@ export const TutorialDialog = (props: Props) => {
   };
 
   return (
-    <Dialog open={isOpen} onClose={close} slots={{ transition: SlideTransition }}>
-      <Carousel
-        indicators
-        cycleNavigation={false}
-        swipe={false}
-        index={carouselIndex}
-        onChange={setCarouselIndex}
-        sx={{
-          width: { xs: '80vw', lg: '25vw' },
-          position: 'relative',
-        }}
-      >
+    <PopupDialog open={isOpen} onClose={close} width={460}>
+      <Carousel indicators cycleNavigation={false} swipe={false} index={carouselIndex} onChange={setCarouselIndex}>
         {props.pages}
       </Carousel>
-      <DialogActions sx={{ justifyContent: 'space-between' }}>
-        <Button onClick={close}>Skip Tutorial</Button>
-        <Button
-          onClick={() => {
-            isOnLastIndex ? close() : setCarouselIndex(carouselIndex + 1);
-          }}
-        >
+      <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+        <Button onClick={close}>Skip</Button>
+        <Button variant="contained" onClick={() => (isOnLastIndex ? close() : setCarouselIndex(carouselIndex + 1))}>
           {isOnLastIndex ? props.closeText || 'Done' : 'Next'}
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Stack>
+    </PopupDialog>
   );
 };

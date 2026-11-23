@@ -1,6 +1,7 @@
 import { Box, Link, Typography, keyframes } from '@mui/material';
 
 import { appColors } from 'styles/theme/colors';
+import { ui } from 'styles/theme/ui';
 
 const pulse = keyframes`
   0%, 100% { opacity: 0.25; transform: scale(0.85); }
@@ -19,8 +20,7 @@ export const MaintenancePage = () => {
         textAlign: 'center',
         px: 3,
         py: 4,
-        background:
-          'radial-gradient(1200px 600px at 50% -10%, #eaf3fb 0%, rgba(234,243,251,0) 60%), linear-gradient(180deg, #f7fafd 0%, #eef3f7 100%)',
+        bgcolor: ui.fill,
       }}
     >
       <Box
@@ -30,7 +30,7 @@ export const MaintenancePage = () => {
         sx={{ width: 260, maxWidth: '80%', mb: 5 }}
       />
 
-      <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 2 }}>
+      <Typography variant="h3" component="h1" sx={{ mb: 2 }}>
         We&rsquo;ll be back soon
       </Typography>
 
@@ -44,7 +44,7 @@ export const MaintenancePage = () => {
         }}
       />
 
-      <Typography sx={{ fontSize: 16, lineHeight: 1.6, color: '#6b7075', maxWidth: 440, mb: 4 }}>
+      <Typography sx={{ fontSize: 16, lineHeight: 1.6, color: 'text.secondary', maxWidth: 440, mb: 4 }}>
         SlackMap is temporarily offline for a technical reason. We plan to come back online soon.
         Thank you.
       </Typography>
@@ -57,7 +57,7 @@ export const MaintenancePage = () => {
               width: 9,
               height: 9,
               borderRadius: '50%',
-              backgroundColor: appColors.slackmapBlue,
+              backgroundColor: ui.blue,
               animation: `${pulse} 1.2s infinite`,
               animationDelay: `${delay}s`,
             }}
@@ -65,11 +65,11 @@ export const MaintenancePage = () => {
         ))}
       </Box>
 
-      <Typography sx={{ fontSize: 13, color: '#9aa3ab' }}>
+      <Typography sx={{ fontSize: 13, color: 'text.secondary' }}>
         Questions?{' '}
         <Link
           href="mailto:slackmap@slacklineinternational.org"
-          sx={{ color: appColors.slackmapBlue, fontWeight: 600, textDecoration: 'none' }}
+          sx={{ fontWeight: 600 }}
         >
           slackmap@slacklineinternational.org
         </Link>

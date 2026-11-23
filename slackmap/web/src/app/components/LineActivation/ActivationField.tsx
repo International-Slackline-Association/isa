@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
+import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
+import LinkIcon from '@mui/icons-material/Link';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import LockIcon from '@mui/icons-material/Lock';
 import SensorsIcon from '@mui/icons-material/Sensors';
@@ -10,7 +15,7 @@ import { Box, Button, ButtonBase, Chip, Link, Stack, Typography } from '@mui/mat
 import { useSignInDialog } from 'app/components/Dialogs/useSignInDialog';
 import { selectIsUserSignedIn } from 'app/slices/app/selectors';
 import { format } from 'date-fns';
-import { appColors } from 'styles/theme/colors';
+import { ui } from 'styles/theme/ui';
 import { showErrorNotification, showInfoNotification, showSuccessNotification } from 'utils';
 
 import { ActivateDialog, ActivationMode } from './ActivateDialog';
@@ -35,7 +40,6 @@ import {
 } from './activationTimes';
 import { hasPass, passQuota } from './passes';
 
-const orange = appColors.activeColor;
 
 interface Props {
   lineId: string;
@@ -48,27 +52,18 @@ interface Props {
 type Step = 'until' | 'done' | 'extend' | 'confirmDeactivate';
 
 const Section = (props: { live?: boolean; children: React.ReactNode }) => (
-  <Stack
-    spacing={1.25}
-    sx={{
-      borderRadius: 3.5,
-      p: 1.5,
-      bgcolor: props.live ? '#fff4e6' : '#f5f7f9',
-      border: props.live ? '1px solid #ffd3a1' : 'none',
-    }}
-  >
+  <Stack spacing={1.25} sx={{ borderRadius: '14px', p: 1.5, bgcolor: props.live ? ui.liveTint : ui.fill }}>
     {props.children}
   </Stack>
 );
-
-const pill = { borderRadius: 999, textTransform: 'none', fontWeight: 700, boxShadow: 'none' } as const;
 
 const ModePill = (props: { mode: ActivationMode; onChange: () => void }) => (
   <Stack direction="row" sx={{ alignItems: 'center' }}>
     <Chip
       size="small"
-      label={props.mode === 'named' ? '🏷️ With my name' : '🕶️ Anonymous'}
-      sx={{ bgcolor: '#fff', border: '1px solid #e4e7eb', fontWeight: 600 }}
+      icon={props.mode === 'named' ? <BadgeOutlinedIcon /> : <VisibilityOffOutlinedIcon />}
+      label={props.mode === 'named' ? 'With my name' : 'Anonymous'}
+      sx={{ bgcolor: '#fff', fontWeight: 600, '& .MuiChip-icon': { fontSize: 16, ml: 0.75 } }}
     />
     <Link component="button" variant="body2" onClick={props.onChange} sx={{ ml: 'auto', fontWeight: 600 }}>
       change
@@ -87,37 +82,35 @@ const UntilChips = (props: { after?: number; value?: number; onPick: (until: num
           onClick={() => props.onPick(p.until)}
           sx={{
             fontWeight: 600,
-            border: '1.5px solid',
-            borderColor: props.value === p.until ? orange : '#d3d8de',
-            bgcolor: props.value === p.until ? orange : '#fff',
-            color: props.value === p.until ? '#fff' : 'text.primary',
-            '&:hover': { bgcolor: props.value === p.until ? orange : '#f5f7f9' },
+            bgcolor: props.value === p.until ? ui.live : '#fff',
+            color: props.value === p.until ? ui.onLive : 'text.primary',
+            '&&:hover': { bgcolor: props.value === p.until ? ui.live : ui.fillHover },
           }}
         />
       ))}
       <Box
         component="label"
-        sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1.25, borderRadius: 999, border: '1.5px solid #d3d8de', bgcolor: '#fff' }}
+        sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1.25, height: 32, borderRadius: 999, bgcolor: '#fff', color: 'text.secondary' }}
       >
-        📅
+        <CalendarMonthOutlinedIcon sx={{ fontSize: 16 }} />
         <Box
           component="input"
           type="date"
           {...dateInputBounds()}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => e.target.value && props.onPick(untilFromDateInput(e.target.value))}
-          sx={{ border: 0, font: 'inherit', bgcolor: 'transparent', width: 120 }}
+          sx={{ border: 0, font: 'inherit', fontSize: 13, color: 'text.primary', bgcolor: 'transparent', width: 120 }}
         />
       </Box>
     </Stack>
   );
 };
 
-const Tile = (props: { emoji: string; title: string; line: string; onClick: () => void }) => (
+const Tile = (props: { icon: React.ReactNode; title: string; line: string; onClick: () => void }) => (
   <ButtonBase
     onClick={props.onClick}
-    sx={{ flex: 1, flexDirection: 'column', gap: 0.25, p: 1.25, borderRadius: 3.5, border: '1.5px solid #ffd3a1', bgcolor: '#fff' }}
+    sx={{ flex: 1, flexDirection: 'column', gap: 0.25, p: 1.25, borderRadius: '12px', bgcolor: '#fff', '&:hover': { bgcolor: ui.fill } }}
   >
-    <Typography sx={{ fontSize: 24 }}>{props.emoji}</Typography>
+    <Box sx={{ color: ui.liveInk, '& .MuiSvgIcon-root': { fontSize: 22 } }}>{props.icon}</Box>
     <Typography variant="body2Bold">{props.title}</Typography>
     <Typography variant="caption" color="text.secondary">
       {props.line}
@@ -260,21 +253,21 @@ export const ActivationField = (props: Props) => {
         {dialog}
         <Section>
           <ModePill mode={mode} onChange={() => setDialogOpen(true)} />
-          <Typography sx={{ fontWeight: 700, fontSize: 16 }}>Up until when?</Typography>
+          <Typography variant="subtitle1">Up until when?</Typography>
           <UntilChips value={until} onPick={setUntil} />
           <Typography variant="body2" color="text.secondary">
             {until ? `Gone from the map after ${formatUntil(until)}.` : 'Pick a day, up to 14 days.'}
           </Typography>
           <Stack direction="row" spacing={1}>
-            <Button fullWidth variant="outlined" sx={pill} onClick={() => setStep(undefined)}>
+            <Button fullWidth variant="outlined" sx={{ bgcolor: '#fff' }} onClick={() => setStep(undefined)}>
               Cancel
             </Button>
             <Button
               fullWidth
               variant="contained"
+              color="live"
               startIcon={<SensorsIcon />}
               disabled={busy || !until}
-              sx={{ ...pill, bgcolor: orange, '&:hover': { bgcolor: orange } }}
               onClick={onActivate}
             >
               Activate
@@ -289,19 +282,19 @@ export const ActivationField = (props: Props) => {
     return (
       <Section live>
         <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
-          <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: orange, display: 'grid', placeItems: 'center' }}>
-            <CheckIcon sx={{ color: '#fff' }} />
+          <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: ui.live, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+            <CheckIcon sx={{ color: ui.onLive }} />
           </Box>
           <Box>
-            <Typography sx={{ fontWeight: 800, fontSize: 18, lineHeight: 1.15 }}>Active until {formatUntil(doneUntil)}</Typography>
+            <Typography variant="h5">Active until {formatUntil(doneUntil)}</Typography>
             <Typography variant="body2" color="text.secondary">
               On the map within a minute{mode === 'named' ? ', with your name' : ', anonymously'}.
             </Typography>
           </Box>
         </Stack>
         <Stack direction="row" spacing={1}>
-          <Tile emoji="📅" title="Remind me" line="add to calendar" onClick={() => onCalendar(doneUntil)} />
-          <Tile emoji="🔗" title="Share link" line="other phone or crew" onClick={onShare} />
+          <Tile icon={<EventOutlinedIcon />} title="Remind me" line="add to calendar" onClick={() => onCalendar(doneUntil)} />
+          <Tile icon={<LinkIcon />} title="Share link" line="other phone or crew" onClick={onShare} />
         </Stack>
         <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', color: 'text.secondary' }}>
           <LockIcon sx={{ fontSize: 14 }} />
@@ -309,7 +302,6 @@ export const ActivationField = (props: Props) => {
         </Stack>
         <Button
           variant="contained"
-          sx={pill}
           onClick={() => {
             setStep(undefined);
             props.onChanged();
@@ -327,7 +319,7 @@ export const ActivationField = (props: Props) => {
         <SignInDialog />
         {dialog}
         <Stack spacing={0.5}>
-          <Button variant="contained" fullWidth startIcon={<SensorsIcon />} sx={pill} onClick={onActivateClicked}>
+          <Button variant="contained" color="live" fullWidth startIcon={<SensorsIcon />} onClick={onActivateClicked}>
             Activate
           </Button>
           <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center' }}>
@@ -342,7 +334,7 @@ export const ActivationField = (props: Props) => {
     <Section live>
       <Box>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <Chip label="● ACTIVE" size="small" sx={{ bgcolor: orange, color: '#fff', fontWeight: 800 }} />
+          <Chip label="Active" size="small" color="live" />
           <Typography variant="body2Bold">until {formatUntil(activation.until)}</Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
@@ -353,30 +345,24 @@ export const ActivationField = (props: Props) => {
       </Box>
       {code && step === 'extend' && (
         <>
-          <Typography sx={{ fontWeight: 700 }}>Extend until?</Typography>
+          <Typography variant="subtitle1">Extend until?</Typography>
           <UntilChips after={activation.until} onPick={onExtend} />
-          <Button variant="outlined" sx={pill} onClick={() => setStep(undefined)}>
+          <Button variant="outlined" sx={{ bgcolor: '#fff' }} onClick={() => setStep(undefined)}>
             Cancel
           </Button>
         </>
       )}
       {code && step === 'confirmDeactivate' && (
         <>
-          <Typography sx={{ fontWeight: 700 }}>Take it off the map?</Typography>
+          <Typography variant="subtitle1">Take it off the map?</Typography>
           <Typography variant="body2" color="text.secondary">
             The manage link stops working.
           </Typography>
           <Stack direction="row" spacing={1}>
-            <Button fullWidth variant="outlined" sx={pill} onClick={() => setStep(undefined)}>
+            <Button fullWidth variant="outlined" sx={{ bgcolor: '#fff' }} onClick={() => setStep(undefined)}>
               Keep
             </Button>
-            <Button
-              fullWidth
-              variant="contained"
-              disabled={busy}
-              sx={{ ...pill, bgcolor: orange, '&:hover': { bgcolor: orange } }}
-              onClick={onDeactivate}
-            >
+            <Button fullWidth variant="contained" color="live" disabled={busy} onClick={onDeactivate}>
               Deactivate
             </Button>
           </Stack>
@@ -385,24 +371,19 @@ export const ActivationField = (props: Props) => {
       {code && !step && (
         <>
           {expiresWithinADay(activation.until) && (
-            <Typography variant="body2" sx={{ color: '#b26a00' }}>
+            <Typography variant="body2" sx={{ color: ui.liveInk, fontWeight: 500 }}>
               Ends {formatUntil(activation.until)}. Still up?
             </Typography>
           )}
           <Stack direction="row" spacing={1}>
-            <Button fullWidth variant="outlined" sx={pill} onClick={() => setStep('extend')}>
-              ⏩ Extend
+            <Button fullWidth variant="outlined" sx={{ bgcolor: '#fff' }} onClick={() => setStep('extend')}>
+              Extend
             </Button>
-            <Button
-              fullWidth
-              variant="contained"
-              sx={{ ...pill, bgcolor: orange, '&:hover': { bgcolor: orange } }}
-              onClick={() => setStep('confirmDeactivate')}
-            >
-              ⏹ Deactivate
+            <Button fullWidth variant="outlined" sx={{ bgcolor: '#fff' }} onClick={() => setStep('confirmDeactivate')}>
+              Take it off
             </Button>
           </Stack>
-          <Button size="small" startIcon={<ShareIcon />} sx={{ alignSelf: 'flex-start', textTransform: 'none' }} onClick={onShare}>
+          <Button size="small" startIcon={<ShareIcon />} sx={{ alignSelf: 'flex-start' }} onClick={onShare}>
             Share manage link
           </Button>
         </>

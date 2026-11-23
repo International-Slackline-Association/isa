@@ -1,22 +1,16 @@
 import { useNavigate } from 'react-router';
 import { NavLink } from 'react-router';
 
-import CloseIcon from '@mui/icons-material/Close';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import EmailIcon from '@mui/icons-material/Email';
 import GroupIcon from '@mui/icons-material/Group';
 import InfoIcon from '@mui/icons-material/Info';
 import LinkIcon from '@mui/icons-material/Link';
-import { Divider, Link, Stack, Typography } from '@mui/material';
-import Avatar from '@mui/material/Avatar';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
-import IconButton from '@mui/material/IconButton';
+import { Avatar, Chip, Link, Stack, Typography } from '@mui/material';
 
 import { communityApi } from 'app/api/community-api';
+import { CloseAndRefreshActions, FeatureCard, FlagAvatar } from 'app/components/FeatureCard';
 import { FeatureDetailFieldLayout } from 'app/components/FeatureDetailFields/DetailFieldLayout';
-import { LoadingIndicator } from 'app/components/LoadingIndicator';
 import { appColors } from 'styles/theme/colors';
 
 import { GroupsManifestText } from './GroupsManifestText';
@@ -46,13 +40,9 @@ export const CommunityCountryDetailCard = (props: Props) => {
       <Stack
         direction={'row'}
         spacing={1}
-        sx={{
-          '.MuiTypography-root': {
-            fontSize: '0.66rem',
-          },
-        }}
+        sx={{ alignItems: 'center', '.MuiTypography-root': { fontSize: 12.5, fontWeight: 500 } }}
       >
-        <props.icon color="primary" sx={{ fontSize: '1rem' }} />
+        <props.icon sx={{ fontSize: 14, color: 'text.secondary' }} />
         {props.url && (
           <Link href={props.url} target="_blank" rel="noopener">
             <Typography>{props.text}</Typography>
@@ -68,119 +58,76 @@ export const CommunityCountryDetailCard = (props: Props) => {
   };
 
   return (
-    <Card
-      sx={{
-        boxShadow: 'none',
-        border: 'none',
-        height: '100%',
-        width: '100%',
-        overflow: 'scroll',
-      }}
+    <FeatureCard
+      loading={isFetching || !countryDetails}
+      avatar={<FlagAvatar countryCode={props.countryCode} />}
+      title={countryDetails?.name ?? 'Unknown'}
+      actions={<CloseAndRefreshActions onClose={onCloseClicked} />}
     >
-      {isFetching || !countryDetails ? (
-        <LoadingIndicator />
-      ) : (
+      {countryDetails && (
         <>
-          <CardHeader
-            avatar={
-              <Avatar
-                src={`https://hatscripts.github.io/circle-flags/flags/${props.countryCode.toLowerCase()}.svg`}
-              >
-                C
-              </Avatar>
+          <FeatureDetailFieldLayout
+            icon={<Diversity3Icon />}
+            header={'ISA members and partners'}
+            subHeader={
+              <Typography variant="body2">
+                Slackline organizations officially recognized by the ISA.{' '}
+                <Link href="https://www.slacklineinternational.org/members-partners/" target={'_blank'}>
+                  Read more
+                </Link>
+              </Typography>
             }
-            action={
-              <>
-                <IconButton onClick={onCloseClicked}>
-                  <CloseIcon />
-                </IconButton>
-              </>
-            }
-            title={countryDetails.name ?? 'Unknown'}
-            slotProps={{ title: { variant: 'h6' } }}
-          />
-          <Divider />
-          <CardContent component={Stack} spacing={2}>
-            <FeatureDetailFieldLayout
-              icon={<Diversity3Icon />}
-              header={'ISA Members & Partners'}
-              subHeader={
-                <Typography variant="body2">
-                  List of officially recognized slackline organizations by ISA.{' '}
-                  <Link
-                    href="https://www.slacklineinternational.org/members-partners/"
-                    target={'_blank'}
-                  >
-                    Read more...
-                  </Link>
-                </Typography>
-              }
-            >
-              {countryDetails.isaMembers.length > 0 ? (
-                countryDetails.isaMembers.map((member) => (
-                  <Stack key={member.id} direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-                    <Avatar
-                      sx={{
-                        bgcolor: appColors.isaMemberGroupColor,
-                      }}
-                    >
-                      {member.name[0]}
-                    </Avatar>
-                    <Stack sx={{ alignItems: 'flex-start', justifyContent: "center" }}>
-                      <Typography variant="body2">{member.name} </Typography>
-                      <Stack direction={'row'} spacing={1}>
-                        {member.email && (
-                          <MemberSubLink
-                            icon={EmailIcon}
-                            text={'Email'}
-                            url={`mailto:${encodeURIComponent(member.email)}`}
-                          />
-                        )}
-                        <MemberSubLink icon={InfoIcon} text={'Details'} groupId={member.id} />
-                        <MemberSubLink
-                          icon={LinkIcon}
-                          text={'Link'}
-                          url={safeHttpUrl(member.isaMembership?.infoUrl)}
-                        />
-                      </Stack>
+          >
+            {countryDetails.isaMembers.length > 0 ? (
+              countryDetails.isaMembers.map((member) => (
+                <Stack key={member.id} direction={'row'} spacing={1.25} sx={{ alignItems: 'center' }}>
+                  <Avatar sx={{ width: 32, height: 32, fontSize: 14, bgcolor: appColors.isaMemberGroupColor }}>
+                    {member.name[0]}
+                  </Avatar>
+                  <Stack sx={{ alignItems: 'flex-start', justifyContent: 'center' }}>
+                    <Typography variant="body2Bold">{member.name}</Typography>
+                    <Stack direction={'row'} spacing={1.25}>
+                      {member.email && (
+                        <MemberSubLink icon={EmailIcon} text={'Email'} url={`mailto:${encodeURIComponent(member.email)}`} />
+                      )}
+                      <MemberSubLink icon={InfoIcon} text={'Details'} groupId={member.id} />
+                      <MemberSubLink icon={LinkIcon} text={'Link'} url={safeHttpUrl(member.isaMembership?.infoUrl)} />
                     </Stack>
                   </Stack>
-                ))
-              ) : (
-                <Typography variant="body2">
-                  There are no registered members in this country.
-                </Typography>
-              )}
-            </FeatureDetailFieldLayout>
-            <FeatureDetailFieldLayout
-              icon={<GroupIcon />}
-              header={'Slackline Groups'}
-              subHeader={<GroupsManifestText type="communityCountry" />}
-            >
-              {slacklineGroups.length > 0 ? (
-                <Stack
-                  direction={'row'}
-                  spacing={1}
-                  sx={{
-                    justifyContent: 'space-evenly',
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  {slacklineGroups.map((group) => (
-                    <NavLink key={group.id} to={`/communities/group/${group.id}`}>
-                      <Typography variant="body2">- {group.name}</Typography>
-                    </NavLink>
-                  ))}
                 </Stack>
-              ) : (
-                <Typography variant="body2">
-                  There are no slackline groups in this country.
-                </Typography>
-              )}
-            </FeatureDetailFieldLayout>
-          </CardContent>
+              ))
+            ) : (
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                There are no registered members in this country.
+              </Typography>
+            )}
+          </FeatureDetailFieldLayout>
+          <FeatureDetailFieldLayout
+            icon={<GroupIcon />}
+            header={'Slackline groups'}
+            subHeader={<GroupsManifestText type="communityCountry" />}
+          >
+            {slacklineGroups.length > 0 ? (
+              <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.75 }}>
+                {slacklineGroups.map((group) => (
+                  <Chip
+                    key={group.id}
+                    label={group.name}
+                    size="small"
+                    clickable
+                    component={NavLink}
+                    to={`/communities/group/${group.id}`}
+                  />
+                ))}
+              </Stack>
+            ) : (
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                There are no slackline groups in this country.
+              </Typography>
+            )}
+          </FeatureDetailFieldLayout>
         </>
       )}
-    </Card>
+    </FeatureCard>
   );
 };

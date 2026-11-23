@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 import AddIcon from '@mui/icons-material/Add';
 import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
@@ -12,6 +12,7 @@ import { useSignInDialog } from 'app/components/Dialogs/useSignInDialog';
 import { SlacklineFeatureIcon } from 'app/components/Icons/SlacklineFeatureIcon';
 import { mapUrlSearchParams } from 'app/components/Maps/mapUtils';
 import { selectIsUserSignedIn, selectLastMapLocation } from 'app/slices/app/selectors';
+import { shadow, ui } from 'styles/theme/ui';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 
 const items = [
@@ -23,6 +24,9 @@ const items = [
 
 export const AddMenu = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  // Next to the open blue panel a blue button would vanish.
+  const besideOpenPanel = pathname === '/' || pathname === '/communities';
   const { isDesktop } = useMediaQuery();
   const lastMapLocation = useSelector(selectLastMapLocation);
   const isUserSignedIn = useSelector(selectIsUserSignedIn);
@@ -55,16 +59,14 @@ export const AddMenu = () => {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={(e) => setAnchor(e.currentTarget)}
-          disableElevation
           sx={{
             position: 'absolute',
             top: 12,
-            right: 16,
+            right: 'calc(var(--card-inset, 0px) + 12px)',
             zIndex: 3,
-            borderRadius: 999,
-            textTransform: 'none',
-            fontWeight: 600,
-            px: 2,
+            minHeight: 38,
+            boxShadow: shadow.float,
+            ...(besideOpenPanel && { bgcolor: '#fff', color: ui.blueDark, '&:hover': { bgcolor: ui.blueTint } }),
           }}
         >
           Add
@@ -74,7 +76,7 @@ export const AddMenu = () => {
           color="primary"
           aria-label="Add"
           onClick={(e) => setAnchor(e.currentTarget)}
-          sx={{ position: 'absolute', bottom: 72, right: 16, zIndex: 3 }}
+          sx={{ position: 'absolute', bottom: 72, right: 12, zIndex: 3 }}
         >
           <AddIcon />
         </Fab>
@@ -82,7 +84,7 @@ export const AddMenu = () => {
       <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}>
         {items.map((item) => (
           <MenuItem key={item.path} onClick={() => open(item.path)}>
-            <ListItemIcon sx={{ color: 'primary.main' }}>{item.icon}</ListItemIcon>
+            <ListItemIcon sx={{ color: ui.muted }}>{item.icon}</ListItemIcon>
             <Box component="span">{item.label}</Box>
           </MenuItem>
         ))}

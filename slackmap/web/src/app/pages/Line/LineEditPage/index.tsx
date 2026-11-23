@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-import { Box, Stack } from '@mui/material';
 
 import { lineApi } from 'app/api/line-api';
 import { DrawableMap } from 'app/components/Maps/SlacklineMap/DrawableMap';
@@ -11,6 +10,7 @@ import { LineEditCard } from 'app/pages/Create/Line/LineEditCard';
 import { LineDetailsForm } from 'app/pages/Create/Line/types';
 import { validateLineFeatures } from 'app/pages/Create/Line/validations';
 import { Feature, FeatureCollection } from 'geojson';
+import { FeatureFormLayout } from 'app/components/FeatureFormLayout';
 
 export function LineEditPage() {
   const { lineId } = useParams();
@@ -59,66 +59,54 @@ export function LineEditPage() {
   };
 
   return (
-    <Stack
-      direction={{ xs: 'column', lg: 'row' }}
-      sx={{
-        minHeight: '100%',
-      }}
-    >
-      <Box
-        sx={{
-          height: { xs: '50vh', lg: '100vh' },
-          width: { xs: '100%', lg: '67%' },
-          position: 'relative',
-        }}
-      >
-        <CreateLineTutorial />
-        {lineDetails?.geoJson && (
-          <DrawableMap
-            drawControls={{
-              polygon: false,
-              line_string: true,
-              trash: true,
-            }}
-            onDrawingFeaturesChanged={onDrawingFeaturesChanged}
-            drawControlStyles={drawControlStyles('line')}
-            drawingFeatures={lineDetails?.geoJson.features as Feature[]}
-          />
-        )}
-      </Box>
-
-      <Box
-        sx={{
-          flex: 1,
-          height: { xs: 'auto', lg: '100vh' },
-        }}
-      >
-        {lineDetails && (
-          <LineEditCard
-            mapErrors={mapErrors}
-            onSubmit={onDetailsSubmit}
-            disableSubmit={features.length === 0 || mapErrors.length > 0}
-            isSubmitting={isSaving}
-            initialValues={{
-              isMeasured: lineDetails.isMeasured || false,
-              accessInfo: lineDetails.accessInfo,
-              description: lineDetails.description,
-              name: lineDetails.name,
-              anchorsInfo: lineDetails.anchorsInfo,
-              contactInfo: lineDetails.contactInfo,
-              extraInfo: lineDetails.extraInfo,
-              gearInfo: lineDetails.gearInfo,
-              length: lineDetails.length,
-              height: lineDetails.height,
-              restrictionInfo: lineDetails.restrictionInfo,
-              restrictionLevel: lineDetails.restrictionLevel,
-              type: lineDetails.type,
-              anchorImages: lineDetails.anchorImages,
-              images: lineDetails.images,
-            }}
-          />
-        )}
-      </Box>
-    </Stack>
+    <FeatureFormLayout
+      map={
+        <>
+          <CreateLineTutorial />
+          {lineDetails?.geoJson && (
+            <DrawableMap
+              drawControls={{
+                polygon: false,
+                line_string: true,
+                trash: true,
+              }}
+              onDrawingFeaturesChanged={onDrawingFeaturesChanged}
+              drawControlStyles={drawControlStyles('line')}
+              drawingFeatures={lineDetails?.geoJson.features as Feature[]}
+            />
+          )}
+        </>
+      }
+      form={
+        <>
+          {lineDetails && (
+            <LineEditCard
+              mapChanged={JSON.stringify(features) !== JSON.stringify(lineDetails.geoJson.features)}
+              mapErrors={mapErrors}
+              onSubmit={onDetailsSubmit}
+              disableSubmit={features.length === 0 || mapErrors.length > 0}
+              isSubmitting={isSaving}
+              initialValues={{
+                isMeasured: lineDetails.isMeasured || false,
+                accessInfo: lineDetails.accessInfo,
+                description: lineDetails.description,
+                name: lineDetails.name,
+                anchorsInfo: lineDetails.anchorsInfo,
+                contactInfo: lineDetails.contactInfo,
+                extraInfo: lineDetails.extraInfo,
+                gearInfo: lineDetails.gearInfo,
+                length: lineDetails.length,
+                height: lineDetails.height,
+                restrictionInfo: lineDetails.restrictionInfo,
+                restrictionLevel: lineDetails.restrictionLevel,
+                type: lineDetails.type,
+                anchorImages: lineDetails.anchorImages,
+                images: lineDetails.images,
+              }}
+            />
+          )}
+        </>
+      }
+    />
   );
 }

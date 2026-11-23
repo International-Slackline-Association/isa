@@ -82,7 +82,7 @@ export const ActivityHistoryField = (props: Props) => {
   };
 
   return (
-    <FeatureDetailFieldLayout icon={<HistoryIcon />} header={'Global History'} noDivider>
+    <FeatureDetailFieldLayout icon={<HistoryIcon />} header={'Global History'}>
       {filters}
       {!changelogs ? (
         isFetching ? (

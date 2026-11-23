@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 
-import { Stack, TextField } from '@mui/material';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import { Button, TextField } from '@mui/material';
+
+import { PopupDialog } from './PopupDialog';
 
 interface ConfirmDialogProps {
   title: string;
@@ -24,63 +20,46 @@ export const useTextBoxDialog = () => {
 
   const TextBoxDialog: React.FC = () => {
     const [text, setText] = useState('');
+    const cancel = () => {
+      setIsOpen(false);
+      dialogProps?.onCancel?.();
+    };
 
     return (
-      <Dialog
+      <PopupDialog
         open={isOpen}
-        onClose={() => {
+        onClose={cancel}
+        width={480}
+        title={dialogProps?.title}
+        description={dialogProps?.description}
+        onSubmit={(event) => {
+          event.preventDefault();
+          dialogProps?.onConfirm(text);
           setIsOpen(false);
-          dialogProps?.onCancel?.();
         }}
-        slotProps={{
-          paper: {
-            component: 'form',
-            onSubmit: (event) => {
-              event.preventDefault();
-              const formData = new FormData(event.currentTarget as unknown as HTMLFormElement);
-              const formJson = Object.fromEntries((formData as any).entries());
-              dialogProps?.onConfirm(formJson.text);
-              setIsOpen(false);
-            },
-          },
-        }}
-        fullWidth
-        sx={{
-          backdropFilter: 'blur(2px)',
-        }}
+        actions={
+          <>
+            <Button variant="outlined" onClick={cancel}>
+              {dialogProps?.cancelText || 'Cancel'}
+            </Button>
+            <Button type="submit" variant="contained" disabled={text.length <= 5}>
+              {dialogProps?.confirmText || 'Confirm'}
+            </Button>
+          </>
+        }
       >
-        <DialogTitle> {dialogProps?.title}</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2}>
-            <DialogContentText>{dialogProps?.description}</DialogContentText>
-            <TextField
-              autoFocus
-              required
-              margin="dense"
-              name="text"
-              label={dialogProps?.textBoxLabel}
-              type="text"
-              variant="outlined"
-              fullWidth
-              value={text}
-              onChange={(event) => setText(event.target.value)}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setIsOpen(false);
-              dialogProps?.onCancel?.();
-            }}
-          >
-            {dialogProps?.cancelText || 'Cancel'}
-          </Button>
-          <Button type="submit" variant="contained" disabled={text.length <= 5}>
-            {dialogProps?.confirmText || 'Confirm'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <TextField
+          autoFocus
+          required
+          name="text"
+          label={dialogProps?.textBoxLabel}
+          multiline
+          minRows={3}
+          fullWidth
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+        />
+      </PopupDialog>
     );
   };
 

@@ -6,17 +6,13 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 import LinkIcon from '@mui/icons-material/Link';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import { Divider, Link, Stack, Typography } from '@mui/material';
-import Avatar from '@mui/material/Avatar';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
+import { Avatar, Link, Stack, Typography } from '@mui/material';
 
 import { communityApi } from 'app/api/community-api';
+import { FeatureCard, FeatureTag } from 'app/components/FeatureCard';
 import { FeatureDetailFieldLayout } from 'app/components/FeatureDetailFields/DetailFieldLayout';
 import { FeatureHistoryField } from 'app/components/FeatureDetailFields/FeatureHistoryField';
 import { FeatureMenuActions } from 'app/components/FeatureDetailFields/FeatureMenuActions';
-import { LoadingIndicator } from 'app/components/LoadingIndicator';
 import { format } from 'date-fns';
 import { appColors } from 'styles/theme/colors';
 
@@ -41,7 +37,7 @@ const LinkField = (props: { icon: typeof LinkIcon; label: string; url?: string }
   if (!url) return null;
   return (
     <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-      <props.icon color="primary" />
+      <props.icon sx={{ fontSize: 18, color: 'text.secondary' }} />
       <Link href={url.href} target="_blank" rel="noopener noreferrer nofollow ugc">
         {props.label}
       </Link>
@@ -60,84 +56,66 @@ export const SlacklineGroupDetailCard = (props: Props) => {
   } = communityApi.useGetGroupDetailsQuery(props.groupId);
 
   return (
-    <Card
-      sx={{
-        boxShadow: 'none',
-        border: 'none',
-        height: '100%',
-        width: '100%',
-        overflow: 'scroll',
-      }}
-    >
-      {isFetching || !group ? (
-        <LoadingIndicator />
-      ) : (
-        <>
-          <CardHeader
-            avatar={
-              <Avatar
-                sx={{
-                  bgcolor: group.isaMembership
-                    ? appColors.isaMemberGroupColor
-                    : appColors.slacklineGroupColor,
-                }}
-              >
-                G
-              </Avatar>
-            }
-            action={
-              <FeatureMenuActions
-                editorPermissions={group.editorPermissions}
-                feature={{ id: group.id, type: 'group' }}
-                onRefreshClick={refetch}
-              />
-            }
-            title={group.name}
-            slotProps={{ title: { variant: 'h6' } }}
-            subheader={`Last updated: ${format(
-              new Date(group.lastModifiedDateTime || group.createdDateTime),
-              'dd MMM yyy',
-            )}`}
+    <FeatureCard
+      loading={isFetching || !group}
+      avatar={
+        <Avatar sx={{ width: 36, height: 36, bgcolor: group?.isaMembership ? appColors.isaMemberGroupColor : appColors.slacklineGroupColor }}>
+          <Diversity3Icon fontSize="small" />
+        </Avatar>
+      }
+      title={group?.name}
+      tags={
+        group && (
+          <>
+            <FeatureTag label={group.isaMembership ? `ISA ${isaMemberTypeLabel(group.isaMembership.type)}` : 'Slackline group'} />
+            <FeatureTag label={`Updated ${format(new Date(group.lastModifiedDateTime || group.createdDateTime), 'MMM yyyy')}`} />
+          </>
+        )
+      }
+      actions={
+        group && (
+          <FeatureMenuActions
+            editorPermissions={group.editorPermissions}
+            feature={{ id: group.id, type: 'group' }}
+            onRefreshClick={refetch}
           />
-          <Divider />
-          <CardContent component={Stack} spacing={2}>
-            {group.isaMembership && (
-              <FeatureDetailFieldLayout
-                icon={<Diversity3Icon />}
-                header={`ISA ${isaMemberTypeLabel(group.isaMembership.type)}`}
-                subHeader={<GroupsManifestText type="isaMember" />}
-              >
-                <LinkField icon={LinkIcon} label="Read more" url={group.isaMembership.infoUrl} />
-              </FeatureDetailFieldLayout>
-            )}
+        )
+      }
+    >
+      {group && (
+        <>
+          {group.isaMembership && (
             <FeatureDetailFieldLayout
-              icon={<CallIcon />}
-              header={'Contact'}
-              subHeader={!group.isaMembership && <GroupsManifestText type="groupDetail" />}
+              icon={<Diversity3Icon />}
+              header={`ISA ${isaMemberTypeLabel(group.isaMembership.type)}`}
+              subHeader={<GroupsManifestText type="isaMember" />}
             >
-              <Stack spacing={1}>
-                {group.email && (
-                  <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-                    <EmailIcon color="primary" />
-                    <Link href={`mailto:${encodeURIComponent(group.email)}`}>{group.email}</Link>
-                  </Stack>
-                )}
-                <LinkField icon={FacebookIcon} label="Facebook Page" url={group.facebookPage} />
-                <LinkField icon={FacebookIcon} label="Facebook Group" url={group.facebookGroup} />
-                <LinkField icon={TelegramIcon} label="Telegram Group" url={group.telegram} />
-                <LinkField icon={InstagramIcon} label="Instagram Page" url={group.instagram} />
-                <LinkField icon={WhatsAppIcon} label="WhatsApp Group" url={group.whatsapp} />
-                <LinkField icon={LinkIcon} label="Web Page" url={group.webpage} />
-              </Stack>
+              <LinkField icon={LinkIcon} label="Read more" url={group.isaMembership.infoUrl} />
             </FeatureDetailFieldLayout>
-            <FeatureHistoryField
-              featureId={group.id}
-              featureType={'group'}
-              createdDateTime={group.createdDateTime}
-            />
-          </CardContent>
+          )}
+          <FeatureDetailFieldLayout
+            icon={<CallIcon />}
+            header={'Contact'}
+            subHeader={!group.isaMembership && <GroupsManifestText type="groupDetail" />}
+          >
+            <Stack spacing={0.75}>
+              {group.email && (
+                <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
+                  <EmailIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                  <Link href={`mailto:${encodeURIComponent(group.email)}`}>{group.email}</Link>
+                </Stack>
+              )}
+              <LinkField icon={FacebookIcon} label="Facebook page" url={group.facebookPage} />
+              <LinkField icon={FacebookIcon} label="Facebook group" url={group.facebookGroup} />
+              <LinkField icon={TelegramIcon} label="Telegram group" url={group.telegram} />
+              <LinkField icon={InstagramIcon} label="Instagram page" url={group.instagram} />
+              <LinkField icon={WhatsAppIcon} label="WhatsApp group" url={group.whatsapp} />
+              <LinkField icon={LinkIcon} label="Web page" url={group.webpage} />
+            </Stack>
+          </FeatureDetailFieldLayout>
+          <FeatureHistoryField featureId={group.id} featureType={'group'} createdDateTime={group.createdDateTime} />
         </>
       )}
-    </Card>
+    </FeatureCard>
   );
 };

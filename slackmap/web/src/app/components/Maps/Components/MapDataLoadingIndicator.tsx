@@ -3,6 +3,8 @@ import type { MapRef } from 'react-map-gl/mapbox';
 
 import { Box, CircularProgress, Typography } from '@mui/material';
 
+import { shadow } from 'styles/theme/ui';
+
 import { useSessionReady } from 'app/session';
 
 // Shown over the drawn map while the browser check runs and the map data downloads, so an empty
@@ -53,12 +55,12 @@ export const MapDataLoadingIndicator = (props: {
           paddingX: 2,
           paddingY: 1,
           borderRadius: 999,
-          backgroundColor: 'rgba(255,255,255,0.9)',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
+          backgroundColor: '#fff',
+          boxShadow: shadow.float,
         }}
       >
         <CircularProgress size={18} thickness={5} />
-        <Typography variant="body2" sx={{ color: 'rgba(0,0,0,0.8)' }}>
+        <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500 }}>
           {sessionReady ? 'Loading map data…' : 'Checking your browser…'}
         </Typography>
       </Box>

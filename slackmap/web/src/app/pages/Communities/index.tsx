@@ -15,6 +15,7 @@ import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { CommunityCountryDetailCard } from './CommunityCountryDetailCard';
 import { SlacklineGroupDetailCard } from './SlacklineGroupDetailCard';
 import { useActiveCommunityFeature } from './useCommunityFeature';
+import { radius, shadow } from 'styles/theme/ui';
 
 export function CommunitiesPage() {
   const navigate = useNavigate();
@@ -80,11 +81,15 @@ export function CommunitiesPage() {
         minHeight: '100%',
         position: 'relative',
         height: '100%',
+        // How much of the map's right edge the open card covers, for the controls to stay clear of it.
+        '--card-inset': isDesktop && activeFeature ? 'max(30vw, 352px)' : '0px',
+        // On phones the open card is a sheet over the lower 60%; the map's controls sit above it.
+        '& .mapboxgl-ctrl-bottom-right': !isDesktop && activeFeature ? { bottom: '60%', mb: '0 !important' } : {},
       }}
     >
       <Box
         sx={{
-          height: { xs: activeFeature ? '75vh' : '100%', lg: '100vh' },
+          height: '100%',
           width: { xs: '100%', lg: '100%' },
           position: 'relative',
           flexShrink: 0,
@@ -101,11 +106,14 @@ export function CommunitiesPage() {
         <Box
           sx={{
             flex: 1,
-            height: { xs: 'auto', lg: '100vh' },
-            position: isDesktop ? 'absolute' : 'unset',
-            top: isDesktop ? '0' : 'unset',
-            right: isDesktop ? '0' : 'unset',
-            width: isDesktop ? '33%' : '100%',
+            position: 'absolute',
+            top: isDesktop ? 12 : '40%',
+            bottom: isDesktop ? 12 : 0,
+            right: isDesktop ? 12 : 0,
+            width: isDesktop ? 'calc(max(30vw, 352px) - 12px)' : '100%',
+            borderRadius: isDesktop ? `${radius.card}px` : '18px 18px 0 0',
+            boxShadow: shadow.float,
+            overflow: 'hidden',
             zIndex: 4,
           }}
         >

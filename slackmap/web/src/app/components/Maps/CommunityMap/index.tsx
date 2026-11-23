@@ -98,9 +98,9 @@ export const CommunityMap = (props: Props) => {
           display: 'none',
         },
         // On phones the panel's bar covers the bottom 56px.
-        '& .mapboxgl-ctrl-bottom-left': { marginBottom: { xs: '56px', lg: 0 } },
+        '& .mapboxgl-ctrl-bottom-left': { marginBottom: { xs: '56px', lg: 0 }, marginLeft: 'var(--panel-inset, 0px)' },
         // and the add button sits above it.
-        '& .mapboxgl-ctrl-bottom-right': { marginBottom: { xs: '140px', lg: 0 } },
+        '& .mapboxgl-ctrl-bottom-right': { marginBottom: { xs: '140px', lg: 0 }, marginRight: 'var(--card-inset, 0px)' },
       }}
     >
       {!isMapLoaded && <MapLoadingPlaceholder pad={Boolean(props.activeCommunityFeature)} />}

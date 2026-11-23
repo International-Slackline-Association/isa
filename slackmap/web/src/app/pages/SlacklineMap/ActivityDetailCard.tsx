@@ -2,21 +2,14 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import CloseIcon from '@mui/icons-material/Close';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
-import { Avatar, Button, Divider, Menu, MenuItem, Stack, Typography } from '@mui/material';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
-import IconButton from '@mui/material/IconButton';
+import { Avatar, Box, Button, Stack, Typography } from '@mui/material';
 
 import { activityApi } from 'app/api/activity-api';
+import { CloseAndRefreshActions, FeatureCard } from 'app/components/FeatureCard';
 import { ActivityHistoryField } from 'app/components/FeatureDetailFields/ActivityHistoryField';
 import { FeatureDetailFieldLayout } from 'app/components/FeatureDetailFields/DetailFieldLayout';
-import { LoadingIndicator } from 'app/components/LoadingIndicator';
 import { trimString } from 'utils';
 
 interface Props {
@@ -28,8 +21,6 @@ export const ActivityDetailCard = (props: Props) => {
   const [contributorsDisplayLength, setContributorsDisplayLength] = useState(5);
 
   const navigate = useNavigate();
-  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
-  const closeMenu = () => setMenuAnchor(null);
   const dispatch = useDispatch();
 
   const { data: contributors, isFetching, refetch } = activityApi.useGetGlobalContributorsQuery();
@@ -39,144 +30,70 @@ export const ActivityDetailCard = (props: Props) => {
   };
 
   const onRefreshClicked = () => {
-    closeMenu();
     refetch();
     dispatch(activityApi.util.invalidateTags(['activityContributors', 'activityChangelogs']));
   };
 
   return (
-    <Card
-      sx={{
-        boxShadow: 'none',
-        border: 'none',
-        height: '100%',
-        width: '100%',
-        overflow: 'scroll',
-      }}
+    <FeatureCard
+      loading={isFetching || !contributors}
+      avatar={
+        <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.light', color: 'primary.main' }}>
+          <TravelExploreIcon fontSize="small" />
+        </Avatar>
+      }
+      title="Global activity"
+      actions={<CloseAndRefreshActions onClose={onCloseClicked} onRefresh={onRefreshClicked} />}
     >
-      {isFetching || !contributors ? (
-        <LoadingIndicator />
-      ) : (
+      {contributors && (
         <>
-          <CardHeader
-            avatar={
-              <Avatar
-                src=""
-                sx={{
-                  backgroundColor: (t) => t.palette.primary.main,
-                }}
-              >
-                <TravelExploreIcon
-                  sx={{
-                    fontSize: '2rem',
-                    color: (t) => t.palette.primary.contrastText,
-                  }}
-                />
-              </Avatar>
+          <FeatureDetailFieldLayout
+            icon={<EmojiEventsIcon />}
+            header={'Top contributors'}
+            subHeader={
+              'The most active contributors of the last 12 months, by lines, spots and guides created and updated. Updated weekly.'
             }
-            action={
-              <>
-                <IconButton onClick={onCloseClicked}>
-                  <CloseIcon />
-                </IconButton>
-
-                <IconButton aria-controls={menuAnchor ? 'cardHeaderMenu' : undefined}
-                  aria-haspopup="true"
-                  onClick={(e) => setMenuAnchor(e.currentTarget)}>
-                  <MoreVertIcon />
-                </IconButton>
-
-                <Menu
-                  id="cardHeaderMenu"
-                  anchorEl={menuAnchor}
-                  open={Boolean(menuAnchor)}
-                  onClose={closeMenu}
-                  sx={{
-                    '& svg': {
-                      mr: 1,
-                      color: (t) => t.palette.primary.main,
-                    },
-                  }}
+          >
+            <Stack spacing={1.25} sx={{ pt: 0.5 }}>
+              {contributors.items.slice(0, contributorsDisplayLength).map((c) => (
+                <Stack key={c.user.fullName} direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
+                  <Avatar src={c.user.profilePictureUrl} sx={{ width: 34, height: 34, fontSize: 14 }}>
+                    {c.user.fullName.charAt(0)}
+                  </Avatar>
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography variant="body2Bold" noWrap>
+                      {c.user.fullName}
+                    </Typography>
+                    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', color: 'text.secondary' }}>
+                      {c.user.countryCode && (
+                        <Avatar
+                          src={`https://hatscripts.github.io/circle-flags/flags/${c.user.countryCode.toLowerCase()}.svg`}
+                          sx={{ width: 13, height: 13, bgcolor: 'transparent' }}
+                        />
+                      )}
+                      <Typography variant="caption">
+                        {c.user.countryCode && `${trimString(c.user.countryName, 12)} · `}
+                        {c.added} created, {c.updated} updated
+                      </Typography>
+                    </Stack>
+                  </Box>
+                </Stack>
+              ))}
+              {contributorsDisplayLength < contributors.items.length && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  sx={{ alignSelf: 'flex-start' }}
+                  onClick={() => setContributorsDisplayLength(contributorsDisplayLength + 10)}
                 >
-                  <MenuItem onClick={onRefreshClicked}>
-                    <RefreshIcon />
-                    Refresh
-                  </MenuItem>
-                </Menu>
-              </>
-            }
-            title={'Global Activity'}
-            slotProps={{ title: { variant: 'h6' } }}
-          />
-          <Divider />
-          <CardContent component={Stack} spacing={2}>
-            <FeatureDetailFieldLayout
-              icon={<EmojiEventsIcon />}
-              header={'Top Contributors'}
-              subHeader={
-                'List of the most active contributors of the last 12 months based on the number of created and updated lines/spots/guides. The list is updated weekly.'
-              }
-            >
-              <Stack spacing={2}>
-                {contributors?.items?.slice(0, contributorsDisplayLength).map((c) => (
-                  <CardHeader
-                    key={c.user.fullName}
-                    sx={{
-                      p: 0,
-                    }}
-                    avatar={
-                      <Avatar
-                        src={c.user.profilePictureUrl}
-                        sx={{
-                          backgroundColor: (t) => t.palette.primary.main,
-                        }}
-                      >
-                        {c.user.fullName.charAt(0)}
-                      </Avatar>
-                    }
-                    title={c.user.fullName}
-                    subheader={
-                      <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-                        {c.user.countryCode && (
-                          <>
-                            <Avatar
-                              src={`https://hatscripts.github.io/circle-flags/flags/${c.user.countryCode?.toLowerCase()}.svg`}
-                              sx={{
-                                width: 15,
-                                height: 15,
-                                bgcolor: 'transparent',
-                              }}
-                            />
-                            <Typography variant="body2">
-                              {trimString(c.user.countryName, 12)}
-                            </Typography>
-                            <Divider orientation="vertical" flexItem />
-                          </>
-                        )}
-                        <Typography variant="body2">
-                          <b>{c.added}</b> created, <b>{c.updated}</b> updated
-                        </Typography>
-                      </Stack>
-                    }
-                  />
-                ))}
-                {contributorsDisplayLength < contributors.items.length && (
-                  <Button
-                    variant="text"
-                    onClick={() => setContributorsDisplayLength(contributorsDisplayLength + 10)}
-                  >
-                    Show more
-                  </Button>
-                )}
-              </Stack>
-            </FeatureDetailFieldLayout>
-            <ActivityHistoryField
-              onChangelogClick={props.onChangelogClick}
-              onChangelogHover={props.onChangelogHover}
-            />
-          </CardContent>
+                  Show more
+                </Button>
+              )}
+            </Stack>
+          </FeatureDetailFieldLayout>
+          <ActivityHistoryField onChangelogClick={props.onChangelogClick} onChangelogHover={props.onChangelogHover} />
         </>
       )}
-    </Card>
+    </FeatureCard>
   );
 };

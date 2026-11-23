@@ -1,56 +1,30 @@
 import React, { useState } from 'react';
 
-import { Stack, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
 
 import { signInWithRedirect } from 'aws-amplify/auth';
-import logoColor from 'isa-brand/logos/isa-wide/isa-wide-color.svg';
+import isaLogo from 'isa-brand/logos/isa-wide/isa-wide-color.svg';
+
+import { PopupDialog } from './PopupDialog';
 
 export const useSignInDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const signInClicked = () => {
-    signInWithRedirect();
-  };
-
   const SignInDialog: React.FC = () => (
-    <Dialog
+    <PopupDialog
       open={isOpen}
-      onClose={() => {
-        setIsOpen(false);
-      }}
-      maxWidth="sm"
-      sx={{
-        backdropFilter: 'blur(2px)',
-      }}
-    >
-      <DialogContent>
-        <Stack
-          spacing={2}
-          sx={{
-            alignItems: 'center',
-            textAlign: 'center',
-          }}
-        >
-          <img src={logoColor} alt="International Slackline Association" width={'50%'} />
-          <Typography variant="body2">Login to your ISA Account</Typography>
-          <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
-            If you don`t have an account, you can create one in a few seconds.
-          </Typography>
-
-          <Button
-            variant="contained"
-            startIcon={<img src="/images/isa-logo-no-text.svg" alt="ISA Logo" width={50} />}
-            onClick={signInClicked}
-            sx={{ alignSelf: 'center' }}
-          >
-            Sign In / Sign Up
-          </Button>
-        </Stack>
-      </DialogContent>
-    </Dialog>
+      onClose={() => setIsOpen(false)}
+      width={380}
+      centered
+      image={<img src={isaLogo} alt="International Slackline Association" style={{ width: 200, maxWidth: '70%' }} />}
+      title="Sign in to continue"
+      description="SlackMap uses your ISA account. If you don't have one, creating it takes a few seconds."
+      actions={
+        <Button variant="contained" onClick={() => signInWithRedirect()}>
+          Sign in or sign up
+        </Button>
+      }
+    />
   );
 
   const showSignInDialog = () => {

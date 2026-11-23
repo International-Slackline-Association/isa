@@ -1,28 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import BarChartIcon from '@mui/icons-material/BarChart';
-import CloseIcon from '@mui/icons-material/Close';
-import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import PentagonIcon from '@mui/icons-material/Pentagon';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import { Divider, Menu, MenuItem, Stack, Typography } from '@mui/material';
-import Avatar from '@mui/material/Avatar';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
-import IconButton from '@mui/material/IconButton';
 
 import { countryApi } from 'app/api/country-api';
+import { CloseAndRefreshActions, FeatureCard, FeatureStats, FlagAvatar } from 'app/components/FeatureCard';
 import { getSlacklinePointFeaturesOfCountry } from 'app/api/geojson-data';
-import { SlacklineFeatureIcon } from 'app/components/Icons/SlacklineFeatureIcon';
-import { LoadingIndicator } from 'app/components/LoadingIndicator';
-import { appColors } from 'styles/theme/colors';
 
 import { CountryHistoryField } from '../../components/FeatureDetailFields/CountryHistoryField';
-import { FeatureDetailFieldLayout } from '../../components/FeatureDetailFields/DetailFieldLayout';
 
 interface Props {
   countryCode: string;
@@ -32,8 +17,6 @@ interface Props {
 
 export const CountryDetailCard = (props: Props) => {
   const navigate = useNavigate();
-  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
-  const closeMenu = () => setMenuAnchor(null);
   const dispatch = useDispatch();
 
   const [statsInfo, setStatsInfo] = React.useState<{
@@ -64,7 +47,6 @@ export const CountryDetailCard = (props: Props) => {
   };
 
   const onRefreshClicked = () => {
-    closeMenu();
     refetch();
     dispatch(countryApi.util.invalidateTags(['countryDetails', 'countryChangelogs']));
   };
@@ -74,113 +56,32 @@ export const CountryDetailCard = (props: Props) => {
       {
         label: 'Lines',
         value: statsInfo.lineCount,
-        icon: <SlacklineFeatureIcon fontSize="medium" />,
-        color: appColors.lineStrokeColor,
       },
       {
         label: 'Spots',
         value: statsInfo.spotCount,
-        icon: <PentagonIcon fontSize="medium" />,
-        color: appColors.spotFillColor,
       },
       {
-        label: 'Access Guides',
+        label: 'Access guides',
         value: statsInfo.guideCount,
-        icon: <FollowTheSignsIcon fontSize="medium" />,
-        color: appColors.guideFeaturesColor,
       },
     ],
     [statsInfo],
   );
 
   return (
-    <Card
-      sx={{
-        boxShadow: 'none',
-        border: 'none',
-        height: '100%',
-        width: '100%',
-        overflow: 'scroll',
-      }}
+    <FeatureCard
+      loading={isFetching || !countryDetails}
+      avatar={<FlagAvatar countryCode={props.countryCode} />}
+      title={countryDetails?.name ?? 'Unknown'}
+      actions={<CloseAndRefreshActions onClose={onCloseClicked} onRefresh={onRefreshClicked} />}
     >
-      {isFetching || !countryDetails ? (
-        <LoadingIndicator />
-      ) : (
-        <>
-          <CardHeader
-            avatar={
-              <Avatar
-                src={`https://hatscripts.github.io/circle-flags/flags/${props.countryCode.toLowerCase()}.svg`}
-              >
-                C
-              </Avatar>
-            }
-            action={
-              <>
-                <IconButton onClick={onCloseClicked}>
-                  <CloseIcon />
-                </IconButton>
-
-                <IconButton aria-controls={menuAnchor ? 'cardHeaderMenu' : undefined}
-                  aria-haspopup="true"
-                  onClick={(e) => setMenuAnchor(e.currentTarget)}>
-                  <MoreVertIcon />
-                </IconButton>
-
-                <Menu
-                  id="cardHeaderMenu"
-                  anchorEl={menuAnchor}
-                  open={Boolean(menuAnchor)}
-                  onClose={closeMenu}
-                  sx={{
-                    '& svg': {
-                      mr: 1,
-                      color: (t) => t.palette.primary.main,
-                    },
-                  }}
-                >
-                  <MenuItem onClick={onRefreshClicked}>
-                    <RefreshIcon />
-                    Refresh
-                  </MenuItem>
-                </Menu>
-              </>
-            }
-            title={countryDetails.name ?? 'Unknown'}
-            slotProps={{ title: { variant: 'h6' } }}
-          />
-          <Divider />
-          <CardContent component={Stack} spacing={2}>
-            <FeatureDetailFieldLayout icon={<BarChartIcon />} header={'Statistics'}>
-              <Stack spacing={2}>
-                {stats.map((stat, index) => (
-                  <Stack key={index} direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-                    <Avatar
-                      sx={{
-                        width: 'auto',
-                        height: 'auto',
-                        p: 0.5,
-                        backgroundColor: stat.color,
-                      }}
-                    >
-                      {stat.icon}
-                    </Avatar>
-                    <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-                      <Typography variant="body2">{stat.label}:</Typography>
-                      <Typography variant="body2Bold">{stat.value}</Typography>
-                    </Stack>
-                  </Stack>
-                ))}
-              </Stack>
-            </FeatureDetailFieldLayout>
-            <CountryHistoryField
-              code={props.countryCode}
-              onChangelogClick={props.onChangelogClick}
-              onChangelogHover={props.onChangelogHover}
-            />
-          </CardContent>
-        </>
-      )}
-    </Card>
+      <FeatureStats items={stats.map((stat) => ({ value: stat.value, label: stat.label }))} />
+      <CountryHistoryField
+        code={props.countryCode}
+        onChangelogClick={props.onChangelogClick}
+        onChangelogHover={props.onChangelogHover}
+      />
+    </FeatureCard>
   );
 };

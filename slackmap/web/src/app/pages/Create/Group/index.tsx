@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 
-import { Box, Stack } from '@mui/material';
 
 import { communityApi } from 'app/api/community-api';
 import { DrawableMap } from 'app/components/Maps/SlacklineMap/DrawableMap';
@@ -12,6 +11,7 @@ import { Feature } from 'geojson';
 
 import { GroupEditCard } from './GroupEditCard';
 import { validateGroupFeatures } from './validations';
+import { FeatureFormLayout } from 'app/components/FeatureFormLayout';
 
 export function CreateGroupPage() {
   const [searchParams] = useSearchParams();
@@ -29,33 +29,32 @@ export function CreateGroupPage() {
   }, [createdGroup]);
 
   return (
-    <Stack direction={{ xs: 'column', lg: 'row' }} sx={{ minHeight: '100%' }}>
-      <Box
-        sx={{
-          height: { xs: '50vh', lg: '100vh' },
-          width: { xs: '100%', lg: '67%' },
-          position: 'relative',
-        }}
-      >
-        <DrawableMap
-          initialViewState={mapUrlSearchParams.parse(searchParams)}
-          drawControls={{ point: true, trash: true }}
-          onDrawingFeaturesChanged={setFeatures}
-          drawControlStyles={drawControlStyles('group')}
-          sources={<CommunityMapSources />}
-          showGeocoder
-        />
-      </Box>
-      <Box sx={{ flex: 1, height: { xs: 'auto', lg: '100vh' } }}>
-        <GroupEditCard
-          mapErrors={features.length > 0 ? mapErrors : []}
-          onSubmit={(values) =>
-            createGroup({ ...values, geoJson: { type: 'FeatureCollection', features } })
-          }
-          disableSubmit={mapErrors.length > 0}
-          isSubmitting={isSaving}
-        />
-      </Box>
-    </Stack>
+    <FeatureFormLayout
+      map={
+        <>
+          <DrawableMap
+            initialViewState={mapUrlSearchParams.parse(searchParams)}
+            drawControls={{ point: true, trash: true }}
+            onDrawingFeaturesChanged={setFeatures}
+            drawControlStyles={drawControlStyles('group')}
+            sources={<CommunityMapSources />}
+            showGeocoder
+          />
+        </>
+      }
+      form={
+        <>
+          <GroupEditCard
+            mapChanged={features.length > 0}
+            mapErrors={features.length > 0 ? mapErrors : []}
+            onSubmit={(values) =>
+              createGroup({ ...values, geoJson: { type: 'FeatureCollection', features } })
+            }
+            disableSubmit={mapErrors.length > 0}
+            isSubmitting={isSaving}
+          />
+        </>
+      }
+    />
   );
 }

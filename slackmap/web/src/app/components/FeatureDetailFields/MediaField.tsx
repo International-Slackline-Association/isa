@@ -22,11 +22,11 @@ export const FeatureMediaField = (props: Props) => {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const title = props.type === 'anchor-images' ? 'Anchor Photos' : 'Photos';
+  const title = props.type === 'anchor-images' ? 'Anchor photos' : 'Photos';
   const noDataMessage =
     props.type === 'anchor-images'
-      ? 'There are no anchor photos 😔 Anchor photos can be very helpful for others!. Be the first one and upload some images by editing :)'
-      : 'There are no photos 😔 Be the first one and upload some images by editing :)';
+      ? 'No anchor photos yet. They help others a lot: add some by editing.'
+      : 'No photos yet. Be the first: add some by editing.';
   return (
     <FeatureDetailFieldLayout icon={<LandscapeIcon />} header={title}>
       <Dialog
@@ -41,6 +41,7 @@ export const FeatureMediaField = (props: Props) => {
             height: 'unset',
             maxHeight: 'unset',
             p: 1,
+            borderRadius: '16px',
           },
         }}
       >
@@ -78,9 +79,9 @@ export const FeatureMediaField = (props: Props) => {
                   position: 'absolute',
                   top: 8,
                   right: 8,
-                  backgroundColor: '#494949',
-                  color: 'white',
-                  '&:hover': { backgroundColor: '#494949', opacity: 0.6 },
+                  backgroundColor: 'rgba(255, 255, 255, 0.94)',
+                  color: 'text.primary',
+                  '&:hover': { backgroundColor: '#fff' },
                 }}
               >
                 <OpenInNewIcon />
@@ -108,6 +109,7 @@ export const FeatureMediaField = (props: Props) => {
           {images.map((image, index) => (
             <ImageListItem
               key={index}
+              sx={{ cursor: 'pointer', '& img': { borderRadius: '10px' } }}
               onClick={() => {
                 setCarouselIndex(index);
                 setIsDialogOpen(true);

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-import { Box, Stack } from '@mui/material';
 
 import { guideApi } from 'app/api/guide-api';
 import { DrawableMap } from 'app/components/Maps/SlacklineMap/DrawableMap';
@@ -10,6 +9,7 @@ import { GuideEditCard } from 'app/pages/Create/Guide/GuideEditCard';
 import { GuideDetailsForm } from 'app/pages/Create/Guide/types';
 import { validateGuideFeatures } from 'app/pages/Create/Guide/validations';
 import { Feature, FeatureCollection } from 'geojson';
+import { FeatureFormLayout } from 'app/components/FeatureFormLayout';
 
 export function GuideEditPage() {
   const { guideId } = useParams();
@@ -58,54 +58,42 @@ export function GuideEditPage() {
   };
 
   return (
-    <Stack
-      direction={{ xs: 'column', lg: 'row' }}
-      sx={{
-        minHeight: '100%',
-      }}
-    >
-      <Box
-        sx={{
-          height: { xs: '50vh', lg: '100vh' },
-          width: { xs: '100%', lg: '67%' },
-          position: 'relative',
-        }}
-      >
-        {guideDetails?.geoJson && (
-          <DrawableMap
-            drawControls={{
-              point: true,
-              polygon: true,
-              line_string: true,
-              trash: true,
-            }}
-            onDrawingFeaturesChanged={onDrawingFeaturesChanged}
-            drawControlStyles={drawControlStyles('guide')}
-            drawingFeatures={guideDetails.geoJson.features as Feature[]}
-          />
-        )}
-      </Box>
-
-      <Box
-        sx={{
-          flex: 1,
-          height: { xs: 'auto', lg: '100vh' },
-        }}
-      >
-        {guideDetails && (
-          <GuideEditCard
-            mapErrors={mapErrors}
-            onSubmit={onDetailsSubmit}
-            disableSubmit={features.length === 0 || mapErrors.length > 0}
-            isSubmitting={isSaving}
-            initialValues={{
-              description: guideDetails.description,
-              type: guideDetails.type,
-              images: guideDetails.images,
-            }}
-          />
-        )}
-      </Box>
-    </Stack>
+    <FeatureFormLayout
+      map={
+        <>
+          {guideDetails?.geoJson && (
+            <DrawableMap
+              drawControls={{
+                point: true,
+                polygon: true,
+                line_string: true,
+                trash: true,
+              }}
+              onDrawingFeaturesChanged={onDrawingFeaturesChanged}
+              drawControlStyles={drawControlStyles('guide')}
+              drawingFeatures={guideDetails.geoJson.features as Feature[]}
+            />
+          )}
+        </>
+      }
+      form={
+        <>
+          {guideDetails && (
+            <GuideEditCard
+              mapChanged={JSON.stringify(features) !== JSON.stringify(guideDetails.geoJson.features)}
+              mapErrors={mapErrors}
+              onSubmit={onDetailsSubmit}
+              disableSubmit={features.length === 0 || mapErrors.length > 0}
+              isSubmitting={isSaving}
+              initialValues={{
+                description: guideDetails.description,
+                type: guideDetails.type,
+                images: guideDetails.images,
+              }}
+            />
+          )}
+        </>
+      }
+    />
   );
 }

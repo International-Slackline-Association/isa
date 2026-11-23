@@ -15,8 +15,8 @@ export const OutdatedInfoField = (props: Props) => {
 
   return (
     <Box>
-      <Alert severity={'warning'} variant="outlined">
-        The last update on this was more than 2 years ago. The information might be outdated!
+      <Alert severity={'warning'}>
+        Last updated more than 2 years ago. The information might be outdated.
       </Alert>
     </Box>
   );

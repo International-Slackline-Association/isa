@@ -13,7 +13,7 @@ import { formatUntil } from 'app/components/LineActivation/activationTimes';
 import { appActions } from 'app/slices/app';
 import { formatDistanceToNowStrict } from 'date-fns';
 import ReactHtmlParser from 'html-react-parser';
-import { appColors } from 'styles/theme/colors';
+import { ui } from 'styles/theme/ui';
 
 import { PanelRow, SectionTitle, flagUrl } from './PanelRow';
 
@@ -30,7 +30,7 @@ const ActiveLineRow = (props: { line: ActiveLine; onOpen: () => void }) => {
   const highlight = useHighlight();
   return (
     <PanelRow
-      accent={appColors.activeColor}
+      accent={ui.live}
       title={data ? data.name || 'No name' : '…'}
       subtitle={`until ${formatUntil(props.line.activeUntil)}`}
       flag={props.line.country}
@@ -106,6 +106,7 @@ export const LatestChangesSection = (props: { onNavigate?: () => void }) => {
       {changelogs?.pagination?.cursor && (
         <Button
           size="small"
+          variant="outlined"
           disabled={isFetching}
           onClick={() => setCursor(changelogs.pagination.cursor)}
           sx={{ mt: 0.5 }}
@@ -129,7 +130,7 @@ export const TopContributorsStrip = () => {
         sx={{ width: '100%', justifyContent: 'space-between', borderRadius: 1, py: 0.5 }}
       >
         <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+          <Typography variant="caption" sx={{ fontSize: 13, fontWeight: 500, color: 'text.secondary' }}>
             Top contributors
           </Typography>
           <ExpandMoreIcon
@@ -138,7 +139,7 @@ export const TopContributorsStrip = () => {
           />
         </Stack>
         {!open && (
-          <AvatarGroup max={6} sx={{ '& .MuiAvatar-root': { width: 22, height: 22, fontSize: '0.65rem' } }}>
+          <AvatarGroup max={6} sx={{ '& .MuiAvatar-root': { width: 22, height: 22, fontSize: 11, borderColor: ui.blue } }}>
             {contributors.items.slice(0, 6).map((c) => (
               <Avatar key={c.user.fullName} src={c.user.profilePictureUrl} alt={c.user.fullName}>
                 {c.user.fullName.charAt(0)}
@@ -162,11 +163,11 @@ export const TopContributorsStrip = () => {
               <Typography variant="caption" sx={{ width: 16, color: 'text.secondary' }}>
                 {i + 1}
               </Typography>
-              <Avatar src={c.user.profilePictureUrl} sx={{ width: 24, height: 24, fontSize: '0.7rem' }}>
+              <Avatar src={c.user.profilePictureUrl} sx={{ width: 24, height: 24, fontSize: 11 }}>
                 {c.user.fullName.charAt(0)}
               </Avatar>
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography variant="body2" noWrap sx={{ fontSize: '0.8rem', fontWeight: 600 }}>
+                <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
                   {c.user.fullName}
                 </Typography>
                 <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>

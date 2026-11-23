@@ -20,7 +20,7 @@ export const CommunitiesSection = () => {
   }, []);
 
   return (
-    <Stack spacing={1.5} sx={{ mt: 2 }}>
+    <Stack spacing={1.5} sx={{ mt: 1.75 }}>
       <Typography variant="body2" sx={{ color: 'text.secondary' }}>
         Find people to slackline with. Click a group on the map, or a country for all of its groups.
       </Typography>

@@ -6,6 +6,8 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Box, IconButton, SxProps, Theme } from '@mui/material';
 
+import { shadow, ui } from 'styles/theme/ui';
+
 interface Props {
   children: React.ReactNode[];
   index: number;
@@ -26,10 +28,11 @@ const navButtonSx: SxProps<Theme> = {
   top: '50%',
   transform: 'translateY(-50%)',
   zIndex: 1,
-  backgroundColor: '#494949',
-  color: 'white',
+  backgroundColor: 'rgba(255, 255, 255, 0.94)',
+  color: ui.text,
+  boxShadow: shadow.chip,
   transition: '200ms',
-  '&:hover': { backgroundColor: '#494949', opacity: 0.6 },
+  '&:hover': { backgroundColor: '#fff' },
 };
 
 export const Carousel = ({
@@ -94,7 +97,7 @@ export const Carousel = ({
               size="small"
               aria-label={`carousel indicator ${i + 1}`}
               onClick={() => onChange(i)}
-              sx={{ p: '2px', color: i === index ? '#494949' : '#afafaf' }}
+              sx={{ p: '2px', color: i === index ? ui.blue : ui.line }}
             >
               <FiberManualRecordIcon sx={{ fontSize: 15 }} />
             </IconButton>

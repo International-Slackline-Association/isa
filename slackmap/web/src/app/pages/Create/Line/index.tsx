@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router';
 
-import { Box, Stack } from '@mui/material';
 
 import { length } from '@turf/turf';
 import { lineApi } from 'app/api/line-api';
@@ -16,6 +15,7 @@ import { showInfoNotification } from 'utils';
 import { LineEditCard } from './LineEditCard';
 import { LineDetailsForm } from './types';
 import { validateLineFeatures } from './validations';
+import { FeatureFormLayout } from 'app/components/FeatureFormLayout';
 
 export function CreateLinePage() {
 
@@ -61,45 +61,33 @@ export function CreateLinePage() {
     createLine({ ...values, geoJson });
   };
   return (
-    <Stack
-      direction={{ xs: 'column', lg: 'row' }}
-      sx={{
-        minHeight: '100%',
-      }}
-    >
-      <Box
-        sx={{
-          height: { xs: '50vh', lg: '100vh' },
-          width: { xs: '100%', lg: '67%' },
-          position: 'relative',
-        }}
-      >
-        <CreateLineTutorial />
-        <DrawableMap
-          initialViewState={mapUrlSearchParams.parse(searchParams)}
-          drawControls={{
-            polygon: false,
-            line_string: true,
-            trash: true,
-          }}
-          onDrawingFeaturesChanged={onDrawingFeaturesChanged}
-          drawControlStyles={drawControlStyles('line')}
-        />
-      </Box>
-
-      <Box
-        sx={{
-          flex: 1,
-          height: { xs: 'auto', lg: '100vh' },
-        }}
-      >
-        <LineEditCard
-          mapErrors={mapErrors}
-          onSubmit={onDetailsSubmit}
-          disableSubmit={features.length === 0 || mapErrors.length > 0}
-          isSubmitting={isSaving}
-        />
-      </Box>
-    </Stack>
+    <FeatureFormLayout
+      map={
+        <>
+          <CreateLineTutorial />
+          <DrawableMap
+            initialViewState={mapUrlSearchParams.parse(searchParams)}
+            drawControls={{
+              polygon: false,
+              line_string: true,
+              trash: true,
+            }}
+            onDrawingFeaturesChanged={onDrawingFeaturesChanged}
+            drawControlStyles={drawControlStyles('line')}
+          />
+        </>
+      }
+      form={
+        <>
+          <LineEditCard
+            mapChanged={features.length > 0}
+            mapErrors={mapErrors}
+            onSubmit={onDetailsSubmit}
+            disableSubmit={features.length === 0 || mapErrors.length > 0}
+            isSubmitting={isSaving}
+          />
+        </>
+      }
+    />
   );
 }

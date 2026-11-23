@@ -50,7 +50,8 @@ export const SlacklineMap = (props: Props) => {
 
   const {
     FilterChips,
-    MapStyleButton,
+    MapStyleControl,
+    MapStyleMenu,
     selectedDisplayFeature,
     selectedLineType,
     selectedSpotType,
@@ -123,18 +124,18 @@ export const SlacklineMap = (props: Props) => {
           right: { xs: 0, lg: 'auto' },
         },
         '& .mapboxgl-ctrl-geocoder': {
-          marginTop: '10px',
-          marginLeft: '10px',
-          width: { xs: 'calc(100vw - 20px)', lg: '300px' },
+          marginTop: '12px',
+          marginLeft: 'calc(var(--panel-inset, 0px) + 12px)',
+          width: { xs: 'calc(100vw - 24px)', lg: '300px' },
           maxWidth: 'none',
         },
         '& .mapboxgl-ctrl-geocoder--input': {
-          height: { xs: 'unset', lg: '36px' },
-          fontSize: { xs: '1rem' },
+          height: '38px',
+          fontSize: { xs: '16px', lg: '14px' },
         },
         '& .mapboxgl-ctrl-geocoder--icon-search': {
-          height: { xs: '15px', lg: '15px' },
-          top: { xs: '12px', lg: '12px' },
+          height: '16px',
+          top: '11px',
         },
 
         ...mapControlsSx,
@@ -142,9 +143,9 @@ export const SlacklineMap = (props: Props) => {
           display: 'none',
         },
         // On phones the panel's bar covers the bottom 56px.
-        '& .mapboxgl-ctrl-bottom-left': { marginBottom: { xs: '56px', lg: 0 } },
+        '& .mapboxgl-ctrl-bottom-left': { marginBottom: { xs: '56px', lg: 0 }, marginLeft: 'var(--panel-inset, 0px)' },
         // and the add button sits above it.
-        '& .mapboxgl-ctrl-bottom-right': { marginBottom: { xs: '140px', lg: 0 } },
+        '& .mapboxgl-ctrl-bottom-right': { marginBottom: { xs: '140px', lg: 0 }, marginRight: 'var(--card-inset, 0px)' },
       }}
     >
       {!isMapLoaded && <MapLoadingPlaceholder pad={Boolean(props.activeSlacklineFeature)} />}
@@ -155,7 +156,7 @@ export const SlacklineMap = (props: Props) => {
       />
       <MapTermsNote />
       {FilterChips}
-      {MapStyleButton}
+      {MapStyleMenu}
       <ReactMapGL
         {...defaultMapSettings}
         initialViewState={props.initialViewState || defaultMapViewState}
@@ -175,6 +176,7 @@ export const SlacklineMap = (props: Props) => {
         <GeolocateControl position="bottom-right" />
         <AttributionControl compact customAttribution="International Slackline Association" />
         <NavigationControl position="bottom-right" showCompass={false} />
+        {MapStyleControl}
         <GeocoderControl
           mapboxAccessToken={MAPBOX_TOKEN}
           position="top-left"

@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useControl } from 'react-map-gl/mapbox';
 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CheckIcon from '@mui/icons-material/Check';
-import LayersRoundedIcon from '@mui/icons-material/LayersRounded';
-import { Box, Chip, IconButton, ListItemIcon, Menu, MenuItem, Stack, Tooltip } from '@mui/material';
+import { Box, Chip, ListItemIcon, Menu, MenuItem, Stack } from '@mui/material';
 
 import { SlacklineType, SpotType } from '@server/core/types';
 import { getSlacklineMapStats } from 'app/api/geojson-data';
 import { useSessionReady } from 'app/session';
 import { appColors } from 'styles/theme/colors';
-import { glass, panelSurface } from 'styles/theme/panelTheme';
+import { shadow, ui } from 'styles/theme/ui';
 import { useAppLocalStorage } from 'utils/hooks/useAppLocalStorage';
 import { spotTypeOptions } from 'utils/spotTypes';
 
@@ -37,14 +37,14 @@ type Stats = Awaited<ReturnType<typeof getSlacklineMapStats>>;
 
 // The chips float on the map, so their hover and focus colors must stay opaque.
 const chipSx = (selected: boolean, extra: object = {}) => ({
-  bgcolor: selected ? '#fff' : glass.background,
-  color: selected ? panelSurface : glass.text,
-  backdropFilter: glass.blur,
+  height: 28,
+  bgcolor: selected ? ui.blue : '#fff',
+  color: selected ? '#fff' : ui.text,
+  boxShadow: shadow.chip,
   border: 'none',
-  fontWeight: selected ? 600 : 500,
   flexShrink: 0,
-  '&&:hover, &&.Mui-focusVisible': { bgcolor: selected ? '#e9edf1' : glass.hover },
-  '& .MuiChip-deleteIcon': { color: selected ? panelSurface : glass.muted },
+  '&&:hover, &&.Mui-focusVisible': { bgcolor: selected ? ui.blueDark : ui.fill },
+  '& .MuiChip-deleteIcon': { color: selected ? '#fff' : ui.muted },
   ...extra,
 });
 
@@ -93,11 +93,12 @@ export const useMapOptions = () => {
       sx={{
         position: 'absolute',
         zIndex: 3,
-        top: { xs: 64, lg: 60 },
-        left: 10,
-        right: { xs: 0, lg: 160 },
+        top: { xs: 60, lg: 58 },
+        left: 'calc(var(--panel-inset, 0px) + 12px)',
+        right: { xs: 0, lg: 'calc(var(--card-inset, 0px) + 160px)' },
         overflowX: 'auto',
-        pb: 0.5,
+        p: '2px 4px 6px 2px',
+        m: '-2px',
         scrollbarWidth: 'none',
       }}
     >
@@ -158,46 +159,29 @@ export const useMapOptions = () => {
     </Stack>
   );
 
-  const MapStyleButton = (
-    <>
-      <Tooltip title="Map style" placement="left">
-        <IconButton
-          onClick={(e) => setStyleMenuAnchor(e.currentTarget)}
-          sx={{
-            position: 'absolute',
-            zIndex: 3,
-            top: { xs: 104, lg: 64 },
-            right: { xs: 10, lg: 16 },
-            bgcolor: glass.background,
-            backdropFilter: glass.blur,
-            color: glass.text,
-            borderRadius: '10px',
-            '&:hover': { bgcolor: glass.hover },
+  const MapStyleControl = <StyleControl onOpen={setStyleMenuAnchor} />;
+
+  const MapStyleMenu = (
+    <Menu anchorEl={styleMenuAnchor} open={Boolean(styleMenuAnchor)} onClose={() => setStyleMenuAnchor(null)}>
+      {mapStyleItems.map((item) => (
+        <MenuItem
+          key={item.key}
+          onClick={() => {
+            savedMapStyle.set(item.key);
+            setStyleMenuAnchor(null);
           }}
         >
-          <LayersRoundedIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-      <Menu anchorEl={styleMenuAnchor} open={Boolean(styleMenuAnchor)} onClose={() => setStyleMenuAnchor(null)}>
-        {mapStyleItems.map((item) => (
-          <MenuItem
-            key={item.key}
-            onClick={() => {
-              savedMapStyle.set(item.key);
-              setStyleMenuAnchor(null);
-            }}
-          >
-            <ListItemIcon>{savedMapStyle.value === item.key && <CheckIcon fontSize="small" />}</ListItemIcon>
-            {item.label}
-          </MenuItem>
-        ))}
-      </Menu>
-    </>
+          <ListItemIcon>{savedMapStyle.value === item.key && <CheckIcon fontSize="small" />}</ListItemIcon>
+          {item.label}
+        </MenuItem>
+      ))}
+    </Menu>
   );
 
   return {
     FilterChips,
-    MapStyleButton,
+    MapStyleControl,
+    MapStyleMenu,
     selectedDisplayFeature,
     selectedLineType:
       (selectedDisplayFeature === 'line' || selectedDisplayFeature === 'active') && selectedType !== 'none'
@@ -209,4 +193,34 @@ export const useMapOptions = () => {
         : undefined,
     selectedMapStyle: savedMapStyle.value as SelectedMapStyle,
   };
+};
+
+const layersIcon =
+  '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 5-9 5-9-5 9-5zM3 14l9 5 9-5"/></svg>';
+
+// The map-style button as a map control, so it stacks with zoom and locate instead of floating apart.
+const StyleControl = (props: { onOpen: (anchor: HTMLElement) => void }) => {
+  const onOpen = useRef(props.onOpen);
+  onOpen.current = props.onOpen;
+  useControl(() => {
+    const group = document.createElement('div');
+    return {
+      onAdd: () => {
+        group.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.title = 'Map style';
+        button.setAttribute('aria-label', 'Map style');
+        button.style.display = 'grid';
+        button.style.placeItems = 'center';
+        button.style.color = ui.text;
+        button.innerHTML = layersIcon;
+        button.onclick = () => onOpen.current(button);
+        group.replaceChildren(button);
+        return group;
+      },
+      onRemove: () => group.remove(),
+    };
+  }, { position: 'bottom-right' });
+  return null;
 };

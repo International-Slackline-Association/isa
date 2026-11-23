@@ -20,6 +20,7 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 - Answering a usage question: [usage analytics](usage-analytics.md)
 - Touching the browser check, the session cookie or the terms: [data access](data-access.md)
 - Touching activations, passes or the activation routes: [live lines](live-lines.md): an anonymous activation must never be tied to a person
+- Touching how the web app looks: [look and feel](look-and-feel.md): one coherent look, so a screen uses the theme's parts and never paints its own
 
 ## From higher scopes
 
@@ -29,4 +30,4 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 
 ## Related scopes
 
-- [ISA brand](/isa-brand/docs/README.md): the web app's fonts, text and error colors and ISA logos are a copy from there; its main colors stay SlackMap's blue and green, its own product identity
+- [ISA brand](/isa-brand/docs/README.md): the web app's fonts, default text, error and warning colors and ISA logos are a copy from there; its main colors stay SlackMap's blue and green, its own product identity

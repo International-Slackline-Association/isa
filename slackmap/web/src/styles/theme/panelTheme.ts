@@ -1,50 +1,50 @@
 import { createTheme } from '@mui/material';
 
-import { appColors } from './colors';
 import { theme } from './index';
-
-// The side panel and the controls floating on the map are dark and flat, so the map stays the
-// brightest thing on screen; the detail cards keep the light theme.
-export const panelSurface = '#0E1A26';
-
-export const glass = {
-  background: 'rgba(14, 26, 38, 0.72)',
-  hover: 'rgba(14, 26, 38, 0.88)',
-  text: 'rgba(255, 255, 255, 0.92)',
-  muted: 'rgba(255, 255, 255, 0.6)',
-  blur: 'blur(10px)',
-};
+import { radius, shadow, ui } from './ui';
 
 export const panelTheme = createTheme(theme, {
   palette: {
-    mode: 'dark',
-    background: { default: panelSurface, paper: panelSurface },
-    text: { primary: 'rgba(255, 255, 255, 0.92)', secondary: 'rgba(255, 255, 255, 0.56)' },
-    divider: 'rgba(255, 255, 255, 0.08)',
-    action: { hover: 'rgba(255, 255, 255, 0.06)', selected: 'rgba(255, 255, 255, 0.1)' },
-    primary: { main: appColors.slackmapBlue },
+    primary: { main: '#fff', dark: ui.blueTint, contrastText: ui.blueDark },
+    text: { primary: ui.onBlue, secondary: ui.onBlueMuted },
+    background: { default: ui.blue, paper: ui.blue },
+    divider: ui.onBlueFill,
+    action: { hover: ui.onBlueFill, selected: ui.onBlueFillHover, active: ui.onBlue },
   },
   components: {
-    // Dark mode lightens raised surfaces; the sheet stays the panel's navy.
-    MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
     MuiButton: {
-      styleOverrides: { root: { textTransform: 'none', boxShadow: 'none', borderRadius: 999 } },
+      variants: [
+        {
+          props: { variant: 'outlined' },
+          style: { backgroundColor: ui.onBlueFill, color: ui.onBlue, '&:hover': { backgroundColor: ui.onBlueFillHover } },
+        },
+      ],
+    },
+    MuiIconButton: {
+      styleOverrides: { root: { color: ui.onBlue, '&:hover': { backgroundColor: ui.onBlueFill } } },
+    },
+    MuiLink: {
+      styleOverrides: { root: { color: ui.onBlueMuted, '&:hover': { color: ui.onBlue } } },
+    },
+    MuiAvatar: {
+      styleOverrides: { colorDefault: { backgroundColor: ui.onBlueFill, color: ui.onBlue } },
+    },
+    MuiPaper: {
+      styleOverrides: { root: { color: ui.onBlue } },
     },
   },
 });
 
 export const mapControlsSx = {
   '& .mapboxgl-ctrl-group, & div.mapboxgl-ctrl-geocoder': {
-    backgroundColor: glass.background,
-    backdropFilter: glass.blur,
-    boxShadow: 'none',
+    backgroundColor: '#fff',
+    boxShadow: shadow.float,
   },
-  '& .mapboxgl-ctrl-group': { borderRadius: '10px' },
-  '& .mapboxgl-ctrl-group button + button': { borderTopColor: 'rgba(255, 255, 255, 0.12)' },
-  '& .mapboxgl-ctrl-group .mapboxgl-ctrl-icon': { filter: 'invert(1)', opacity: 0.85 },
-  '& .mapboxgl-ctrl-group button:not(:disabled):hover': { backgroundColor: 'rgba(255, 255, 255, 0.08)' },
-  '& div.mapboxgl-ctrl-geocoder': { borderRadius: '999px' },
-  '& input.mapboxgl-ctrl-geocoder--input': { color: glass.text },
-  '& input.mapboxgl-ctrl-geocoder--input::placeholder': { color: glass.muted },
-  '& .mapboxgl-ctrl-geocoder--icon': { fill: glass.muted },
+  '& .mapboxgl-ctrl-group': { borderRadius: '12px', overflow: 'hidden' },
+  '& .mapboxgl-ctrl-group button': { width: 34, height: 34 },
+  '& .mapboxgl-ctrl-group button + button': { borderTopColor: ui.line },
+  '& div.mapboxgl-ctrl-geocoder': { borderRadius: `${radius.pill}px`, fontFamily: theme.typography.fontFamily },
+  '& input.mapboxgl-ctrl-geocoder--input': { color: ui.text, height: 38, fontSize: 14 },
+  '& .mapboxgl-ctrl-geocoder--icon': { fill: ui.muted },
+  '& .mapboxgl-ctrl-geocoder .suggestions': { borderRadius: '14px', boxShadow: shadow.float },
 };

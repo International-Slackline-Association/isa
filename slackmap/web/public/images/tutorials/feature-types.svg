@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 520" role="img" aria-label="Lines, spots and access guides on the map, and the Add menu">
+  <defs>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="6" stdDeviation="9" flood-color="#0A192D" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="760" height="520" rx="24" fill="#E3EEDB"/>
+  <path d="M0 360 Q160 300 320 340 T760 300 V520 H0Z" fill="#D2E4C6"/>
+  <path d="M0 120 Q200 90 380 140 T760 110" stroke="#FFFFFF" stroke-width="10" fill="none" opacity="0.7"/>
+  <path d="M60 470 Q220 420 300 380 T470 300" stroke="#FFFFFF" stroke-width="7" fill="none" opacity="0.7"/>
+
+  <path d="M110 190 L300 150 L360 280 L150 330Z" fill="#42C842" fill-opacity="0.28" stroke="#42C842" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M150 230 L320 205" stroke="#FC3E3E" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="150" cy="230" r="6" fill="#FC3E3E"/><circle cx="320" cy="205" r="6" fill="#FC3E3E"/>
+  <path d="M175 285 L330 262" stroke="#FC3E3E" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="175" cy="285" r="6" fill="#FC3E3E"/><circle cx="330" cy="262" r="6" fill="#FC3E3E"/>
+  <path d="M60 440 Q120 400 160 370 T240 330" stroke="#FFA726" stroke-width="5" stroke-dasharray="2 12" stroke-linecap="round" fill="none"/>
+  <g transform="translate(40 440)">
+    <rect x="-4" y="-18" width="36" height="36" rx="10" fill="#FFA726"/>
+    <path d="M7 -8 H22 L18 -2 H7Z M7 -10 V12" stroke="#FFFFFF" stroke-width="3" fill="#FFFFFF" stroke-linejoin="round"/>
+  </g>
+
+  <g font-family="Barlow, system-ui, sans-serif" font-size="15" font-weight="600" fill="#29292A">
+    <g transform="translate(210 112)" filter="url(#sh)">
+      <rect width="96" height="30" rx="15" fill="#FFFFFF"/>
+      <circle cx="16" cy="15" r="5" fill="#42C842"/>
+      <text x="28" y="20">Spot</text>
+    </g>
+    <g transform="translate(340 222)" filter="url(#sh)">
+      <rect width="80" height="30" rx="15" fill="#FFFFFF"/>
+      <circle cx="16" cy="15" r="5" fill="#FC3E3E"/>
+      <text x="28" y="20">Lines</text>
+    </g>
+    <g transform="translate(90 470)" filter="url(#sh)">
+      <rect width="132" height="30" rx="15" fill="#FFFFFF"/>
+      <circle cx="16" cy="15" r="5" fill="#FFA726"/>
+      <text x="28" y="20">Access guide</text>
+    </g>
+
+    <g transform="translate(612 28)" filter="url(#sh)">
+      <rect width="112" height="44" rx="22" fill="#2E73B8"/>
+      <path d="M30 22 H46 M38 14 V30" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      <text x="56" y="28" fill="#FFFFFF" font-size="17">Add</text>
+    </g>
+    <g transform="translate(486 88)" filter="url(#sh)">
+      <rect width="238" height="196" rx="18" fill="#FFFFFF"/>
+      <rect x="8" y="8" width="222" height="42" rx="11" fill="#F2F4F7"/>
+      <circle cx="30" cy="29" r="6" fill="#FC3E3E"/><text x="48" y="34">Add a line</text>
+      <circle cx="30" cy="75" r="6" fill="#42C842"/><text x="48" y="80">Add a spot</text>
+      <circle cx="30" cy="121" r="6" fill="#FFA726"/><text x="48" y="126">Add an access guide</text>
+      <circle cx="30" cy="167" r="6" fill="#9039A5"/><text x="48" y="172">Add a slackline group</text>
+    </g>
+  </g>
+</svg>

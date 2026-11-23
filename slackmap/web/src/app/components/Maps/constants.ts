@@ -29,7 +29,10 @@ export const defaultMapViewState = {
   pitch: 0,
 };
 
-export const MAP_PADDING_RIGHT_FOR_FEATURE_CARD = window.innerWidth * 0.3;
+// The floating card's width and its gap to the edge.
+export const MAP_PADDING_RIGHT_FOR_FEATURE_CARD = Math.max(window.innerWidth * 0.3, 352) + 12;
+// On phones the card is a sheet over the lower 60% of the map.
+export const mapPaddingBottomForFeatureSheet = () => window.innerHeight * 0.6;
 
 export const mapStyles = {
   streets: 'mapbox://styles/mapbox/streets-v11?optimize=true',

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 
-import { Box, Stack } from '@mui/material';
 
 import { spotApi } from 'app/api/spot-api';
 import { DrawableMap } from 'app/components/Maps/SlacklineMap/DrawableMap';
@@ -12,6 +11,7 @@ import { Feature, FeatureCollection } from 'geojson';
 import { SpotEditCard } from './SpotEditCard';
 import { SpotDetailsForm } from './types';
 import { validateSpotFeatures } from './validations';
+import { FeatureFormLayout } from 'app/components/FeatureFormLayout';
 
 export function CreateSpotPage() {
 
@@ -52,44 +52,32 @@ export function CreateSpotPage() {
     createSpot({ ...values, geoJson });
   };
   return (
-    <Stack
-      direction={{ xs: 'column', lg: 'row' }}
-      sx={{
-        minHeight: '100%',
-      }}
-    >
-      <Box
-        sx={{
-          height: { xs: '50vh', lg: '100vh' },
-          width: { xs: '100%', lg: '67%' },
-          position: 'relative',
-        }}
-      >
-        <DrawableMap
-          initialViewState={mapUrlSearchParams.parse(searchParams)}
-          drawControls={{
-            polygon: true,
-            line_string: false,
-            trash: true,
-          }}
-          onDrawingFeaturesChanged={onDrawingFeaturesChanged}
-          drawControlStyles={drawControlStyles('spot')}
-        />
-      </Box>
-
-      <Box
-        sx={{
-          flex: 1,
-          height: { xs: 'auto', lg: '100vh' },
-        }}
-      >
-        <SpotEditCard
-          mapErrors={mapErrors}
-          onSubmit={onDetailsSubmit}
-          disableSubmit={features.length === 0 || mapErrors.length > 0}
-          isSubmitting={isSaving}
-        />
-      </Box>
-    </Stack>
+    <FeatureFormLayout
+      map={
+        <>
+          <DrawableMap
+            initialViewState={mapUrlSearchParams.parse(searchParams)}
+            drawControls={{
+              polygon: true,
+              line_string: false,
+              trash: true,
+            }}
+            onDrawingFeaturesChanged={onDrawingFeaturesChanged}
+            drawControlStyles={drawControlStyles('spot')}
+          />
+        </>
+      }
+      form={
+        <>
+          <SpotEditCard
+            mapChanged={features.length > 0}
+            mapErrors={mapErrors}
+            onSubmit={onDetailsSubmit}
+            disableSubmit={features.length === 0 || mapErrors.length > 0}
+            isSubmitting={isSaving}
+          />
+        </>
+      }
+    />
   );
 }

@@ -1,9 +1,9 @@
 import React from 'react';
 
-import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button';
 import {
   Alert,
+  Box,
   Chip,
   MenuItem,
   Stack,
@@ -11,20 +11,18 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import Avatar from '@mui/material/Avatar';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 
 import { S3ImageList, S3PhotoMeta } from 'app/components/ImageList';
 import { useFormik } from 'formik';
 
-import { EditingTextFieldHeader, restrictionSelectOptions } from '../Line/LineEditCard';
+import { CancelEditButton, EditingTextFieldHeader, restrictionSelectOptions } from '../Line/LineEditCard';
 import { spotTypeOptions } from 'utils/spotTypes';
 
 import { SpotDetailsForm } from './types';
 
 interface Props {
+  // Whether the drawing on the map differs from the saved or empty one.
+  mapChanged?: boolean;
   initialValues?: SpotDetailsForm;
   mapErrors?: string[];
   onSubmit: (values: SpotDetailsForm) => void;
@@ -61,28 +59,13 @@ export const SpotEditCard = (props: Props) => {
   });
 
   return (
-    <Card
-      sx={{
-        boxShadow: 'none',
-        border: 'none',
-        height: '100%',
-        width: '100%',
-        overflow: 'scroll',
-      }}
-    >
-      <CardHeader
-        avatar={
-          <Avatar sx={{ backgroundColor: (t) => t.palette.primary.main }}>
-            <AddIcon />
-          </Avatar>
-        }
-        title={
-          <>
-            <Typography variant="h5">{isCreateMode ? 'Create New Spot' : 'Edit Spot'}</Typography>
+    <Box component="form" onSubmit={formik.handleSubmit} sx={{ display: 'flex', flexDirection: 'column', height: '100%', bgcolor: 'background.paper' }}>
+      <Box sx={{ px: 2, pt: 2, pb: 1.25 }}>
+        <>
+            <Typography variant="h4" component="h1">{isCreateMode ? 'Add a spot' : 'Edit spot'}</Typography>
           </>
-        }
-      />
-      <CardContent component={Stack} spacing={1} sx={{}}>
+      </Box>
+      <Stack spacing={1.5} sx={{ flex: 1, overflowY: 'auto', px: 2, pb: 2, scrollbarWidth: 'thin' }}>
         <Stack spacing={1}>
           {props.mapErrors?.map((e) => (
             <Alert key={e} severity="error">
@@ -90,7 +73,7 @@ export const SpotEditCard = (props: Props) => {
             </Alert>
           ))}
         </Stack>
-        <form onSubmit={formik.handleSubmit}>
+        <>
           <Stack spacing={1}>
             <EditingTextFieldHeader>Details</EditingTextFieldHeader>
 
@@ -128,19 +111,19 @@ export const SpotEditCard = (props: Props) => {
             <EditingTextField
               formik={formik}
               field={'accessInfo'}
-              label={'Access Information'}
+              label={'Access'}
               multiline
             />
             <EditingTextField
               formik={formik}
               field={'contactInfo'}
-              label={'Contact Information'}
+              label={'Contact'}
               multiline
             />
             <EditingTextField
               formik={formik}
               field={'extraInfo'}
-              label={'Extra Information'}
+              label={'Additional details'}
               multiline
             />
 
@@ -152,7 +135,7 @@ export const SpotEditCard = (props: Props) => {
               formik={formik}
               select
               field="restrictionLevel"
-              label="Restriction Level"
+              label="Restriction level"
               required
             >
               <MenuItem value={''}></MenuItem>
@@ -166,7 +149,7 @@ export const SpotEditCard = (props: Props) => {
             <EditingTextField
               formik={formik}
               field={'restrictionInfo'}
-              label={'Restriction Details'}
+              label={'Restriction details'}
               multiline
               placeholder="Don't forget to add your contact info for people to reach you"
             />
@@ -181,20 +164,20 @@ export const SpotEditCard = (props: Props) => {
               maxPhotoCount={3}
             />
 
-            <Button
-              color="primary"
-              variant="contained"
-              fullWidth
-              type="submit"
-              disabled={props.disableSubmit}
-              loading={props.isSubmitting}
-            >
-              Submit
-            </Button>
           </Stack>
-        </form>
-      </CardContent>
-    </Card>
+        </>
+      </Stack>
+      <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end', px: 2, py: 1.25, borderTop: (t) => `1px solid ${t.palette.divider}` }}>
+        <CancelEditButton
+          noun="spot"
+          isCreateMode={isCreateMode}
+          hasChanges={formik.dirty || Boolean(props.mapChanged)}
+        />
+        <Button variant="contained" type="submit" disabled={props.disableSubmit} loading={props.isSubmitting}>
+          Save
+        </Button>
+      </Stack>
+    </Box>
   );
 };
 

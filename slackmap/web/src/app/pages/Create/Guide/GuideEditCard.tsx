@@ -1,25 +1,21 @@
 import React from 'react';
 
-import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button';
 import {
   Alert,
+  Box,
   MenuItem,
   Stack,
   StandardTextFieldProps,
   TextField,
   Typography,
 } from '@mui/material';
-import Avatar from '@mui/material/Avatar';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 
 import { GuideType } from '@server/core/types';
 import { S3ImageList, S3PhotoMeta } from 'app/components/ImageList';
 import { useFormik } from 'formik';
 
-import { EditingTextFieldHeader } from '../Line/LineEditCard';
+import { CancelEditButton, EditingTextFieldHeader } from '../Line/LineEditCard';
 import { GuideDetailsForm } from './types';
 
 const guideTypes: { value: GuideType; label: string }[] = [
@@ -50,6 +46,8 @@ const guideTypes: { value: GuideType; label: string }[] = [
 ];
 
 interface Props {
+  // Whether the drawing on the map differs from the saved or empty one.
+  mapChanged?: boolean;
   initialValues?: GuideDetailsForm;
   mapErrors?: string[];
   onSubmit: (values: GuideDetailsForm) => void;
@@ -86,30 +84,15 @@ export const GuideEditCard = (props: Props) => {
   });
 
   return (
-    <Card
-      sx={{
-        boxShadow: 'none',
-        border: 'none',
-        height: '100%',
-        width: '100%',
-        overflow: 'scroll',
-      }}
-    >
-      <CardHeader
-        avatar={
-          <Avatar sx={{ backgroundColor: (t) => t.palette.primary.main }}>
-            <AddIcon />
-          </Avatar>
-        }
-        title={
-          <>
-            <Typography variant="h5">
-              {isCreateMode ? 'Create New Access Guide' : 'Edit Access Guide'}
+    <Box component="form" onSubmit={formik.handleSubmit} sx={{ display: 'flex', flexDirection: 'column', height: '100%', bgcolor: 'background.paper' }}>
+      <Box sx={{ px: 2, pt: 2, pb: 1.25 }}>
+        <>
+            <Typography variant="h4" component="h1">
+              {isCreateMode ? 'Add an access guide' : 'Edit access guide'}
             </Typography>
           </>
-        }
-      />
-      <CardContent component={Stack} spacing={1} sx={{}}>
+      </Box>
+      <Stack spacing={1.5} sx={{ flex: 1, overflowY: 'auto', px: 2, pb: 2, scrollbarWidth: 'thin' }}>
         {isCreateMode && (
           <Typography variant="caption">
             Access guides are used to provide extra visual information for the viewers. You can draw
@@ -124,7 +107,7 @@ export const GuideEditCard = (props: Props) => {
             </Alert>
           ))}
         </Stack>
-        <form onSubmit={formik.handleSubmit}>
+        <>
           <Stack spacing={1}>
             <EditingTextFieldHeader>Details</EditingTextFieldHeader>
 
@@ -153,20 +136,20 @@ export const GuideEditCard = (props: Props) => {
               maxPhotoCount={2}
             />
 
-            <Button
-              color="primary"
-              variant="contained"
-              fullWidth
-              type="submit"
-              disabled={props.disableSubmit}
-              loading={props.isSubmitting}
-            >
-              Submit
-            </Button>
           </Stack>
-        </form>
-      </CardContent>
-    </Card>
+        </>
+      </Stack>
+      <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end', px: 2, py: 1.25, borderTop: (t) => `1px solid ${t.palette.divider}` }}>
+        <CancelEditButton
+          noun="access guide"
+          isCreateMode={isCreateMode}
+          hasChanges={formik.dirty || Boolean(props.mapChanged)}
+        />
+        <Button variant="contained" type="submit" disabled={props.disableSubmit} loading={props.isSubmitting}>
+          Save
+        </Button>
+      </Stack>
+    </Box>
   );
 };
 

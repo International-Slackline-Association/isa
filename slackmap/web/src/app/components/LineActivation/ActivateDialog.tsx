@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import CloseIcon from '@mui/icons-material/Close';
-import { Box, Button, ButtonBase, Dialog, IconButton, Stack, ThemeProvider, Typography } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Box, Button, ButtonBase, Stack, Typography } from '@mui/material';
 
-import { appColors } from 'styles/theme/colors';
-import { panelSurface, panelTheme } from 'styles/theme/panelTheme';
+import { PopupDialog } from 'app/components/Dialogs/PopupDialog';
+import { ui } from 'styles/theme/ui';
 
 import { AnonymousDrawing, NamedDrawing, slides } from './drawings';
 
@@ -19,22 +19,6 @@ interface Props {
   onChoose: (mode: ActivationMode) => void;
 }
 
-const tileSx = {
-  flex: 1,
-  flexDirection: 'column',
-  gap: 0.5,
-  p: 1.25,
-  pb: 1.5,
-  borderRadius: 4,
-  bgcolor: '#16263a',
-  border: '1.5px solid rgba(255,255,255,.1)',
-  color: 'text.primary',
-  textAlign: 'center',
-  transition: 'border-color .15s, transform .15s',
-  '&:hover': { borderColor: appColors.slackmapBlue, transform: 'translateY(-2px)' },
-  '&.Mui-disabled': { opacity: 0.45 },
-} as const;
-
 const Choice = (props: {
   drawing: React.ReactNode;
   title: string;
@@ -43,22 +27,36 @@ const Choice = (props: {
   disabled?: boolean;
   onClick: () => void;
 }) => (
-  <ButtonBase sx={tileSx} disabled={props.disabled} onClick={props.onClick}>
-    {props.drawing}
-    <Typography
-      variant="caption"
-      sx={{ fontWeight: 700, letterSpacing: '.05em', color: appColors.slackmapGreen, visibility: props.tag ? 'visible' : 'hidden' }}
-    >
+  <ButtonBase
+    disabled={props.disabled}
+    onClick={props.onClick}
+    sx={{
+      flex: 1,
+      flexDirection: 'column',
+      alignItems: 'stretch',
+      gap: 0.25,
+      p: 1.25,
+      pb: 1.5,
+      borderRadius: '14px',
+      border: `1.5px solid ${ui.line}`,
+      textAlign: 'center',
+      transition: 'border-color 120ms, background-color 120ms',
+      '&:hover': { borderColor: ui.blue, bgcolor: ui.blueTint },
+      '&.Mui-disabled': { opacity: 0.5 },
+    }}
+  >
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>{props.drawing}</Box>
+    <Typography variant="caption" sx={{ fontWeight: 600, color: ui.blue, visibility: props.tag ? 'visible' : 'hidden' }}>
       {props.tag ?? '·'}
     </Typography>
-    <Typography sx={{ fontWeight: 700, fontSize: 16 }}>{props.title}</Typography>
-    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.25 }}>
+    <Typography variant="subtitle1">{props.title}</Typography>
+    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
       {props.line}
     </Typography>
   </ButtonBase>
 );
 
-const Carousel = (props: { onBack: () => void }) => {
+const HowItWorks = (props: { onBack: () => void }) => {
   const [index, setIndex] = useState(0);
   const slide = slides[index];
   const last = index === slides.length - 1;
@@ -76,9 +74,6 @@ const Carousel = (props: { onBack: () => void }) => {
   let startX: number | undefined;
   return (
     <Stack spacing={1.5}>
-      <Button size="small" onClick={props.onBack} sx={{ alignSelf: 'flex-start', color: 'text.secondary', px: 0 }}>
-        ‹ Back to the choice
-      </Button>
       <Box
         sx={{ textAlign: 'center', touchAction: 'pan-y' }}
         onPointerDown={(e) => (startX = e.clientX)}
@@ -89,30 +84,29 @@ const Carousel = (props: { onBack: () => void }) => {
         }}
       >
         {slide.drawing}
-        <Typography sx={{ fontSize: 30, lineHeight: 1, mt: 0.5 }}>{slide.emoji}</Typography>
-        <Typography sx={{ mt: 0.75, fontSize: 16, lineHeight: 1.35, minHeight: 66, '& b': { color: '#fff' } }}>
+        <Typography sx={{ mt: 1.25, fontSize: 15, lineHeight: 1.4, minHeight: 64, '& b': { fontWeight: 600 } }}>
           {slide.text}
         </Typography>
         {slide.link && (
-          <Button href={slide.link.href} target="_blank" rel="noreferrer" size="small" sx={{ mt: 1, color: '#8ec0ec' }}>
+          <Button href={slide.link.href} target="_blank" rel="noreferrer" size="small" sx={{ mt: 0.5 }}>
             {slide.link.label} ↗
           </Button>
         )}
         {slide.aside && (
           <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ display: 'inline-block', mt: 1, px: 1.25, py: 0.25, borderRadius: 999, bgcolor: 'rgba(255,255,255,.06)' }}
+            variant="caption"
+            component="p"
+            sx={{ display: 'inline-block', mt: 1, px: 1.25, py: 0.25, borderRadius: 999, bgcolor: ui.fill, color: 'text.secondary' }}
           >
             {slide.aside}
           </Typography>
         )}
       </Box>
       <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
-        <Button onClick={() => go(index - 1)} sx={{ color: 'text.secondary', visibility: index ? 'visible' : 'hidden' }}>
-          ‹ Back
+        <Button onClick={index ? () => go(index - 1) : props.onBack} startIcon={<ArrowBackIcon />}>
+          {index ? 'Back' : 'The choice'}
         </Button>
-        <Stack direction="row" spacing={0.875}>
+        <Stack direction="row" spacing={0.75}>
           {slides.map((_, i) => (
             <Box
               key={i}
@@ -120,19 +114,20 @@ const Carousel = (props: { onBack: () => void }) => {
               aria-label={`Slide ${i + 1}`}
               onClick={() => go(i)}
               sx={{
-                width: i === index ? 22 : 9,
-                height: 9,
+                width: i === index ? 20 : 8,
+                height: 8,
                 p: 0,
                 border: 0,
-                borderRadius: 6,
+                borderRadius: 4,
                 cursor: 'pointer',
-                bgcolor: i === index ? appColors.slackmapGreen : 'rgba(255,255,255,.22)',
+                transition: 'width 150ms',
+                bgcolor: i === index ? ui.blue : ui.line,
               }}
             />
           ))}
         </Stack>
         <Button variant="contained" onClick={last ? props.onBack : () => go(index + 1)}>
-          {last ? 'Choose now' : 'Next ›'}
+          {last ? 'Choose now' : 'Next'}
         </Button>
       </Stack>
     </Stack>
@@ -146,52 +141,38 @@ export const ActivateDialog = (props: Props) => {
   }, [props.open]);
 
   return (
-    <ThemeProvider theme={panelTheme}>
-      <Dialog
-        open={props.open}
-        onClose={props.onClose}
-        slotProps={{
-          paper: { sx: { bgcolor: panelSurface, borderRadius: 5, p: 2.25, m: 1.5, width: 460, maxWidth: 'calc(100% - 24px)' } },
-          backdrop: { sx: { bgcolor: 'rgba(8,14,22,.5)' } },
-        }}
-      >
-        <IconButton
-          aria-label="Close"
-          onClick={props.onClose}
-          size="small"
-          sx={{ position: 'absolute', top: 12, right: 12, bgcolor: 'rgba(255,255,255,.08)' }}
-        >
-          <CloseIcon fontSize="small" />
-        </IconButton>
-        {explaining ? (
-          <Carousel onBack={() => setExplaining(false)} />
-        ) : (
-          <>
-            <Typography sx={{ fontWeight: 700, fontSize: 19, pr: 4 }}>Activate {props.lineName}</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1.75 }}>
-              Show it as rigged now, for whoever needs to know. You stay out of it.
-            </Typography>
-            <Stack direction="row" spacing={1.25}>
-              <Choice
-                drawing={<AnonymousDrawing />}
-                title="Anonymous"
-                line={props.anonymousUnavailable ?? 'SlackMap can’t know it’s you'}
-                disabled={Boolean(props.anonymousUnavailable)}
-                onClick={() => props.onChoose('anonymous')}
-              />
-              <Choice
-                drawing={<NamedDrawing />}
-                title="With my name"
-                line="Your name shows on the line"
-                onClick={() => props.onChoose('named')}
-              />
-            </Stack>
-            <Button onClick={() => setExplaining(true)} sx={{ mt: 1.75, alignSelf: 'center', color: '#8ec0ec' }}>
-              💡 How does this work?
-            </Button>
-          </>
-        )}
-      </Dialog>
-    </ThemeProvider>
+    <PopupDialog
+      open={props.open}
+      onClose={props.onClose}
+      width={440}
+      title={explaining ? 'How does this work?' : `Activate ${props.lineName}`}
+      description={!explaining && 'Show it as rigged now, for whoever needs to know. You stay out of it.'}
+    >
+      {explaining ? (
+        <HowItWorks onBack={() => setExplaining(false)} />
+      ) : (
+        <>
+          <Stack direction="row" spacing={1.25}>
+            <Choice
+              drawing={<AnonymousDrawing />}
+              tag="Default"
+              title="Anonymous"
+              line={props.anonymousUnavailable ?? 'SlackMap can’t know it’s you'}
+              disabled={Boolean(props.anonymousUnavailable)}
+              onClick={() => props.onChoose('anonymous')}
+            />
+            <Choice
+              drawing={<NamedDrawing />}
+              title="With my name"
+              line="Your name shows on the line"
+              onClick={() => props.onChoose('named')}
+            />
+          </Stack>
+          <Button onClick={() => setExplaining(true)} sx={{ alignSelf: 'center' }}>
+            How does this work?
+          </Button>
+        </>
+      )}
+    </PopupDialog>
   );
 };

@@ -147,9 +147,9 @@ export const FAQ = () => (
     {sections.map((section) => (
       <Box key={section.title} sx={{ marginBottom: 2 }}>
         <Typography
-          variant="overline"
+          variant="subtitle2"
           component="h3"
-          sx={{ color: 'primary.main', fontWeight: 700, letterSpacing: 1 }}
+          sx={{ color: 'text.primary', mb: 0.75 }}
         >
           {section.title}
         </Typography>
@@ -159,11 +159,11 @@ export const FAQ = () => (
             disableGutters
             elevation={0}
             sx={{
-              border: 1,
-              borderColor: 'divider',
-              borderRadius: 1,
-              marginBottom: 1,
+              bgcolor: 'neutral.main',
+              borderRadius: '12px',
+              marginBottom: 0.75,
               '&:before': { display: 'none' },
+              '&.MuiAccordion-rounded': { borderRadius: '12px' },
             }}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>

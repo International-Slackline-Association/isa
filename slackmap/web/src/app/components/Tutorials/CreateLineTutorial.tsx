@@ -10,7 +10,7 @@ const Page = (props: { img: string; title: string; children: React.ReactNode }) 
     <Stack
       spacing={0}
       sx={{
-        height: { xs: '66vh', lg: '75vh' },
+        maxHeight: { xs: '60vh', lg: '62vh' },
         overflowY: 'scroll',
       }}
     >
@@ -23,7 +23,7 @@ const Page = (props: { img: string; title: string; children: React.ReactNode }) 
         alt={''}
       />
       <Stack spacing={2} sx={{ px: 4, alignItems: 'center', textAlign: 'center' }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+        <Typography variant="h5">
           {props.title}
         </Typography>
         {props.children}
@@ -43,10 +43,10 @@ export const CreateLineTutorial = () => {
     <Page
       key={'create-line-tutorial-0'}
       img={'/images/tutorials/create-line-controls.png'}
-      title={'Tip: Double Click'}
+      title={'Tip: double tap'}
     >
       <Typography variant="subtitle2">
-        In order to <b>finish drawing</b> the line, you need to <b>click twice</b> the last point.
+        In order to <b>finish drawing</b> the line, <b>tap the last point twice</b>.
       </Typography>
     </Page>,
   ];

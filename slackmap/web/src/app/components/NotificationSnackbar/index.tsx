@@ -5,6 +5,7 @@ import { Alert, Slide, SlideProps, Snackbar } from '@mui/material';
 
 import { appActions } from 'app/slices/app';
 import { selectSnackbarNotification } from 'app/slices/app/selectors';
+import { shadow, ui } from 'styles/theme/ui';
 
 function SlideTransition(props: SlideProps) {
   return <Slide {...props} direction="down" />;
@@ -34,10 +35,21 @@ const NotificationSnackbar = () => {
       slots={{ transition: SlideTransition }}
     >
       <Alert
-        elevation={6}
         variant="filled"
         onClose={onClose}
         severity={lastSnackbarNotification?.severity}
+        sx={{
+          borderRadius: 999,
+          px: 2,
+          py: 0.25,
+          fontWeight: 500,
+          boxShadow: shadow.float,
+          bgcolor: lastSnackbarNotification?.severity === 'error' ? 'error.main' : ui.toast,
+          color: '#fff',
+          '& .MuiAlert-icon': {
+            color: lastSnackbarNotification?.severity === 'success' ? '#6FD86F' : '#fff',
+          },
+        }}
       >
         {lastSnackbarNotification?.message}
       </Alert>

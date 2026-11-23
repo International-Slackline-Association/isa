@@ -24,6 +24,7 @@ import { GuideDetailCard } from './GuideDetailCard';
 import { LineDetailCard } from './LineDetailCard';
 import { SpotDetailCard } from './SpotDetailCard';
 import { useActiveSlacklineFeature } from './useActiveFeature';
+import { radius, shadow } from 'styles/theme/ui';
 
 const featureGeoJsonDict: { [key: string]: FeatureCollection } = {};
 
@@ -160,12 +161,16 @@ export function SlacklineMapPage() {
         position: 'relative',
         height: '100%',
         overflowX: 'hidden',
+        // How much of the map's right edge the open card covers, for the controls to stay clear of it.
+        '--card-inset': isDesktop && (activeFeature || lastActiveFeature) ? 'max(30vw, 352px)' : '0px',
+        // On phones the open card is a sheet over the lower 60%; the map's controls sit above it.
+        '& .mapboxgl-ctrl-bottom-right': !isDesktop && activeFeature ? { bottom: '60%', mb: '0 !important' } : {},
       }}
     >
       {!activeFeature && <WelcomeTutorial />}
       <Box
         sx={{
-          height: { xs: activeFeature ? '75vh' : '100%', lg: '100vh' },
+          height: '100%',
           width: { xs: '100%', lg: '100%' },
           position: 'relative',
           flexShrink: 0,
@@ -184,18 +189,20 @@ export function SlacklineMapPage() {
 
       <Slide
         in={Boolean(activeFeature)}
-        direction="left"
-        timeout={isDesktop ? undefined : 0}
+        direction={isDesktop ? 'left' : 'up'}
         onExited={() => setLastActiveFeature(undefined)}
       >
         <Box
           sx={{
             flex: 1,
-            height: { xs: 'auto', lg: '100vh' },
-            position: isDesktop ? 'absolute' : 'unset',
-            top: isDesktop ? '0' : 'unset',
-            right: isDesktop ? '0' : 'unset',
-            width: isDesktop ? '33%' : '100%',
+            position: 'absolute',
+            top: isDesktop ? 12 : '40%',
+            bottom: isDesktop ? 12 : 0,
+            right: isDesktop ? 12 : 0,
+            width: isDesktop ? 'calc(max(30vw, 352px) - 12px)' : '100%',
+            borderRadius: isDesktop ? `${radius.card}px` : '18px 18px 0 0',
+            boxShadow: shadow.float,
+            overflow: 'hidden',
             zIndex: 4,
           }}
         >

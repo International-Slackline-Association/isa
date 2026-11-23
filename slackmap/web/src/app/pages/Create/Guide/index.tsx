@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 
-import { Box, Stack } from '@mui/material';
 
 import { guideApi } from 'app/api/guide-api';
 import { DrawableMap } from 'app/components/Maps/SlacklineMap/DrawableMap';
@@ -12,6 +11,7 @@ import { Feature, FeatureCollection } from 'geojson';
 import { GuideEditCard } from './GuideEditCard';
 import { GuideDetailsForm } from './types';
 import { validateGuideFeatures } from './validations';
+import { FeatureFormLayout } from 'app/components/FeatureFormLayout';
 
 export function CreateGuidePage() {
 
@@ -52,45 +52,33 @@ export function CreateGuidePage() {
     createGuide({ ...values, geoJson });
   };
   return (
-    <Stack
-      direction={{ xs: 'column', lg: 'row' }}
-      sx={{
-        minHeight: '100%',
-      }}
-    >
-      <Box
-        sx={{
-          height: { xs: '50vh', lg: '100vh' },
-          width: { xs: '100%', lg: '67%' },
-          position: 'relative',
-        }}
-      >
-        <DrawableMap
-          initialViewState={mapUrlSearchParams.parse(searchParams)}
-          drawControls={{
-            point: true,
-            polygon: true,
-            line_string: true,
-            trash: true,
-          }}
-          onDrawingFeaturesChanged={onDrawingFeaturesChanged}
-          drawControlStyles={drawControlStyles('guide')}
-        />
-      </Box>
-
-      <Box
-        sx={{
-          flex: 1,
-          height: { xs: 'auto', lg: '100vh' },
-        }}
-      >
-        <GuideEditCard
-          mapErrors={mapErrors}
-          onSubmit={onDetailsSubmit}
-          disableSubmit={features.length === 0 || mapErrors.length > 0}
-          isSubmitting={isSaving}
-        />
-      </Box>
-    </Stack>
+    <FeatureFormLayout
+      map={
+        <>
+          <DrawableMap
+            initialViewState={mapUrlSearchParams.parse(searchParams)}
+            drawControls={{
+              point: true,
+              polygon: true,
+              line_string: true,
+              trash: true,
+            }}
+            onDrawingFeaturesChanged={onDrawingFeaturesChanged}
+            drawControlStyles={drawControlStyles('guide')}
+          />
+        </>
+      }
+      form={
+        <>
+          <GuideEditCard
+            mapChanged={features.length > 0}
+            mapErrors={mapErrors}
+            onSubmit={onDetailsSubmit}
+            disableSubmit={features.length === 0 || mapErrors.length > 0}
+            isSubmitting={isSaving}
+          />
+        </>
+      }
+    />
   );
 }

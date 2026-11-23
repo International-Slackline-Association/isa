@@ -1,16 +1,17 @@
 import { appColors } from 'styles/theme/colors';
-import { panelSurface } from 'styles/theme/panelTheme';
+import { ui } from 'styles/theme/ui';
 
+// Drawn for the white pop-up.
 const C = {
-  blue: appColors.slackmapBlue,
+  blue: ui.blue,
   green: appColors.slackmapGreen,
-  orange: appColors.activeColor,
+  live: appColors.activeColor,
   red: appColors.lineStrokeColor,
-  ink: panelSurface,
-  card: '#16263a',
-  rock: '#2f4a63',
-  soft: 'rgba(255,255,255,.85)',
-  dim: 'rgba(255,255,255,.35)',
+  ink: ui.text,
+  card: ui.fill,
+  rock: '#C3CFDB',
+  soft: '#5B6B7B',
+  dim: '#9AA8B6',
 };
 const font = { fontFamily: 'Barlow, sans-serif', fontWeight: 800 } as const;
 
@@ -30,8 +31,8 @@ const Anchors = (p: { y: number; x1: number; x2: number; color: string }) => (
 
 const Person = (p: { x: number; y: number; s?: number; fill?: string; shades?: boolean }) => (
   <g transform={`translate(${p.x} ${p.y}) scale(${p.s ?? 1})`}>
-    <circle cx={0} cy={-16} r={10} fill={p.fill ?? '#cfe0f0'} />
-    <path d="M-15 12 Q-15 -4 0 -4 Q15 -4 15 12Z" fill={p.fill ?? '#cfe0f0'} />
+    <circle cx={0} cy={-16} r={10} fill={p.fill ?? '#8FA9C2'} />
+    <path d="M-15 12 Q-15 -4 0 -4 Q15 -4 15 12Z" fill={p.fill ?? '#8FA9C2'} />
     {p.shades && (
       <path d="M-11 -19 H11 V-16 Q11 -11 5 -11 Q1 -11 0 -15 Q-1 -11 -5 -11 Q-11 -11 -11 -16Z" fill="#0b121a" />
     )}
@@ -62,7 +63,7 @@ const choiceBox = { viewBox: '0 0 150 92', width: '100%', style: { maxWidth: 150
 
 export const AnonymousDrawing = () => (
   <svg {...choiceBox}>
-    <Anchors y={70} x1={18} x2={132} color={C.orange} />
+    <Anchors y={70} x1={18} x2={132} color={C.live} />
     <Person x={75} y={42} s={1.15} shades />
     <g transform="translate(104 8)">
       <rect width={26} height={24} rx={8} fill={C.blue} />
@@ -76,7 +77,7 @@ export const AnonymousDrawing = () => (
 
 export const NamedDrawing = () => (
   <svg {...choiceBox}>
-    <Anchors y={70} x1={18} x2={132} color={C.orange} />
+    <Anchors y={70} x1={18} x2={132} color={C.live} />
     <Person x={60} y={42} s={1.15} />
     <NameTag x={88} y={22} text="Mia" />
   </svg>
@@ -109,14 +110,16 @@ const Helicopter = (p: { x: number; y: number }) => (
 const WhySlide = () => (
   <SlideSvg>
     <rect x={8} y={10} width={284} height={110} rx={14} fill={C.card} />
-    <Anchors y={78} x1={26} x2={86} color={C.orange} />
+    <Anchors y={78} x1={26} x2={86} color={C.live} />
     <Person x={56} y={54} s={0.8} shades />
     <Arrow x={98} y={70} w={30} />
     <g transform="translate(136 46)">
       <rect width={52} height={48} rx={12} fill={C.blue} />
-      <text x={26} y={30} textAnchor="middle" fontSize={22}>
-        📡
-      </text>
+      <g fill="none" stroke="#fff" strokeWidth={2.5} strokeLinecap="round">
+        <circle cx={26} cy={24} r={3} fill="#fff" />
+        <path d="M19 17 a10 10 0 0 0 0 14 M33 17 a10 10 0 0 1 0 14" />
+        <path d="M14 12 a17 17 0 0 0 0 24 M38 12 a17 17 0 0 1 0 24" />
+      </g>
     </g>
     <Arrow x={196} y={70} w={30} />
     <Plane x={238} y={28} />
@@ -136,13 +139,13 @@ const LiveSlide = () => (
       <circle cx={108} cy={74} r={4} fill={C.red} />
     </g>
     <Arrow x={122} y={66} w={22} />
-    <path d="M160 56 L240 74" stroke={C.orange} strokeWidth={10} strokeLinecap="round" opacity={0.4} />
-    <path d="M160 56 L240 74" stroke={C.orange} strokeWidth={4} strokeLinecap="round" />
-    <circle cx={160} cy={56} r={5} fill={C.orange} />
-    <circle cx={240} cy={74} r={5} fill={C.orange} />
+    <path d="M160 56 L240 74" stroke={C.live} strokeWidth={10} strokeLinecap="round" opacity={0.4} />
+    <path d="M160 56 L240 74" stroke={C.live} strokeWidth={4} strokeLinecap="round" />
+    <circle cx={160} cy={56} r={5} fill={C.live} />
+    <circle cx={240} cy={74} r={5} fill={C.live} />
     <g transform="translate(212 20)">
-      <rect width={66} height={24} rx={12} fill={C.orange} />
-      <text x={33} y={17} textAnchor="middle" {...font} fontSize={12.5} fill="#fff">
+      <rect width={66} height={24} rx={12} fill={C.live} />
+      <text x={33} y={17} textAnchor="middle" {...font} fontSize={12.5} fill={ui.onLive}>
         until Sun
       </text>
     </g>
@@ -191,7 +194,7 @@ const AnonymousSlide = () => (
 const NamedSlide = () => (
   <SlideSvg>
     <rect x={8} y={10} width={284} height={110} rx={14} fill={C.card} />
-    <Anchors y={50} x1={86} x2={250} color={C.orange} />
+    <Anchors y={50} x1={86} x2={250} color={C.live} />
     <Person x={150} y={62} s={1.1} />
     <NameTag x={184} y={34} text="by Mia" />
   </SlideSvg>
@@ -219,8 +222,8 @@ const LinkSlide = () => (
       <rect x={-6} y={28} width={56} height={5} rx={2} fill={C.soft} />
     </g>
     <Person x={240} y={76} s={0.75} />
-    <Person x={262} y={72} s={0.8} fill="#a9c9e8" />
-    <Person x={282} y={78} s={0.7} fill="#cfe0f0" />
+    <Person x={262} y={72} s={0.8} fill="#A7BBCF" />
+    <Person x={282} y={78} s={0.7} fill="#8FA9C2" />
     <text x={262} y={28} textAnchor="middle" fontFamily="Barlow, sans-serif" fontWeight={700} fontSize={12} fill={C.soft}>
       your crew
     </text>
@@ -231,9 +234,9 @@ const EndSlide = () => (
   <SlideSvg>
     <g transform="translate(34 18)">
       <rect width={88} height={92} rx={12} fill="#fff" />
-      <rect width={88} height={24} rx={12} fill={C.orange} />
-      <rect y={12} width={88} height={12} fill={C.orange} />
-      <text x={44} y={17} textAnchor="middle" {...font} fontSize={12} fill="#fff">
+      <rect width={88} height={24} rx={12} fill={C.live} />
+      <rect y={12} width={88} height={12} fill={C.live} />
+      <text x={44} y={17} textAnchor="middle" {...font} fontSize={12} fill={ui.onLive}>
         MAX 14 DAYS
       </text>
       <text x={44} y={70} textAnchor="middle" {...font} fontSize={38} fill={C.ink}>
@@ -249,9 +252,10 @@ const EndSlide = () => (
     </text>
     <g transform="translate(196 78)">
       <rect width={78} height={34} rx={10} fill={C.card} stroke={C.green} strokeWidth={1.5} />
-      <text x={14} y={23} fontSize={15}>
-        📅
-      </text>
+      <g transform="translate(8 9)">
+        <rect width={17} height={16} rx={3} fill="#fff" stroke={C.green} strokeWidth={1.5} />
+        <rect width={17} height={5} rx={2} fill={C.green} />
+      </g>
       <text x={32} y={16} fontFamily="Barlow, sans-serif" fontWeight={700} fontSize={10.5} fill={C.soft}>
         reminder
       </text>
@@ -283,14 +287,12 @@ const OpenSourceSlide = () => (
 export const repositoryUrl = 'https://github.com/International-Slackline-Association/isa';
 
 export const slides: {
-  emoji: string;
   drawing: React.ReactNode;
   text: React.ReactNode;
   aside?: string;
   link?: { href: string; label: string };
 }[] = [
   {
-    emoji: '🛡️',
     drawing: <WhySlide />,
     text: (
       <>
@@ -300,7 +302,6 @@ export const slides: {
     ),
   },
   {
-    emoji: '📡',
     drawing: <LiveSlide />,
     text: (
       <>
@@ -309,17 +310,15 @@ export const slides: {
     ),
   },
   {
-    emoji: '🕶️',
     drawing: <AnonymousSlide />,
     text: (
       <>
         <b>Anonymous:</b> SlackMap only learns that <i>a</i> member did it, <b>never who</b>.
       </>
     ),
-    aside: '👀 People nearby may still guess who rigs there.',
+    aside: 'People nearby may still guess who rigs there.',
   },
   {
-    emoji: '🔍',
     drawing: <OpenSourceSlide />,
     text: (
       <>
@@ -330,7 +329,6 @@ export const slides: {
     link: { href: repositoryUrl, label: 'See the code on GitHub' },
   },
   {
-    emoji: '🏷️',
     drawing: <NamedSlide />,
     text: (
       <>
@@ -339,7 +337,6 @@ export const slides: {
     ),
   },
   {
-    emoji: '🔗',
     drawing: <LinkSlide />,
     text: (
       <>
@@ -349,7 +346,6 @@ export const slides: {
     ),
   },
   {
-    emoji: '⏳',
     drawing: <EndSlide />,
     text: (
       <>
