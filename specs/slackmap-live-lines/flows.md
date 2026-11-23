@@ -40,7 +40,7 @@ flowchart TD
     C -- no --> R["'Report rigged'"]
     R --> F{First time?}
     F -- yes --> E["One-time explainer:<br/>how anonymous reporting works"] --> Sh
-    F -- no --> Sh["Sheet: until (Today ▾),<br/>height (prefilled),<br/>marked for aircraft y/n"]
+    F -- no --> Sh["Sheet: until (Today ▾)"]
     Sh --> K["Sent without login, with one pass<br/>+ rig key hash"]
     K --> Done["Rigged ✓<br/>'Add reminder to calendar'"]
     Done --> O
@@ -82,7 +82,7 @@ sequenceDiagram
 
     Note over P,L: Reporting: no login, no cookies
     P->>P: make rig key, keep it
-    P->>L: line id, until, height + one pass + hash(rig key)
+    P->>L: line id, until + one pass + hash(rig key)
     L->>L: stamp valid? pass unused? line not rigged?
     L-->>P: ok
 

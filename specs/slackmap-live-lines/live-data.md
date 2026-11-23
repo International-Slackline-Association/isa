@@ -8,12 +8,10 @@ Rigging extends an existing line ([G4](decisions.md#decided-by-can)): a few fiel
 |---|---|---|
 | rigged until | yes | expiry; the browser hides the rig once it passes |
 | reported at | yes | "reported 2 h ago" |
-| marked for aircraft y/n | yes | visibility from the air |
-| height for this rig, if it differs from the line's | no, card only | obstacle height |
-| hash of the rig key | **never** | owner-only update ([D2](decisions.md#d2-how-owner-only-works-without-identity)) |
+| owner proof (rig key hash or rigger id, per [D2](decisions.md#d2-how-the-owner-edits-from-any-device-without-isa-knowing-who)) | **never** | owner-only update |
 | terms version accepted | no | licence |
 
-The line's own fields (geometry, length, height, type) already cover the rest. Later: anchor elevation above sea level, which aviation needs.
+Nothing else ([G10](decisions.md#decided-by-can)).
 
 ## How it reaches the map
 

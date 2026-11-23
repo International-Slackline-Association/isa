@@ -210,7 +210,7 @@
 <!-- ============ 2. LINE CARD ============ -->
 <section>
   <h2>2. The line card</h2>
-  <p>One new field, <b>Rig status</b>, right under the title and cover image, above Restrictions: the first thing you see. It has three states.</p>
+  <p>One new block right under the cover image, above Restrictions: a "Report rigged" button, or the rig status when rigged.</p>
   <div class="row">
     <figure>
       <div class="phone"><div class="screen">
@@ -218,17 +218,13 @@
         <div class="card">
           <div class="ch"><div class="av">L</div><div class="t"><b>Twin Peaks Highline</b><small>Last updated: 04 Aug 2026</small></div><div class="ic">✕ ⋮</div></div>
           <div class="img">cover image</div>
-          <div class="rig idle new">
-            <div class="top">Not reported as rigged</div>
-            <div class="sub">Rigging it now? Let others know. Anonymous.</div>
-            <div class="btns"><div class="btn pri">Report rigged</div></div>
-          </div>
+          <div class="btns new" style="margin:6px 0 8px"><div class="btn pri">Report rigged</div></div>
           <div class="field"><div class="fi">⚠</div><div class="fb"><b>Restrictions</b><div>None known</div></div></div>
           <div class="field"><div class="fi">↔</div><div class="fb"><b>Specs</b> <span class="ok">Measured ✓</span><div>Type: Highline · Length: 85m · Height: 120m</div></div></div>
           <div class="field"><div class="fi">✎</div><div class="fb"><b>Description</b><div class="ghost"></div><div class="ghost" style="width:70%"></div></div></div>
         </div>
       </div></div>
-      <figcaption><b>Not rigged.</b> Signed out, the button reads "Sign in to report rigged" and opens the existing sign-in dialog.</figcaption>
+      <figcaption><b>Not rigged.</b> Just the button, no status text. Signed out, it reads "Sign in to report rigged" and opens the existing sign-in dialog.</figcaption>
     </figure>
 
     <figure>
@@ -239,7 +235,7 @@
           <div class="img">cover image</div>
           <div class="rig live new">
             <div class="top"><span class="badge">RIGGED</span> until Sat 29 Nov, 20:00</div>
-            <div class="sub">Reported 2 h ago · Marked for aircraft: yes · Height 120 m</div>
+            <div class="sub">Reported 2 h ago</div>
           </div>
           <div class="field"><div class="fi">⚠</div><div class="fb"><b>Restrictions</b><div>None known</div></div></div>
           <div class="field"><div class="fi">↔</div><div class="fb"><b>Specs</b> <span class="ok">Measured ✓</span><div>Type: Highline · Length: 85m · Height: 120m</div></div></div>
@@ -320,15 +316,11 @@
           <h3>Report Twin Peaks Highline rigged</h3>
           <div class="lbl">Rigged until</div>
           <div class="chips"><span class="chip on">Today 20:00</span><span class="chip">Sunday</span><span class="chip">1 week</span><span class="chip">Pick date…</span></div>
-          <div class="lbl">Height above ground (m)</div>
-          <div class="input">120</div>
-          <div class="lbl">&nbsp;</div>
-          <div class="switch"><span>Marked for aircraft (balls / flags)</span><span class="tog on"></span></div>
           <div class="anon">🔒 <span>Sent anonymously. By reporting you accept the <span class="link">terms</span>.</span></div>
           <div class="btns" style="margin-top:12px"><div class="btn">Cancel</div><div class="btn live">Report rigged</div></div>
         </div>
       </div></div>
-      <figcaption><b>The sheet.</b> Defaults filled, so it's one tap if nothing changes. Height prefilled from the line. Max 14 days.</figcaption>
+      <figcaption><b>The sheet.</b> One question: until when. Today is preselected, so it's one tap. Max 14 days.</figcaption>
     </figure>
 
     <figure>

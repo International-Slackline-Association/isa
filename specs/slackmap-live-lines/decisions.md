@@ -15,6 +15,8 @@ Each item: the question, the options, a recommendation. ⭐ = recommended. Chang
 | G7 | **Reminder before expiry = "add to calendar" button + banner on the line card.** Nothing sent by ISA. |
 | G8 | **No burner accounts.** Nobody signs in to a second account. |
 | G9 | UI: Claude wireframes first from the current app, Can reviews. [Wireframes](wireframes.html). |
+| G10 | **No fields or UI for consumers' sake** (aviation or other). SlackMap serves slackliners; what others do with the data is not its concern. A rig is: rigged, until when, reported when. |
+| G11 | The owner must be able to edit **from any of their devices** (start on the laptop, end on the phone). |
 
 ---
 
@@ -29,18 +31,20 @@ The [data-access doc](/slackmap/docs/data-access.md) says *no safety-critical us
 
 Why A: most rigs will never be reported; "no live line here" shown to a pilot invites false confidence.
 
-**Status:** open
+**Status:** Decided by G10: community only; consumers are not SlackMap's concern. The no-safety-critical-use clause stays.
 
-## D2. How owner-only works without identity
+## D2. How the owner edits from any device without ISA knowing who
 
-G3 + G5: ISA can't know who the owner is, so the owner must hold something. It can be invisible.
+G3 + G5 + G11. "Edit with your own ISA account" would mean ISA checks which account owns the rig, so ISA would know: that breaks G3. The owner must hold something ISA can't tie to them, and it must travel between their devices.
 
-| Option | Effect |
-|---|---|
-| ⭐ A. A random **rig key** made by the phone when reporting, kept in the browser; ISA stores only its hash | User never sees it. Update / take down from that phone just works. Another phone can't. |
-| B. A as default, plus "move to another phone" as a QR | For crews or a second device. More UI. |
+| Option | Across devices | ISA can link? | User sees | Cost |
+|---|---|---|---|---|
+| ✗ A. Own ISA account owns the rig | yes | **yes** | nothing new | lowest; breaks G3 |
+| B. Rig key in the browser | **no**; manual QR to move it | no | nothing, until a second device | low |
+| ⭐ C. **Anonymous rigger passkey**: an anonymous identity with no email, only a passkey; created once by spending a blind pass | **yes**: passkeys sync through iCloud Keychain / Google Password Manager; a Windows laptop uses the phone by QR | no; its own rigs are linked to each other (one pseudonym) | Face ID / fingerprint prompt to report and edit | medium; standard WebAuthn |
+| D. Passkey-derived rig keys (WebAuthn PRF): the passkey yields a secret only the device sees; each rig's key is derived from it | yes | no, not even rigs to each other | same as C | medium-high; PRF support still uneven across browsers |
 
-Sub-question: phone lost or browser data cleared → the rig can't be ended by anyone and runs to its expiry. Acceptable?
+C is the burner done right: a second identity, but no account to sign in to with email and password, only the device's Face ID.
 
 **Status:** open
 
@@ -108,7 +112,6 @@ The pass is fetched while signed in; reporting itself needs no login.
 |---|---|
 | "Rigged", until when | yes |
 | Reported how long ago | yes ("reported 2 h ago") |
-| Marked for aircraft y/n | yes |
 | Who | **never** |
 
 **Status:** open
