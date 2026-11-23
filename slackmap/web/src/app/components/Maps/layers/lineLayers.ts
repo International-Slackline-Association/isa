@@ -19,6 +19,7 @@ type CommonOpts = {
 export const LineLayerIds = {
   linePoint: 'linePoint',
   lineLine: 'lineLine',
+  lineLineElevated: 'lineLineElevated',
   lineLabel: 'lineLabel',
   lineActiveHalo: 'lineActiveHalo',
   linePointActiveHalo: 'linePointActiveHalo',
@@ -37,11 +38,32 @@ export const linePointLayer = (opts: CommonOpts): CircleLayer => {
     },
   };
 };
-export const lineLineStringLayer = (opts: CommonOpts): LineLayer => {
+// With the line drawn in the air, the ground line stays faint as its shadow.
+export const lineLineStringLayer = (opts: CommonOpts & { shadow?: boolean }): LineLayer => {
   const lineLayer = genericLineLayer(opts);
+  const opacity = lineLayer.paint!['line-opacity'] as any[];
   return {
     ...lineLayer,
     id: LineLayerIds.lineLine,
+    paint: {
+      ...lineLayer.paint,
+      'line-color': appColors.lineStrokeColor,
+      ...(opts.shadow ? { 'line-opacity': [...opacity.slice(0, -2), 0.5, 0.3] as any } : {}),
+    },
+  };
+};
+
+// Straight between the anchors' heights above sea, which its features carry as `ea` and `eb`.
+export const lineLineElevatedLayer = (opts: CommonOpts): LineLayer => {
+  const lineLayer = genericLineLayer(opts);
+  return {
+    ...lineLayer,
+    id: LineLayerIds.lineLineElevated,
+    layout: {
+      ...lineLayer.layout,
+      'line-elevation-reference': 'sea',
+      'line-z-offset': ['interpolate', ['linear'], ['line-progress'], 0, ['get', 'ea'], 1, ['get', 'eb']],
+    },
     paint: {
       ...lineLayer.paint,
       'line-color': appColors.lineStrokeColor,

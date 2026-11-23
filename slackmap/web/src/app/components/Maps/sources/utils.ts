@@ -4,7 +4,11 @@ import { SlacklineMapSourceIds } from './slacklineMapSources';
 export const getSourceIdForType = (type: MapFeatureEntityType): string[] => {
   switch (type) {
     case 'line':
-      return [SlacklineMapSourceIds.lines, SlacklineMapSourceIds.linePoints];
+      return [
+        SlacklineMapSourceIds.lines,
+        SlacklineMapSourceIds.linesElevated,
+        SlacklineMapSourceIds.linePoints,
+      ];
     case 'spot':
       return [SlacklineMapSourceIds.spots, SlacklineMapSourceIds.spotPoints];
     case 'guide':

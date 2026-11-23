@@ -185,7 +185,8 @@ export const SlacklineMap = (props: Props) => {
         projection={projection}
         maxPitch={is3d ? 85 : 0}
         pitchWithRotate={is3d}
-        terrain={is3d ? { source: 'mapbox-dem', exaggeration: 1.2 } : undefined}
+        // At true height: lines in the air are drawn at the measured anchor heights.
+        terrain={is3d ? { source: 'mapbox-dem', exaggeration: 1 } : undefined}
       >
         {/* Always mounted: removing it before terrain lets go of it errors, and unused it loads no tiles. */}
         <Source
@@ -220,6 +221,7 @@ export const SlacklineMap = (props: Props) => {
 
         <SlacklineMapSources
           displayFeature={selectedDisplayFeature}
+          elevatedLines={is3d && tilted}
           filter={{
             country:
               props.activeSlacklineFeature?.type === 'country'

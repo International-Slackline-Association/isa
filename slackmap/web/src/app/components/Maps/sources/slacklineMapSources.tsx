@@ -24,11 +24,13 @@ import {
   activePointLayer,
   useActivePointPulse,
 } from '../layers/lineLayers';
+import { ElevatedLines } from './ElevatedLines';
 import { spotPointLayer, spotPolygonLayer, spotPolygonOutlineLayer } from '../layers/spotLayers';
 
 export const SlacklineMapSourceIds = {
   spots: 'spots',
   lines: 'lines',
+  linesElevated: 'linesElevated',
   guides: 'guides',
   linePoints: 'linePoints',
   spotPoints: 'spotPoints',
@@ -45,6 +47,7 @@ export const SlacklineMapSources = (props: {
     spotType?: SpotType;
     country?: string;
   };
+  elevatedLines?: boolean;
 }) => {
   const sessionReady = useSessionReady();
   const dataVersion = useMapDataVersion('features');
@@ -138,6 +141,7 @@ export const SlacklineMapSources = (props: {
           {...lineLineStringLayer({
             visible: options.lines,
             filter: lineFilterExpr,
+            shadow: props.elevatedLines,
           })}
         />
         <Layer
@@ -147,6 +151,13 @@ export const SlacklineMapSources = (props: {
           })}
         />
       </Source>
+      {/* Always mounted, so hover and selection have a source to set their state on. */}
+      <ElevatedLines
+        enabled={Boolean(props.elevatedLines)}
+        linesSourceId={SlacklineMapSourceIds.lines}
+        visible={options.lines}
+        filter={lineFilterExpr}
+      />
 
       <Source
         id={SlacklineMapSourceIds.guides}
