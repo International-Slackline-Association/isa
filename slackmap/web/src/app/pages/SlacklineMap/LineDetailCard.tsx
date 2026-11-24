@@ -9,6 +9,7 @@ import { FeatureContactField } from 'app/components/FeatureDetailFields/FeatureC
 import { FeatureHistoryField } from 'app/components/FeatureDetailFields/FeatureHistoryField';
 import { FeatureMenuActions } from 'app/components/FeatureDetailFields/FeatureMenuActions';
 import { FeatureDetailInfoField } from 'app/components/FeatureDetailFields/InfoField';
+import { PageItemCard, pageItemOf } from 'app/components/PageItemCard';
 import { FeatureMediaField } from 'app/components/FeatureDetailFields/MediaField';
 import { OutdatedInfoField } from 'app/components/FeatureDetailFields/OutdatedInfoField';
 import { FeatureDetailRestrictionField } from 'app/components/FeatureDetailFields/RestrictionField';
@@ -46,6 +47,9 @@ export const LineDetailCard = (props: Props) => {
   const cover =
     lineDetails &&
     imageUrlFromS3Key(lineDetails.images?.find((i) => i.isCover)?.s3Key || lineDetails.images?.[0]?.s3Key);
+
+  const pageItem = pageItemOf('line', props.lineId);
+  if (!lineDetails && pageItem) return <PageItemCard item={pageItem} />;
 
   return (
     <FeatureCard

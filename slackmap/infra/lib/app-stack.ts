@@ -370,6 +370,7 @@ export class AppStack extends Stack {
           '/country/*',
           '/communities/group/*',
           '/communities/country/*',
+          '/sitemap.xml',
         ].map((pattern) => [pattern, pageBehavior]),
       ),
       // The plain app when the API fails or has no page for a path, such as /line/x/edit.

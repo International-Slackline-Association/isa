@@ -18,6 +18,7 @@ import { ContributorAgreementDialog } from './components/ContributorAgreement';
 import { withErrorBoundry } from './components/ErrorBoundary';
 import { refillPasses } from './components/LineActivation/passes';
 import { MaintenancePage } from './components/MaintenancePage';
+import { PageHeadReset } from './components/PageItemCard';
 import { SignInReturn } from './signIn';
 
 const CreateGroupPage = lazy(() => import('./pages/Create/Group').then((m) => ({ default: m.CreateGroupPage })));
@@ -84,6 +85,7 @@ export function App() {
         <MaintenancePage />
       ) : (
         <BrowserRouter>
+          <PageHeadReset />
           <AppPanel>
             <Suspense fallback={null}>
               <SignInReturn>

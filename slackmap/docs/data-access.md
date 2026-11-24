@@ -9,6 +9,7 @@ description: "Why slackmap's map data and API sit behind a Cloudflare Turnstile 
 The map data is valuable: free for actual humans, not for scripters. Scripts were taking it into their own UIs and internal systems we never approved. What they already downloaded stays with them; this is about from now on. The goal is to make scraping very annoying, not impossible: a real browser or a paid solving service still gets the map file. If people still do it after this, further precautions come then.
 
 - **The API too.** Scripts swept every line's details through it, not only the map file.
+- **Text is public, geometry is not.** Every page and the sitemap listing them are open on purpose, so search engines can index SlackMap ([why](link-previews.md)): anyone can collect each item's name, figures, description and cover image. The protected value is the geometry.
 - **The single file stays.** The map loads all its data in one file so the UI works great. Protection sits on who may fetch it, not on what it holds. Rejected: rough coordinates in the file with exact lines loaded on zoom; it complicates the app.
 - **Turnstile, not AWS WAF.** slackmap's bill is minimal and WAF would multiply it; its affordable form is a check page, too annoying when most people visit once or twice a month.
 - **Turnstile, not a self-hosted check.** The repo is open source, so a check of our own is easy to replicate in a script.

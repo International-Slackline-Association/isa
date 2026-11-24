@@ -3,6 +3,7 @@ import type { APIGatewayProxyResult } from 'aws-lambda';
 
 import { s3 } from '../../../../core/aws/clients';
 import { db } from '../../../../core/db';
+import { getFromS3 } from '../../../../core/features/geojson';
 import { guideTypeLabel } from '../../../../core/features/guide';
 import { SlacklineType } from '../../../../core/types';
 import countriesJson from '../../../../../data/countryInfoDict.json';
@@ -10,7 +11,18 @@ import countriesJson from '../../../../../data/countryInfoDict.json';
 import { Request, Route } from '../../../http';
 import { imagesUrl, webUrl } from '../../../../core/domain';
 
-type Preview = { title: string; description: string; image?: string };
+// What the app's card shows before the API answers.
+type PageItem = {
+  type: 'line' | 'spot' | 'guide';
+  id: string;
+  name?: string;
+  kind: string;
+  length?: number;
+  height?: number;
+  description?: string;
+  image?: string;
+};
+type Preview = { title: string; description: string; image?: string; item?: PageItem };
 type Image = { s3Key: string; isCover?: boolean };
 
 const startMarker = '<!-- preview:start -->';
@@ -50,33 +62,49 @@ const linePreview = async (id: string): Promise<Preview | undefined> => {
   const line = await db.getLineDetails(id);
   if (!line) return undefined;
   const type = lineTypes[line.type] ?? 'Slackline';
+  const image = coverImage(line.images, line.anchorImages);
   return {
     title: line.name || type,
     description: withText(
       joined(type, line.length ? `${line.length} m` : undefined, countryName(line.country)),
       line.description,
     ),
-    image: coverImage(line.images, line.anchorImages),
+    image,
+    item: {
+      type: 'line',
+      id,
+      name: line.name,
+      kind: type,
+      length: line.length,
+      height: line.height,
+      description: line.description,
+      image: coverImage(line.images),
+    },
   };
 };
 
 const spotPreview = async (id: string): Promise<Preview | undefined> => {
   const spot = await db.getSpotDetails(id);
   if (!spot) return undefined;
+  const image = coverImage(spot.images);
   return {
     title: spot.name || 'Slackline spot',
     description: withText(joined('Slackline spot', countryName(spot.country)), spot.description),
-    image: coverImage(spot.images),
+    image,
+    item: { type: 'spot', id, name: spot.name, kind: 'Spot', description: spot.description, image },
   };
 };
 
 const guidePreview = async (id: string): Promise<Preview | undefined> => {
   const guide = await db.getGuideDetails(id);
   if (!guide) return undefined;
+  const image = coverImage(guide.images);
+  const kind = guideTypeLabel(guide.type);
   return {
-    title: guideTypeLabel(guide.type),
+    title: kind,
     description: withText(joined('Slackline guide', countryName(guide.country)), guide.description),
-    image: coverImage(guide.images),
+    image,
+    item: { type: 'guide', id, kind, description: guide.description, image },
   };
 };
 
@@ -114,6 +142,11 @@ const previewTags = (preview: Preview, url: string) => {
   const description = escape(preview.description);
   const image = escape(preview.image ?? `${webUrl}/images/ogimage.png`);
   return [
+    `<title>${title}</title>`,
+    `<link rel="canonical" href="${escape(url)}" />`,
+    ...(preview.item
+      ? [`<script type="application/json" id="page-item">${JSON.stringify(preview.item).replace(/</g, '\\u003c')}</script>`]
+      : []),
     `<meta name="description" content="${description}" />`,
     `<meta property="og:site_name" content="SlackMap" />`,
     `<meta property="og:url" content="${escape(url)}" />`,
@@ -158,7 +191,32 @@ const page =
     };
   };
 
+const sitemapSections = [
+  ['line', 'geojson/lines/points.geojson'],
+  ['spot', 'geojson/spots/points.geojson'],
+  ['guide', 'geojson/guides/points.geojson'],
+  ['country', 'geojson/countries/points.geojson'],
+  ['communities/group', 'geojson/groups/points.geojson'],
+  ['communities/country', 'geojson/groups/countries.geojson'],
+] as const;
+
+const sitemap: Route = async (): Promise<APIGatewayProxyResult> => {
+  const files = await Promise.all(sitemapSections.map(([, key]) => getFromS3(key)));
+  const urls = sitemapSections.flatMap(([path], i) => [
+    ...new Set(files[i].features.map((f) => `${webUrl}/${path}/${encodeURIComponent(String(f.properties?.id))}`)),
+  ]);
+  const body = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    `<url><loc>${webUrl}/</loc></url>`,
+    ...urls.map((url) => `<url><loc>${escape(url)}</loc></url>`),
+    '</urlset>',
+  ].join('\n');
+  return { statusCode: 200, headers: { 'Content-Type': 'application/xml; charset=utf-8' }, body };
+};
+
 export const pageRoutes: Record<string, Route> = {
+  'GET /page/sitemap.xml': sitemap,
   'GET /page/line/:id': page(linePreview),
   'GET /page/spot/:id': page(spotPreview),
   'GET /page/guide/:id': page(guidePreview),

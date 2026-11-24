@@ -478,7 +478,7 @@ const writeToS3 = async (key: string, geoJson: FeatureCollection) => {
   );
 };
 
-const getFromS3 = async (key: string) => {
+export const getFromS3 = async (key: string) => {
   const s3Image = await s3.send(
     new GetObjectCommand({
       Bucket: process.env.SLACKMAP_APPLICATION_DATA_S3_BUCKET,

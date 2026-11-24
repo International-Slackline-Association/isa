@@ -16,7 +16,7 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 - What is set up by hand and what other apps rely on: [manual operations](manual-operations.md)
 - Querying or adding to the table: [table design](table-design.md)
 - Working on the communities map or groups: [communities](communities.md)
-- Touching how shared links display, or the pages CloudFront sends to the API: [link previews](link-previews.md)
+- Touching how shared links display or what search engines see, or the pages CloudFront sends to the API: [link previews and search engines](link-previews.md)
 - Answering a usage question: [usage analytics](usage-analytics.md)
 - Touching the browser check, the session cookie or the terms: [data access](data-access.md)
 - Touching activations, passes or the activation routes: [activations](activations.md): an anonymous activation must never be tied to a person

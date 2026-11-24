@@ -9,6 +9,7 @@ import { GetGuideDetailsAPIResponse, guideApi } from 'app/api/guide-api';
 import { FeatureHistoryField } from 'app/components/FeatureDetailFields/FeatureHistoryField';
 import { FeatureMenuActions } from 'app/components/FeatureDetailFields/FeatureMenuActions';
 import { FeatureDetailInfoField } from 'app/components/FeatureDetailFields/InfoField';
+import { PageItemCard, pageItemOf } from 'app/components/PageItemCard';
 import { FeatureMediaField } from 'app/components/FeatureDetailFields/MediaField';
 import { OutdatedInfoField } from 'app/components/FeatureDetailFields/OutdatedInfoField';
 import { format } from 'date-fns';
@@ -47,6 +48,9 @@ export const GuideDetailCard = (props: Props) => {
   const cover =
     guideDetails &&
     imageUrlFromS3Key(guideDetails.images?.find((i) => i.isCover)?.s3Key || guideDetails.images?.[0]?.s3Key);
+
+  const pageItem = pageItemOf('guide', props.guideId);
+  if (!guideDetails && pageItem) return <PageItemCard item={pageItem} />;
 
   return (
     <FeatureCard

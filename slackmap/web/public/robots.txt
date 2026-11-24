@@ -2,3 +2,5 @@
 # https://slackmap.com/terms
 User-agent: *
 Allow: /
+
+Sitemap: https://slackmap.com/sitemap.xml
