@@ -111,7 +111,12 @@ const useInstall = () => {
   const [stepsOpen, setStepsOpen] = useState(false);
   return {
     available: !isDesktop && isTouch && way !== undefined,
-    install: () => (way?.kind === 'prompt' ? way.prompt() : setStepsOpen(true)),
+    install: () => {
+      if (way?.kind === 'prompt') return way.prompt();
+      // iPhone saves the address shown as the app's start page, so the app opens on the plain map.
+      window.history.replaceState(window.history.state, '', '/');
+      setStepsOpen(true);
+    },
     dialog: way?.kind === 'steps' && (
       <StepsDialog steps={way.steps} open={stepsOpen} onClose={() => setStepsOpen(false)} />
     ),

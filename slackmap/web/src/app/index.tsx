@@ -79,6 +79,8 @@ export function App() {
             height: '100%',
             width: '100%',
           },
+          // From iOS 26 the installed app colors its status bar from the page's background.
+          '@media (display-mode: standalone)': { body: { backgroundColor: '#000' } },
         }}
       />
       {import.meta.env.VITE_APP_MAINTENANCE_MODE === 'true' ? (
