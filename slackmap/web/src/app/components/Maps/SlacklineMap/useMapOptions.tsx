@@ -73,7 +73,6 @@ export const useMapOptions = () => {
 
   const count = (n?: number) => (n === undefined ? '' : ` ${n.toLocaleString()}`);
   const displayChips: { key: SelectedDisplayFeature; label: string; color?: string; hidden?: boolean }[] = [
-    { key: 'all', label: 'All' },
     { key: 'line', label: `Lines${count(stats?.lineCount)}`, color: appColors.lineStrokeColor },
     { key: 'spot', label: `Spots${count(stats?.spotCount)}`, color: appColors.spotFillColor },
     { key: 'guide', label: `Access guides${count(stats?.guideCount)}`, color: appColors.guideFeaturesColor },
@@ -118,7 +117,7 @@ export const useMapOptions = () => {
                 ) : undefined
               }
               onClick={() => {
-                setSelectedDisplayFeature(c.key);
+                setSelectedDisplayFeature(selected ? 'all' : c.key);
                 setSelectedType('none');
               }}
               sx={chipSx(selected, { '& .MuiChip-icon': { ml: 1 } })}

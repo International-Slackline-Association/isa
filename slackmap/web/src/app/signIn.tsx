@@ -25,7 +25,7 @@ export const signIn = (target: Partial<Return> = {}) => {
   signInWithRedirect();
 };
 
-const isReturningFromSignIn = (() => {
+export const isReturningFromSignIn = (() => {
   const params = new URLSearchParams(window.location.search);
   return params.has('code') && params.has('state');
 })();

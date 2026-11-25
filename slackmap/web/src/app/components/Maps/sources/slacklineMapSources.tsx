@@ -7,7 +7,7 @@ import { geoJsonURL } from 'app/api/constants';
 import { useMapDataVersion, versionedUrl } from 'app/api/geojson-data';
 
 import { SelectedDisplayFeature } from '../SlacklineMap/useMapOptions';
-import { countryPointLayer, countryPolygonOutlineLayer } from '../layers/countryLayers';
+import { countryDotLayer, countryPointLayer, countryPolygonOutlineLayer } from '../layers/countryLayers';
 import {
   guideLabelLayer,
   guideLineStringLayer,
@@ -286,7 +286,8 @@ export const SlacklineMapSources = (props: {
         generateId
         promoteId="id"
       >
-        <Layer {...countryPointLayer({ visible: true })} />
+        <Layer {...countryDotLayer()} />
+        <Layer {...countryPointLayer({ visible: true, fromDot: true })} />
       </Source>
 
       {filter?.country && (

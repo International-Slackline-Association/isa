@@ -28,6 +28,8 @@ export const ui = {
   backdrop: 'rgba(10, 20, 32, 0.45)',
 };
 
+export const safeArea = { bottom: 'env(safe-area-inset-bottom, 0px)' };
+
 export const radius = { field: 10, card: 16, pill: 999 };
 
 export const shadow = {

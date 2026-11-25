@@ -1,6 +1,6 @@
 import { appColors } from 'styles/theme/colors';
 
-import { LineLayer, SymbolLayer, genericSymbolLayer } from './common';
+import { CircleLayer, LineLayer, SymbolLayer, genericSymbolLayer } from './common';
 
 type CommonOpts = {
   visible?: boolean;
@@ -9,15 +9,30 @@ type CommonOpts = {
 
 export const CountryLayerIds = {
   countryPoint: 'countryPoint',
+  countryDot: 'countryDot',
   countryPolygonOutline: 'countryPolygonOutline',
 } as const;
 
-export const countryPointLayer = (opts: CommonOpts): SymbolLayer => {
+// Zoomed out, a country is hidden, then only a dot, so the countries do not cover the map; the flag fades in over it.
+// A fade, not a growing size: Mapbox sizes symbols per whole zoom level, so a steep size curve jumps
+// while the next level's tiles load.
+const dotUntilZoom = 2;
+const flagFromZoom = 5;
+
+export const countryPointLayer = (opts: CommonOpts & { fromDot?: boolean }): SymbolLayer => {
   const symbolLayer = genericSymbolLayer(opts);
+  const fadeIn = (opacity: any) =>
+    opts.fromDot ? ['interpolate', ['linear'], ['zoom'], dotUntilZoom, 0, flagFromZoom, opacity] : opacity;
 
   return {
     ...symbolLayer,
     id: CountryLayerIds.countryPoint,
+    ...(opts.fromDot && { minzoom: dotUntilZoom }),
+    paint: {
+      ...symbolLayer.paint,
+      'icon-opacity': fadeIn(symbolLayer.paint?.['icon-opacity']),
+      'text-opacity': fadeIn(1),
+    },
     layout: {
       ...symbolLayer.layout,
       'icon-image': 'slackmap-country-symbol',
@@ -40,6 +55,19 @@ export const countryPointLayer = (opts: CommonOpts): SymbolLayer => {
     },
   };
 };
+
+export const countryDotLayer = (): CircleLayer => ({
+  id: CountryLayerIds.countryDot,
+  type: 'circle',
+  minzoom: dotUntilZoom,
+  maxzoom: flagFromZoom,
+  paint: {
+    'circle-radius': 3,
+    // The flag icon's color.
+    'circle-color': '#1DDECE',
+    'circle-opacity': ['interpolate', ['linear'], ['zoom'], dotUntilZoom, 1, flagFromZoom, 0],
+  },
+});
 
 export const countryPolygonOutlineLayer = (): LineLayer => {
   return {

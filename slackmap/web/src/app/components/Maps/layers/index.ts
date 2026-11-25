@@ -22,6 +22,7 @@ export const cursorInteractableLayerIds = [
   GuideLayerIds.guideLabel,
   GuideLayerIds.guidePolygonOutline,
   CountryLayerIds.countryPoint,
+  CountryLayerIds.countryDot,
   SlacklineGroupsLayerIds.groupPoint,
 ];
 

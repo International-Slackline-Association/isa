@@ -3,6 +3,7 @@ import { appColors } from 'styles/theme/colors';
 import {
   CircleLayer,
   FillLayer,
+  activeMarkerSize,
   LineLayer,
   genericCircleLayer,
   genericFillLayer,
@@ -86,7 +87,7 @@ export const activeSpotPointHaloLayer = (opts: CommonOpts): CircleLayer => ({
   maxzoom: 13,
   filter: opts.filter,
   layout: { visibility: opts.visible ? 'visible' : 'none' },
-  paint: { 'circle-color': appColors.activeColor, 'circle-radius': 12, 'circle-opacity': 0.35 },
+  paint: { 'circle-color': appColors.activeColor, 'circle-radius': activeMarkerSize(12), 'circle-opacity': 0.35 },
 });
 
 export const activeSpotPointLayer = (opts: CommonOpts): CircleLayer => ({
@@ -97,8 +98,8 @@ export const activeSpotPointLayer = (opts: CommonOpts): CircleLayer => ({
   layout: { visibility: opts.visible ? 'visible' : 'none' },
   paint: {
     'circle-color': appColors.activeColor,
-    'circle-radius': 6,
+    'circle-radius': activeMarkerSize(6),
     'circle-stroke-color': '#fff',
-    'circle-stroke-width': 2,
+    'circle-stroke-width': activeMarkerSize(2),
   },
 });

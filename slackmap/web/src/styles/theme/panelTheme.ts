@@ -43,8 +43,12 @@ export const mapControlsSx = {
   '& .mapboxgl-ctrl-group': { borderRadius: '12px', overflow: 'hidden' },
   '& .mapboxgl-ctrl-group button': { width: 34, height: 34 },
   '& .mapboxgl-ctrl-group button + button': { borderTopColor: ui.line },
+  '& .mapboxgl-ctrl-geolocate:disabled': { pointerEvents: 'none' },
+  // On phones the navigation group has no buttons until the 3D view adds the compass.
+  '& .mapboxgl-ctrl-group:empty': { display: 'none' },
   '& div.mapboxgl-ctrl-geocoder': { borderRadius: `${radius.pill}px`, fontFamily: theme.typography.fontFamily },
-  '& input.mapboxgl-ctrl-geocoder--input': { color: ui.text, height: 38, fontSize: 14 },
+  // Under 16px, iPhone zooms the page in when the field gets focus.
+  '& input.mapboxgl-ctrl-geocoder--input': { color: ui.text, height: 38, fontSize: 14, '@media (pointer: coarse)': { fontSize: 16 } },
   '& .mapboxgl-ctrl-geocoder--icon': { fill: ui.muted },
   '& .mapboxgl-ctrl-geocoder .suggestions': { borderRadius: '14px', boxShadow: shadow.float },
 };

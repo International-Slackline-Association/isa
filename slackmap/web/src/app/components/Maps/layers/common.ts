@@ -56,7 +56,7 @@ export const genericCircleLayer = (opts: { big?: boolean } & CommonOpts): Circle
           opts.big ? 7 : 4,
           ['boolean', ['feature-state', 'isSelected'], false],
           opts.big ? 8 : 5,
-          opts.big ? 1 : 0.7,
+          opts.big ? 1.6 : 1.2,
         ],
         7,
         [
@@ -208,4 +208,20 @@ export const genericLabelLayer = (opts: CommonOpts): SymbolLayer => {
       'icon-text-fit-padding': [8, 8, 8, 8],
     },
   };
+};
+
+// Active markers are smaller zoomed out, so they do not outweigh the shrunk countries.
+const activeShrink = { fromZoom: 2, fullZoom: 5, scale: 0.7 };
+export const activeMarkerSize = (size: number): any => [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  activeShrink.fromZoom,
+  size * activeShrink.scale,
+  activeShrink.fullZoom,
+  size,
+];
+export const activeMarkerScaleAt = (zoom: number) => {
+  const progress = (zoom - activeShrink.fromZoom) / (activeShrink.fullZoom - activeShrink.fromZoom);
+  return activeShrink.scale + (1 - activeShrink.scale) * Math.min(1, Math.max(0, progress));
 };

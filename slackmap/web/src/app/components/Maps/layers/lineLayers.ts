@@ -6,6 +6,8 @@ import { SpotLayerIds } from './spotLayers';
 
 import {
   CircleLayer,
+  activeMarkerScaleAt,
+  activeMarkerSize,
   LineLayer,
   SymbolLayer,
   genericCircleLayer,
@@ -104,7 +106,7 @@ export const activePointHaloLayer = (opts: CommonOpts): CircleLayer => ({
   filter: opts.filter,
   layout: { visibility: opts.visible ? 'visible' : 'none' },
   // Radius and opacity are animated into a pulse while the map shows it.
-  paint: { 'circle-color': activeColor, 'circle-radius': 12, 'circle-opacity': 0.35 },
+  paint: { 'circle-color': activeColor, 'circle-radius': activeMarkerSize(12), 'circle-opacity': 0.35 },
 });
 
 // Drawn over the line's plain point.
@@ -116,9 +118,9 @@ export const activePointLayer = (opts: CommonOpts): CircleLayer => ({
   layout: { visibility: opts.visible ? 'visible' : 'none' },
   paint: {
     'circle-color': activeColor,
-    'circle-radius': 6,
+    'circle-radius': activeMarkerSize(6),
     'circle-stroke-color': '#fff',
-    'circle-stroke-width': 2,
+    'circle-stroke-width': activeMarkerSize(2),
   },
 });
 
@@ -130,10 +132,11 @@ export const useActivePointPulse = (map: MapboxMap | undefined) => {
     const markers = [LineLayerIds.linePointActive, SpotLayerIds.spotPointActive];
     const tick = (time: number) => {
       const t = (time % 1600) / 1600;
+      const scale = activeMarkerScaleAt(map.getZoom());
       // Mid style change a halo layer is gone, and a paint change on it throws.
       for (const halo of halos.filter((id) => map.getLayer(id))) {
-        map.setPaintProperty(halo, 'circle-radius', 8 + t * 18);
-        map.setPaintProperty(halo, 'circle-opacity', 0.45 * (1 - t));
+        map.setPaintProperty(halo, 'circle-radius', (8 + t * 22) * scale);
+        map.setPaintProperty(halo, 'circle-opacity', 0.6 * (1 - t));
       }
       frame = requestAnimationFrame(tick);
     };

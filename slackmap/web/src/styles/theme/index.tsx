@@ -167,6 +167,8 @@ export const theme: Theme = createTheme({
           borderRadius: radius.field,
           backgroundColor: ui.fill,
           fontSize: 14,
+          // Under 16px, iPhone zooms the page in when a field gets focus.
+          '@media (pointer: coarse)': { fontSize: 16 },
           transition: 'background-color 120ms, box-shadow 120ms',
           '& .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent', borderWidth: 1.5 },
           '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },

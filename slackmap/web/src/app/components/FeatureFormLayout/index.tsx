@@ -3,7 +3,7 @@ import React from 'react';
 import { Box } from '@mui/material';
 
 import { mapControlsSx } from 'styles/theme/panelTheme';
-import { radius, shadow } from 'styles/theme/ui';
+import { radius, safeArea, shadow } from 'styles/theme/ui';
 
 // The frame of every create and edit page: the drawing map full size, the form floating over its right
 // side on desktop and over its lower half on phones.
@@ -34,6 +34,8 @@ export const FeatureFormLayout = (props: { map: React.ReactNode; form: React.Rea
         left: { xs: 0, lg: 'auto' },
         width: { lg: 'calc(var(--card-inset) - 12px)' },
         borderRadius: { xs: '18px 18px 0 0', lg: `${radius.card}px` },
+        pb: { xs: safeArea.bottom, lg: 0 },
+        bgcolor: 'background.paper',
       }}
     >
       {props.form}

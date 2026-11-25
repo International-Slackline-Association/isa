@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router';
 
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -21,9 +21,10 @@ import {
 
 import { getActivePoints, useMapDataVersion } from 'app/api/geojson-data';
 import { useInfoDialog } from 'app/components/Dialogs/useInfoDialog';
+import { InstallButton, InstallHint } from 'app/components/InstallApp';
 import { useSessionReady } from 'app/session';
 import { panelTheme } from 'styles/theme/panelTheme';
-import { radius, shadow, ui } from 'styles/theme/ui';
+import { radius, safeArea, shadow, ui } from 'styles/theme/ui';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { useWindowHeight } from 'utils/hooks/useWindowHeight';
 
@@ -37,6 +38,7 @@ import { PanelInsetContext } from './panelInset';
 const expandedWidth = 268;
 const collapsedWidth = 52;
 const inset = 12;
+const barHeight = 56;
 
 
 
@@ -145,6 +147,7 @@ const PanelContent = (props: { onNavigate?: () => void; onCollapse?: () => void 
         <Link component={RouterLink} to="/" onClick={props.onNavigate} sx={{ display: 'flex' }}>
           <img src="/images/slackmapLogoOnBlue.svg" alt="SlackMap" style={{ height: 26 }} />
         </Link>
+        <InstallButton />
         {props.onCollapse && (
           <Tooltip title="Collapse">
             <IconButton size="small" onClick={props.onCollapse}>
@@ -226,21 +229,31 @@ const CollapsedRail = (props: { onExpand: () => void; activeCount: number }) => 
 const MobileSheet = (props: { activeCount: number }) => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const swipeStartY = useRef(0);
   const tab = tabOfPath(location.pathname);
+
+  const barShown = isLandingPath(location.pathname) || location.pathname === '/terms';
 
   useEffect(() => setOpen(false), [location.pathname]);
 
   return (
     <>
-      {(isLandingPath(location.pathname) || location.pathname === '/terms') && (
+      {/* Held until the person is back on the map, so it never covers the form or card they signed in for. */}
+      {barShown && <InstallHint bottom={`calc(${barHeight + 12}px + ${safeArea.bottom})`} />}
+      {barShown && (
         <ButtonBase
           onClick={() => setOpen(true)}
+          // MUI's swipe area swallows taps on iPhone, so the bar reads a swipe up itself.
+          onTouchStart={(e) => (swipeStartY.current = e.touches[0].clientY)}
+          onTouchEnd={(e) => {
+            if (swipeStartY.current - e.changedTouches[0].clientY > 24) setOpen(true);
+          }}
           sx={{
             position: 'fixed',
             left: 0,
             right: 0,
             bottom: 0,
-            height: 56,
+            height: `calc(${barHeight}px + ${safeArea.bottom})`,
             zIndex: 5,
             px: 2,
             pt: 1.25,
@@ -279,7 +292,9 @@ const MobileSheet = (props: { activeCount: number }) => {
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
         disableSwipeToOpen
-        slotProps={{ paper: { sx: { height: '85vh', borderTopLeftRadius: 18, borderTopRightRadius: 18 } } }}
+        slotProps={{
+          paper: { sx: { height: '85vh', pb: safeArea.bottom, borderTopLeftRadius: 18, borderTopRightRadius: 18 } },
+        }}
       >
         <Box sx={{ width: 36, height: 4, borderRadius: 2, bgcolor: ui.onBlueFillHover, mx: 'auto', mt: 1 }} />
         <PanelContent onNavigate={() => setOpen(false)} />

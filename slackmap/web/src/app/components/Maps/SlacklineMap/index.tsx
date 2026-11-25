@@ -1,7 +1,5 @@
 import { Fragment, useRef, useState } from 'react';
 import {
-  AttributionControl,
-  GeolocateControl,
   MapGeoJSONFeature,
   Source,
   NavigationControl,
@@ -16,6 +14,7 @@ import { Box } from '@mui/material';
 import type { FeatureCollection } from 'geojson';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+import { GeolocateButton } from '../Components/GeolocateButton';
 import { MapTermsNote } from '../Components/TermsNote';
 import { MapImage } from '../Components/MapImage';
 import { MapDataLoadingIndicator } from '../Components/MapDataLoadingIndicator';
@@ -37,6 +36,8 @@ import { TILT_MIN_PITCH, TiltControl } from './TiltControl';
 import { TopoLayers } from './TopoLayers';
 import { useMapOptions } from './useMapOptions';
 import { mapControlsSx } from 'styles/theme/panelTheme';
+import { safeArea } from 'styles/theme/ui';
+import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 
 interface Props {
   onMapMoveEnd?: (event: ViewStateChangeEvent) => void;
@@ -62,6 +63,7 @@ export const SlacklineMap = (props: Props) => {
   } =
     useMapOptions();
 
+  const { isDesktop } = useMediaQuery();
   const { mapStyle, projection } = useMapStyle(zoomLevel, {
     style: selectedMapStyle,
   });
@@ -132,16 +134,14 @@ export const SlacklineMap = (props: Props) => {
         height: '100%',
         '& .mapboxgl-ctrl-top-left': {
           right: { xs: 0, lg: 'auto' },
+          // Above the filter chips, so the search results open over them.
+          zIndex: 4,
         },
         '& .mapboxgl-ctrl-geocoder': {
           marginTop: '12px',
           marginLeft: 'calc(var(--panel-inset, 0px) + 12px)',
           width: { xs: 'calc(100vw - 24px)', lg: '300px' },
           maxWidth: 'none',
-        },
-        '& .mapboxgl-ctrl-geocoder--input': {
-          height: '38px',
-          fontSize: { xs: '16px', lg: '14px' },
         },
         '& .mapboxgl-ctrl-geocoder--icon-search': {
           height: '16px',
@@ -152,10 +152,10 @@ export const SlacklineMap = (props: Props) => {
         '& .mapboxgl-ctrl-logo': {
           display: 'none',
         },
-        // On phones the panel's bar covers the bottom 56px.
-        '& .mapboxgl-ctrl-bottom-left': { marginBottom: { xs: '56px', lg: 0 }, marginLeft: 'var(--panel-inset, 0px)' },
+        // On phones the panel's bar covers the bottom.
+        '& .mapboxgl-ctrl-bottom-left': { marginBottom: { xs: `calc(56px + ${safeArea.bottom})`, lg: 0 }, marginLeft: 'var(--panel-inset, 0px)' },
         // and the add button sits above it.
-        '& .mapboxgl-ctrl-bottom-right': { marginBottom: { xs: '140px', lg: 0 }, marginRight: 'var(--card-inset, 0px)' },
+        '& .mapboxgl-ctrl-bottom-right': { marginBottom: { xs: `calc(140px + ${safeArea.bottom})`, lg: 0 }, marginRight: 'var(--card-inset, 0px)' },
       }}
     >
       {!isMapLoaded && <MapLoadingPlaceholder pad={Boolean(props.activeSlacklineFeature)} />}
@@ -164,7 +164,7 @@ export const SlacklineMap = (props: Props) => {
         isMapLoaded={isMapLoaded}
         sourceId={SlacklineMapSourceIds.linePoints}
       />
-      <MapTermsNote />
+      <MapTermsNote satellite={mapStyle === mapStyles.satelliteStreets} />
       {FilterChips}
       {MapStyleMenu}
       <ReactMapGL
@@ -197,12 +197,13 @@ export const SlacklineMap = (props: Props) => {
           maxzoom={14}
         />
         {is3d && tilted && <TopoLayers />}
-        <GeolocateControl position="bottom-right" />
-        <AttributionControl compact customAttribution="International Slackline Association" />
+        <GeolocateButton />
         {/* The navigation control reads its options only when added; remounting the group keeps the stack's order. */}
-        <Fragment key={is3d ? '3d' : '2d'}>
+        <Fragment key={`${is3d ? '3d' : '2d'}-${isDesktop}`}>
           <NavigationControl
             position="bottom-right"
+            // Phones pinch to zoom; without the buttons the stack fits above an open card.
+            showZoom={isDesktop}
             showCompass={is3d}
             visualizePitch={is3d}
           />

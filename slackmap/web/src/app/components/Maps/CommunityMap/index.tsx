@@ -1,8 +1,6 @@
 import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
-  AttributionControl,
-  GeolocateControl,
   MapGeoJSONFeature,
   NavigationControl,
   Map as ReactMapGL,
@@ -16,6 +14,7 @@ import { mapControlsSx } from 'styles/theme/panelTheme';
 
 import type { FeatureCollection } from 'geojson';
 
+import { GeolocateButton } from '../Components/GeolocateButton';
 import { MapTermsNote } from '../Components/TermsNote';
 import { MapImage } from '../Components/MapImage';
 import { MapDataLoadingIndicator } from '../Components/MapDataLoadingIndicator';
@@ -33,6 +32,7 @@ import { CountryLayerIds } from '../layers/countryLayers';
 import { SlacklineGroupsLayerIds } from '../layers/slacklineGroupsLayer';
 import { CommunityMapSourceIds, CommunityMapSources } from '../sources/commnunityMapSources';
 import { MapFeatureEntity } from '../types';
+import { safeArea } from 'styles/theme/ui';
 
 interface Props {
   onSelectedFeatureChange?: (feature?: MapGeoJSONFeature) => void;
@@ -97,10 +97,10 @@ export const CommunityMap = (props: Props) => {
         '& .mapboxgl-ctrl-logo': {
           display: 'none',
         },
-        // On phones the panel's bar covers the bottom 56px.
-        '& .mapboxgl-ctrl-bottom-left': { marginBottom: { xs: '56px', lg: 0 }, marginLeft: 'var(--panel-inset, 0px)' },
+        // On phones the panel's bar covers the bottom.
+        '& .mapboxgl-ctrl-bottom-left': { marginBottom: { xs: `calc(56px + ${safeArea.bottom})`, lg: 0 }, marginLeft: 'var(--panel-inset, 0px)' },
         // and the add button sits above it.
-        '& .mapboxgl-ctrl-bottom-right': { marginBottom: { xs: '140px', lg: 0 }, marginRight: 'var(--card-inset, 0px)' },
+        '& .mapboxgl-ctrl-bottom-right': { marginBottom: { xs: `calc(140px + ${safeArea.bottom})`, lg: 0 }, marginRight: 'var(--card-inset, 0px)' },
       }}
     >
       {!isMapLoaded && <MapLoadingPlaceholder pad={Boolean(props.activeCommunityFeature)} />}
@@ -129,8 +129,7 @@ export const CommunityMap = (props: Props) => {
           dispatch(appActions.updateLastMapLocation({ longitude, latitude, zoom }));
         }}
       >
-        <GeolocateControl position="bottom-right" />
-        <AttributionControl compact customAttribution="International Slackline Association" />
+        <GeolocateButton />
         <NavigationControl position="bottom-right" showCompass={false} />
         <MapImage name={'slackmap-country-symbol'} url={'/images/country-symbol.png'} />
         <CommunityMapSources

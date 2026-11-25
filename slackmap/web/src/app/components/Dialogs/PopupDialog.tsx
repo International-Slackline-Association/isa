@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Box, Dialog, IconButton, Stack, ThemeProvider, Typography } from '@mui/material';
 
 import { theme } from 'styles/theme';
-import { ui } from 'styles/theme/ui';
+import { safeArea, ui } from 'styles/theme/ui';
 
 export const PopupDialog = (props: {
   open: boolean;
@@ -36,6 +36,7 @@ export const PopupDialog = (props: {
             maxWidth: { xs: '100%', lg: 'calc(100% - 32px)' },
             maxHeight: { xs: '92%', lg: 'calc(100% - 32px)' },
             borderRadius: { xs: '18px 18px 0 0', lg: '16px' },
+            pb: { xs: safeArea.bottom, lg: 0 },
           },
         } as object,
       }}

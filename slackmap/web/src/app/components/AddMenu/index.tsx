@@ -12,7 +12,7 @@ import { useSignInDialog } from 'app/components/Dialogs/useSignInDialog';
 import { SlacklineFeatureIcon } from 'app/components/Icons/SlacklineFeatureIcon';
 import { mapUrlSearchParams } from 'app/components/Maps/mapUtils';
 import { selectIsUserSignedIn, selectLastMapLocation } from 'app/slices/app/selectors';
-import { shadow, ui } from 'styles/theme/ui';
+import { safeArea, shadow, ui } from 'styles/theme/ui';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 
 const items = [
@@ -74,7 +74,7 @@ export const AddMenu = () => {
           color="primary"
           aria-label="Add"
           onClick={(e) => setAnchor(e.currentTarget)}
-          sx={{ position: 'absolute', bottom: 72, right: 12, zIndex: 3 }}
+          sx={{ position: 'absolute', bottom: `calc(72px + ${safeArea.bottom})`, right: 12, zIndex: 3 }}
         >
           <AddIcon />
         </Fab>

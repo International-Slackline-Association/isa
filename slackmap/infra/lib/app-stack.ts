@@ -385,15 +385,17 @@ export class AppStack extends Stack {
     webBucket.grantRead(apiFunction);
 
     const webDist = path.join(projectRoot, 'web/dist');
+    // Fixed names that browsers and installed apps read; a year in the cache would keep them on an old copy.
+    const unhashed = ['index.html', 'manifest.json', 'favicon.ico', 'apple-touch-icon.png', 'icon-*.png'];
     const webAssets = new s3deploy.BucketDeployment(this, 'WebAssets', {
-      sources: [s3deploy.Source.asset(webDist, { exclude: ['index.html'] })],
+      sources: [s3deploy.Source.asset(webDist, { exclude: unhashed })],
       destinationBucket: webBucket,
-      exclude: ['index.html'],
+      exclude: unhashed,
       cacheControl: [s3deploy.CacheControl.fromString('public, max-age=31536000')],
       memoryLimit: 1024,
     });
     const webIndex = new s3deploy.BucketDeployment(this, 'WebIndex', {
-      sources: [s3deploy.Source.asset(webDist, { exclude: ['*', '!index.html'] })],
+      sources: [s3deploy.Source.asset(webDist, { exclude: ['*', ...unhashed.map((name) => `!${name}`)] })],
       destinationBucket: webBucket,
       prune: false,
       cacheControl: [s3deploy.CacheControl.fromString('no-cache, no-store, must-revalidate')],

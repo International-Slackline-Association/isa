@@ -15,7 +15,7 @@ import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { CommunityCountryDetailCard } from './CommunityCountryDetailCard';
 import { SlacklineGroupDetailCard } from './SlacklineGroupDetailCard';
 import { useActiveCommunityFeature } from './useCommunityFeature';
-import { radius, shadow } from 'styles/theme/ui';
+import { radius, safeArea, shadow } from 'styles/theme/ui';
 
 export function CommunitiesPage() {
   const navigate = useNavigate();
@@ -115,6 +115,8 @@ export function CommunitiesPage() {
             boxShadow: shadow.float,
             overflow: 'hidden',
             zIndex: 4,
+            pb: isDesktop ? 0 : safeArea.bottom,
+            bgcolor: 'background.paper',
           }}
         >
           {activeFeature.type === 'communityCountry' && (

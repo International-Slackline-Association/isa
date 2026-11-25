@@ -24,7 +24,7 @@ import { GuideDetailCard } from './GuideDetailCard';
 import { LineDetailCard } from './LineDetailCard';
 import { SpotDetailCard } from './SpotDetailCard';
 import { useActiveSlacklineFeature } from './useActiveFeature';
-import { radius, shadow } from 'styles/theme/ui';
+import { radius, safeArea, shadow } from 'styles/theme/ui';
 
 const featureGeoJsonDict: { [key: string]: FeatureCollection } = {};
 
@@ -204,6 +204,8 @@ export function SlacklineMapPage() {
             boxShadow: shadow.float,
             overflow: 'hidden',
             zIndex: 4,
+            pb: isDesktop ? 0 : safeArea.bottom,
+            bgcolor: 'background.paper',
           }}
         >
           {lastActiveFeature?.type === 'line' && (

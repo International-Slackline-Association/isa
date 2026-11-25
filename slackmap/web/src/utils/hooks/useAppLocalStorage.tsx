@@ -5,6 +5,7 @@ interface AppLocalStorage {
   'tutorial.createLineSeen': boolean;
   'mapSettings.mapStyle': 'default' | 'satellite' | 'outdoors' | 'streets';
   'activity.lastSeenChangelogDate': string;
+  'install.hintSeen': boolean;
 }
 
 const keyPrefix = 'app.';
