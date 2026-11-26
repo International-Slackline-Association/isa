@@ -60,21 +60,33 @@ export const startInputBounds = () => ({
   max: format(addDays(new Date(), maxActivationDays), 'yyyy-MM-dd'),
 });
 
-export const formatDay = (seconds: number) => {
-  const days = Math.round((startOfDay(new Date(seconds * 1000)) - startOfDay(new Date())) / day);
-  if (days === 0) return 'today';
-  if (days === 1) return 'tomorrow';
-  return format(new Date(seconds * 1000), 'EEE d MMM');
+// A day without a chosen hour starts at 00:00 and ends at 23:59; any other time is a chosen whole hour.
+export type Bound = 'start' | 'end';
+const dayDefault = (date: Date, bound: Bound) => (bound === 'start' ? startOfDay(date) : endOfDay(date));
+
+export const hourOf = (seconds: number, bound: Bound) => {
+  const date = new Date(seconds * 1000);
+  return seconds === dayDefault(date, bound) ? undefined : date.getHours();
 };
 
-export const formatUntil = (until: number) => {
-  const date = new Date(until * 1000);
-  const days = Math.round((endOfDay(date) - endOfDay(new Date())) / day);
-  const time = format(date, 'HH:mm');
-  if (days === 0) return `today, ${time}`;
-  if (days === 1) return `tomorrow, ${time}`;
-  return `${format(date, 'EEE d MMM')}, ${time}`;
+export const atHour = (seconds: number, bound: Bound, hour?: number) => {
+  const date = new Date(seconds * 1000);
+  if (hour === undefined) return dayDefault(date, bound);
+  date.setHours(hour, 0, 0, 0);
+  return Math.floor(date.getTime() / 1000);
 };
+
+export const sameDay = (a?: number, b?: number) =>
+  a === b || (a !== undefined && b !== undefined && new Date(a * 1000).toDateString() === new Date(b * 1000).toDateString());
+
+const formatMoment = (seconds: number, bound: Bound) => {
+  const date = new Date(seconds * 1000);
+  const days = Math.round((startOfDay(date) - startOfDay(new Date())) / day);
+  const dayText = days === 0 ? 'today' : days === 1 ? 'tomorrow' : format(date, 'EEE d MMM');
+  return hourOf(seconds, bound) === undefined ? dayText : `${dayText}, ${format(date, 'HH:mm')}`;
+};
+export const formatStart = (from: number) => formatMoment(from, 'start');
+export const formatUntil = (until: number) => formatMoment(until, 'end');
 
 export const formatActivatedAgo = (activatedAt: number) => {
   const hours = Math.floor((Date.now() / 1000 - activatedAt) / 3600);
@@ -83,27 +95,5 @@ export const formatActivatedAgo = (activatedAt: number) => {
   return `${Math.floor(hours / 24)} d ago`;
 };
 
-export const expiresWithinADay = (until: number) => until - Date.now() / 1000 < day;
-
-export const calendarFile = (lineName: string, until: number, manageLink: string) => {
-  const remindAt = Math.max(until - day, Math.floor(Date.now() / 1000) + 3600);
-  const stamp = (seconds: number) =>
-    new Date(seconds * 1000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-  const escape = (text: string) => text.replace(/[\\;,]/g, (c) => `\\${c}`);
-  const ics = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//SlackMap//Activation reminder//EN',
-    'BEGIN:VEVENT',
-    `UID:${crypto.randomUUID()}@slackmap`,
-    `DTSTAMP:${stamp(Math.floor(Date.now() / 1000))}`,
-    `DTSTART:${stamp(remindAt)}`,
-    `DTEND:${stamp(remindAt + 900)}`,
-    `SUMMARY:${escape(`${lineName} activation ends ${formatUntil(until)}`)}`,
-    `DESCRIPTION:${escape(`Still up? Extend it, or deactivate it: ${manageLink}`)}`,
-    `URL:${manageLink}`,
-    'END:VEVENT',
-    'END:VCALENDAR',
-  ].join('\r\n');
-  return new Blob([ics], { type: 'text/calendar' });
-};
+// A short activation gets no "still up?" nudge; it would show from the start.
+export const nudgeToExtend = (from: number, until: number) => until - from >= day && until - Date.now() / 1000 < day;

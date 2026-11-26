@@ -244,24 +244,11 @@ const EndSlide = () => (
     </g>
     <Arrow x={140} y={64} w={30} />
     <g opacity={0.4}>
-      <path d="M190 46 L270 62" stroke={C.red} strokeWidth={4} strokeLinecap="round" strokeDasharray="2 7" />
+      <path d="M190 58 L270 74" stroke={C.red} strokeWidth={4} strokeLinecap="round" strokeDasharray="2 7" />
     </g>
-    <text x={230} y={38} textAnchor="middle" fontFamily="Barlow, sans-serif" fontWeight={700} fontSize={12} fill={C.soft}>
+    <text x={230} y={50} textAnchor="middle" fontFamily="Barlow, sans-serif" fontWeight={700} fontSize={12} fill={C.soft}>
       ends by itself
     </text>
-    <g transform="translate(196 78)">
-      <rect width={78} height={34} rx={10} fill={C.card} stroke={C.green} strokeWidth={1.5} />
-      <g transform="translate(8 9)">
-        <rect width={17} height={16} rx={3} fill="#fff" stroke={C.green} strokeWidth={1.5} />
-        <rect width={17} height={5} rx={2} fill={C.green} />
-      </g>
-      <text x={32} y={16} fontFamily="Barlow, sans-serif" fontWeight={700} fontSize={10.5} fill={C.soft}>
-        reminder
-      </text>
-      <text x={32} y={28} fontFamily="Barlow, sans-serif" fontSize={10} fill={C.dim}>
-        on your phone
-      </text>
-    </g>
   </SlideSvg>
 );
 
@@ -304,7 +291,7 @@ export const slides: {
     drawing: <ActiveSlide />,
     text: (
       <>
-        Activating says: <b>this line or spot is rigged</b>, from now or a day you pick, until the day you pick.
+        Activating says: <b>this line or spot is rigged</b>, from now or a day you pick, until the day you pick, a time if you like.
       </>
     ),
   },
@@ -348,7 +335,7 @@ export const slides: {
     drawing: <EndSlide />,
     text: (
       <>
-        It <b>ends by itself</b> on its day, 14 days at most. Want a nudge? Add it to your calendar; SlackMap sends nothing.
+        It <b>ends by itself</b> at the end you picked, 14 days at most; SlackMap sends nothing.
       </>
     ),
   },
