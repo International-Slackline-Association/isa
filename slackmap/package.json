@@ -10,7 +10,7 @@
     "deploy": "pnpm run build && pnpm --filter slackmap-infra exec cdk deploy --profile isa-admin"
   },
   "private": true,
-  "license": "GPL-3.0",
+  "license": "AGPL-3.0-only",
   "packageManager": "pnpm@12.16.1",
   "engines": {
     "node": ">=24"
