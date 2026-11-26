@@ -1,7 +1,7 @@
 ---
 type: reference
 title: slackmap manual operations
-description: "What slackmap depends on that CDK does not manage, per stage: the slackmap.com and test.slackmap.com certificates, Cloudflare records and the Turnstile widget, SSM parameters (Mapbox tokens, the isa-users client secret, the Turnstile secret, the session signing key, each stage's pass signing key and the origin secret included), the pre-migration backup, the ISA account that administers groups, and the names other apps use."
+description: "What slackmap depends on that CDK does not manage, per stage: the slackmap.com and test.slackmap.com certificates, Cloudflare records and the Turnstile widget, SSM parameters (Mapbox tokens, the isa-users client secret, the Turnstile secret, the session signing key, each stage's pass signing key and the origin secret included), the on-demand backup, the ISA account that administers groups, and the names other apps use."
 ---
 
 # Manual operations
@@ -21,7 +21,7 @@ Not managed by CDK. Every `slackmap-*` parameter serves both stages, except the 
 | SSM `slackmap-origin-secret` | Parameter Store | Random value CloudFront sends to the API; `dev` sends it too, to get a session without the browser check. |
 | SSM `slackmap-geonames-api-username` | Parameter Store | GeoNames account for country lookups. |
 | SSM `slackmap-isa-users-client-secret` | Parameter Store | Secret of slackmap's client for the isa-users API; its client id is in [config](/slackmap/infra/lib/config.ts). |
-| Backup `slackmap-prod-before-cdk-cutover` | DynamoDB backups | On-demand backup of the map data as it was before the move to CDK; the source table is deleted. |
+| Backup `slackmap-prod-before-cdk-cutover` | DynamoDB backups | On-demand backup of the map data. |
 | ISA account `slackmap@slacklineinternational.org` | isa-users | Holds owner rights on every group; its ISA id is in [config](/slackmap/infra/lib/config.ts). |
 | GitHub label `errors:slackmap` | the monorepo's issues | Created once by hand; the error digest workflow finds its issues by it. |
 | SSM `slackmap-mapbox-tokens` | Parameter Store | JSON `{prod, dev}` of the Mapbox public tokens the web build and `dev` read; `prod` is restricted to slackmap.com and test.slackmap.com in the Mapbox console and serves both stages, `dev` allows localhost. |

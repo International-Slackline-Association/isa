@@ -96,7 +96,8 @@ export const TermsPage = () => (
           research? Talk to us before you script anything. Write to{' '}
           <Link href={`mailto:${contact}`}>{contact}</Link> with what you are building and which data you
           need. ISA looks at every request case by case and is happy to grant access to projects that
-          serve the slackline community.
+          serve the slackline community. How it works is on the{' '}
+          <Link href="/partner-integration">partner access page</Link>.
         </P>
       </Section>
 

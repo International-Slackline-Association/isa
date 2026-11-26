@@ -30,6 +30,7 @@ const CreateSpotPage = lazy(() => import('./pages/Create/Spot').then((m) => ({ d
 const GuideEditPage = lazy(() => import('./pages/Guide/GuideEditPage').then((m) => ({ default: m.GuideEditPage })));
 const LineEditPage = lazy(() => import('./pages/Line/LineEditPage').then((m) => ({ default: m.LineEditPage })));
 const SlacklineMapPage = lazy(() => import('./pages/SlacklineMap').then((m) => ({ default: m.SlacklineMapPage })));
+const PartnersPage = lazy(() => import('./pages/Partners').then((m) => ({ default: m.PartnersPage })));
 const TermsPage = lazy(() => import('./pages/Terms').then((m) => ({ default: m.TermsPage })));
 const SpotEditPage = lazy(() => import('./pages/Spot/SpotEditPage').then((m) => ({ default: m.SpotEditPage })));
 
@@ -113,6 +114,7 @@ export function App() {
                   </>
                 )}
                 <Route path="/terms" element={<TermsPage />} />
+                <Route path="/partner-integration" element={<PartnersPage />} />
                 <Route path="*" element={<SlacklineMapPage />} />
               </Routes>
               </SignInReturn>

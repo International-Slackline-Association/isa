@@ -21,14 +21,14 @@ Both keep 180 days and hold no IP addresses. The anonymous activation routes' `R
 
 ## Steps
 
-1. Pick the log and bound the time range.
-2. Write a Logs Insights query and run it with `aws logs start-query`. The CDN log is the Infrequent Access class: Logs Insights only, no `filter-log-events`.
-3. Field names with parentheses or dashes need backticks; the API line's fields sit under `data.`
+1. Query with Logs Insights. The CDN log is the Infrequent Access class: Logs Insights only, no `filter-log-events`.
+2. Field names with parentheses or dashes need backticks.
 
 ## What the logs can answer
 
 - Who reads the map data and photos, and how much: host, referer, user agent and bytes in the CDN log; photo hot-linking shows as a referer outside slackmap.com.
 - Outside API consumers: a request with no `origin`, or one outside slackmap.com, is not the web app; except the `GET /page/…` routes, which are slackmap.com pages served through CloudFront, counted only when not cached.
+- How often a partner downloads: the user agent it sends, in the CDN log.
 - Scripts and scrapers: a cloud provider's `asn`, or a non-browser user agent.
 - Who passes the browser check: `session` on the API line; calls that skipped CloudFront: `viaCloudFront` false.
 - Countries over time, route popularity and latency, errors by route, signed-in users (`isaId`) per week, partner calls (`appClientId`).

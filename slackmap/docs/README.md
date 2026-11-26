@@ -11,7 +11,7 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 ## Read when
 
 - Before any change: [the vision](/slackmap/README.md): simplicity is the first principle
-- Running locally or deploying: [operating](operating.md)
+- Changing the table or the buckets, or setting up a new stage: [operating](operating.md)
 - Working on or with test.slackmap.com: [the test stage](test-stage.md): it differs from prod on purpose
 - What is set up by hand and what other apps rely on: [manual operations](manual-operations.md)
 - Querying or adding to the table: [table design](table-design.md)
@@ -20,7 +20,7 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 - Answering a usage question: [usage analytics](usage-analytics.md)
 - Touching the browser check, the session cookie or the terms: [data access](data-access.md)
 - Touching activations, passes or the activation routes: [activations](activations.md): an anonymous activation must never be tied to a person
-- Giving a partner the map data, or touching `/v1`: [partner data](partner-data.md)
+- Giving a partner the map data: [giving an app access](/docs/engineering/app-access-steps.md); what partners are told is the [partners page](/slackmap/web/src/app/pages/Partners/index.tsx), kept true with `/v1` and the files
 - Touching how the web app looks: [look and feel](look-and-feel.md): one coherent look, so a screen uses the theme's parts and never paints its own
 
 ## From higher scopes

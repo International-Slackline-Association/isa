@@ -12,3 +12,5 @@ Monorepo of the [International Slackline Association](https://www.slacklineinter
 | [docs](docs/) | Repo-wide docs: why one monorepo, how software is built here, and the documentation system |
 
 Start at [docs/README.md](docs/README.md).
+
+The docs in this repo are internal working notes for developing the code, not official ISA documentation or statements. They can be outdated or wrong and promise nothing; binding is only what ISA publishes on its websites, such as an app's terms.

@@ -92,7 +92,7 @@ const sections: { title: string; items: { q: string; a: React.ReactNode }[] }[] 
         a: (
           <>
             Not without permission. Browsing, planning and sharing links are free; for anything else,
-            ask us at <Link href={`mailto:${contact}`}>{contact}</Link> for a partner licence. See the{' '}
+            see <Link href="/partner-integration">partner access</Link> and the{' '}
             <Link href="/terms">terms of use</Link>.
           </>
         ),

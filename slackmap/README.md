@@ -6,11 +6,7 @@
 
 ---
 
-SlackMap is is a map-based platform that allows slackliners to document their slacklines & spots and share them with the world. The platform is open-source and free to use.
-
-The project is ongoing **since 2015** and has been developed by a group of volunteers and maintained & funded by the International Slackline Association.
-
-There are over **7000 slacklines** and **1700 spots** submitted by **more than thousand** slackliners from all around the world.
+SlackMap is a map-based platform that allows slackliners to document their slacklines & spots and share them with the world. The platform is open-source and free to use.
 
 [slackmap.com](https://slackmap.com)
 
@@ -29,8 +25,5 @@ As International Slackline Association, we think SlackMap is a highly important 
 #### Basic Principles
 
 - We want SlackMap to survive many many years and it is a challenging thing in volunteered projects. We have seen many examples over the years. Therefore, simplicity is the primary goal. We don't want to add every feature we can think of and end up with a project hard to maintain. People will lose motivation over time. The simpler, the better is the first principle. For this, even some trade-offs might be made to sacrifice some detailed functionality to not increase the complexity.
-- Developers from the community should be involved as much as possible. If people become part of the project we can achieve more things and keep the project up and improving throughout the years.
-- Contributors should own their works for years to come. We don't seek 'one-time improvement and done'. If your improvement needs maintenance you should be standing behind it.
-- This is a 100% volunteer-based project. People willing to contribute should come with self-motivation in order to create less burden on others. This means doing prior work of reading, trying to understand first on your own, self-assessment, etc to a certain degree.
 
 Developers: [the docs](docs/README.md).
