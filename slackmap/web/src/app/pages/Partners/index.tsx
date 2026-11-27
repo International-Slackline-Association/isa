@@ -120,7 +120,8 @@ export const PartnersPage = () => (
         API.
       </P>
       <Alert severity="info" sx={{ marginBottom: 1.5 }}>
-        Only ISA members and ISA partners can request API access. Becoming one is the first step.
+        ISA members, ISA partners and third parties are welcome to request API access. Contacting us
+        is the first step.
       </Alert>
       <P>
         This page has two parts: <Link href="#api-access">how API access works</Link>, for everyone,
@@ -131,7 +132,6 @@ export const PartnersPage = () => (
       <Part id="api-access" title="Part 1: How API access works" />
 
       <Section id="who" title="Who can request access">
-        <P>Only organisations that are part of ISA:</P>
         <ul>
           <Item>
             <b>ISA members:</b> non-profit federations, associations and clubs.{' '}
@@ -141,16 +141,15 @@ export const PartnersPage = () => (
             <b>ISA partners:</b> commercial entities.{' '}
             <Link href="https://www.slacklineinternational.org/partners/">Become an ISA partner</Link>.
           </Item>
+          <Item>
+            <b>Third parties:</b> anyone else. Open a request.
+          </Item>
         </ul>
-        <P>If your organisation is neither yet, join first. Then send your request.</P>
+        <P>Then send your request.</P>
       </Section>
 
       <Section title="How to get access">
         <ol>
-          <Item>
-            <b>Be an ISA member or ISA partner.</b> This is required; see{' '}
-            <Link href="#who">who can request access</Link>.
-          </Item>
           <Item>
             <b>Fill out the request form.</b> It asks for the points listed below.
             <Box sx={{ marginY: 1 }}>
@@ -222,7 +221,7 @@ export const PartnersPage = () => (
 
       <Section id="ending-access" title="We can restrict or end your access">
         <P>
-          API access is not an entitlement. We can restrict the access of an application that does
+          API access is not guaranteed. We can restrict the access of an application that does
           not keep to the rules above. We also reserve the right to end access at any time.
         </P>
       </Section>
