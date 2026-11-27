@@ -91,6 +91,7 @@ export const LineDetailCard = (props: Props) => {
             target={{ type: 'line', id: props.lineId }}
             featureName={lineDetails.name || 'this line'}
             activation={lineDetails.activation}
+            activationDates={lineDetails.activationDates}
             onChanged={refetch}
           />
           <ActiveSpotNote lineGeoJson={lineDetails.geoJson} />

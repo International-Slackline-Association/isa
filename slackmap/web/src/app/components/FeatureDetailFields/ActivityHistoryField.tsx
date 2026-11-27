@@ -100,7 +100,7 @@ export const ActivityHistoryField = (props: Props) => {
             }}
           >
             {changelogs.items.map((changelog, index) => (
-              <TimelineItem key={changelog.date}>
+              <TimelineItem key={`${changelog.featureType}:${changelog.featureId}:${changelog.actionType}:${changelog.date}`}>
                 <TimelineSeparator>
                   {index !== 0 && <TimelineConnector />}
                   <TimelineDot color="primary">

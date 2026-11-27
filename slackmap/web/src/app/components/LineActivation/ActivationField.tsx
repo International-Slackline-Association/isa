@@ -10,8 +10,9 @@ import CheckIcon from '@mui/icons-material/Check';
 import LockIcon from '@mui/icons-material/Lock';
 import SensorsIcon from '@mui/icons-material/Sensors';
 import ShareIcon from '@mui/icons-material/Share';
-import { Box, Button, ButtonBase, Chip, Link, Stack, Typography } from '@mui/material';
+import { Box, Button, ButtonBase, Checkbox, Chip, FormControlLabel, Link, Stack, Typography } from '@mui/material';
 
+import { meApi } from 'app/api/me-api';
 import { useSignInDialog } from 'app/components/Dialogs/useSignInDialog';
 import { useResumeAfterSignIn } from 'app/signIn';
 import { selectIsUserSignedIn } from 'app/slices/app/selectors';
@@ -20,15 +21,21 @@ import { ui } from 'styles/theme/ui';
 import { showErrorNotification, showInfoNotification, showSuccessNotification } from 'utils';
 
 import { ActivateDialog, ActivationMode } from './ActivateDialog';
+import { ActivationDatesField, PublicDates } from './ActivationDatesField';
+import { DatesPicker } from './DatesPicker';
 import {
+  ActivationDate,
+  ManageAuth,
   NoPassError,
   activateAnonymously,
+  activateDatesWithName,
   activateWithName,
   consumeManageLinkFromUrl,
   deactivate,
   extendActivation,
-  manageCodeFor,
+  manageLinkFor,
   manageLinkOf,
+  setRemind,
   ActivationTarget,
 } from './activationApi';
 import {
@@ -54,7 +61,8 @@ import { hasPass, passQuota, refillSettled } from './passes';
 interface Props {
   target: ActivationTarget;
   featureName: string;
-  activation?: { from: number; until: number; activatedAt: number; activatedBy?: string };
+  activation?: { from: number; until: number; activatedAt: number; activatedBy?: string; fromDates: boolean };
+  activationDates?: PublicDates;
   onChanged: () => void;
 }
 
@@ -228,7 +236,11 @@ export const ActivationField = (props: Props) => {
   const isSignedIn = useSelector(selectIsUserSignedIn);
   const { SignInDialog, showSignInDialog } = useSignInDialog();
 
-  const [code, setCode] = useState<string>();
+  const [link, setLink] = useState<{ code: string; activatedAt: number }>();
+  const [several, setSeveral] = useState(false);
+  const [pickedDates, setPickedDates] = useState<ActivationDate[]>([]);
+  const [remind, setRemindChoice] = useState(true);
+  const [doneDates, setDoneDates] = useState<number>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [mode, setMode] = useState<ActivationMode>('anonymous');
   const [step, setStep] = useState<Step>();
@@ -241,8 +253,14 @@ export const ActivationField = (props: Props) => {
 
   useEffect(() => {
     consumeManageLinkFromUrl(props.target);
-    setCode(manageCodeFor(props.target, props.activation));
-  }, [props.target.type, props.target.id, props.activation?.activatedAt]);
+    setLink(manageLinkFor(props.target, props.activation, props.activationDates));
+  }, [props.target.type, props.target.id, props.activation?.activatedAt, props.activationDates?.activatedAt]);
+
+  const { data: mine, refetch: refetchMine } = meApi.useGetMyActivationsQuery(undefined, { skip: !isSignedIn });
+  const ownOf = (kind: 'once' | 'dates') =>
+    mine?.activations.find((a) => a.kind === kind && a.featureType === props.target.type && a.featureId === props.target.id);
+  const ownOnce = ownOf('once');
+  const ownDates = ownOf('dates');
 
   useEffect(() => {
     setStep(undefined);
@@ -250,7 +268,22 @@ export const ActivationField = (props: Props) => {
   }, [props.target.type, props.target.id]);
 
   const activation = props.activation;
-  const manageLink = code ? manageLinkOf(props.target, code) : undefined;
+  const dates = props.activationDates;
+  const fromDates = Boolean(activation?.fromDates);
+  const activationAuth: ManageAuth | undefined =
+    activation && link?.activatedAt === activation.activatedAt
+      ? { code: link.code }
+      : activation && (ownOnce || (ownDates && fromDates))
+        ? 'owner'
+        : undefined;
+  const code = activationAuth && activationAuth !== 'owner' ? activationAuth.code : undefined;
+  const manageLink = link ? manageLinkOf(props.target, link) : undefined;
+  // Never a signed-in call right after an anonymous action: the two would be one moment in the logs.
+  const changed = (named: boolean) => {
+    props.onChanged();
+    if (named && isSignedIn) refetchMine();
+  };
+  const isNamed = Boolean(activation?.activatedBy);
 
   const fail = (error: unknown) => {
     const message =
@@ -282,6 +315,8 @@ export const ActivationField = (props: Props) => {
 
   const onChoose = (chosen: ActivationMode) => {
     setMode(chosen);
+    setSeveral(false);
+    setRemindChoice(true);
     setDialogOpen(false);
     setFrom(undefined);
     setUntil(untilPresets()[0].until);
@@ -290,12 +325,22 @@ export const ActivationField = (props: Props) => {
 
   const onActivate = () =>
     run(async () => {
+      if (mode === 'named' && several) {
+        const result = await activateDatesWithName(props.target, pickedDates, remind);
+        setLink(manageLinkFor(props.target, result));
+        setDoneDates(result.dates.length);
+        setDoneFrom(result.dates[0].from);
+        setDoneUntil(result.dates[0].until);
+        setStep('done');
+        return;
+      }
       if (!until) return;
       const result =
         mode === 'named'
-          ? await activateWithName(props.target, until, from)
+          ? await activateWithName(props.target, until, from, remind)
           : await activateAnonymously(props.target, until, from);
-      setCode(manageCodeFor(props.target, result));
+      setLink(manageLinkFor(props.target, result));
+      setDoneDates(undefined);
       setDoneFrom(result.from);
       setDoneUntil(result.until);
       // The card reloads on onChanged and would drop this step, so it reloads when the step is closed.
@@ -304,22 +349,21 @@ export const ActivationField = (props: Props) => {
 
   const onExtend = (newUntil: number) =>
     run(async () => {
-      if (!code) return;
-      await extendActivation(props.target, code, newUntil);
+      if (!activationAuth) return;
+      await extendActivation(props.target, activationAuth, newUntil);
       setStep(undefined);
       setExtendUntil(undefined);
       dispatch(showSuccessNotification(`Extended until ${formatUntil(newUntil)}`));
-      props.onChanged();
+      changed(isNamed);
     });
 
   const onDeactivate = () =>
     run(async () => {
-      if (!code) return;
-      await deactivate(props.target, code);
-      setCode(undefined);
+      if (!activationAuth) return;
+      await deactivate(props.target, activationAuth);
       setStep(undefined);
-      dispatch(showSuccessNotification('Deactivated'));
-      props.onChanged();
+      dispatch(showSuccessNotification(fromDates ? 'Deactivated for this date' : 'Deactivated'));
+      changed(isNamed);
     });
 
   const onShare = async () => {
@@ -344,12 +388,41 @@ export const ActivationField = (props: Props) => {
     />
   );
 
+  const datesField = (
+    <ActivationDatesField
+      target={props.target}
+      dates={dates}
+      link={link}
+      own={ownDates}
+      showNext={!fromDates}
+      onChanged={() => changed(true)}
+    />
+  );
+
   if (step === 'until' && !activation) {
     return (
       <>
         {dialog}
         <Section>
           <ModePill mode={mode} onChange={() => setDialogOpen(true)} />
+          {mode === 'named' && !dates && (
+            <Stack direction="row" sx={{ gap: 0.75 }}>
+              <Chip label="Once" onClick={() => setSeveral(false)} sx={chipSx(!several, ui.blue, ui.onBlue)} />
+              <Chip label="Several dates" onClick={() => setSeveral(true)} sx={chipSx(several, ui.blue, ui.onBlue)} />
+            </Stack>
+          )}
+          {mode === 'named' && several ? (
+            <>
+              <Typography variant="subtitle1">Which dates?</Typography>
+              <DatesPicker onChange={setPickedDates} />
+              <Typography variant="body2" color="text.secondary">
+                {pickedDates.length
+                  ? `${pickedDates.length} date${pickedDates.length > 1 ? 's' : ''}, first ${formatStart(pickedDates[0].from)}. Your name and dates show on the ${props.target.type}.`
+                  : 'Tap the days you meet there, up to 3 months ahead.'}
+              </Typography>
+            </>
+          ) : (
+            <>
           <Typography variant="subtitle1">Starts</Typography>
           <StartChips
             value={from}
@@ -367,6 +440,14 @@ export const ActivationField = (props: Props) => {
               ? `${from ? `On the map from ${formatStart(from)}, gone` : 'Gone from the map'} after ${formatUntil(until)}.`
               : 'Pick a day and, if you like, a time, up to 14 days.'}
           </Typography>
+            </>
+          )}
+          {mode === 'named' && (
+            <FormControlLabel
+              control={<Checkbox size="small" checked={remind} onChange={(e) => setRemindChoice(e.target.checked)} />}
+              label={<Typography variant="body2">{several ? 'Email me before my last date' : 'Email me before it ends'}</Typography>}
+            />
+          )}
           <Stack direction="row" spacing={1}>
             <Button fullWidth variant="outlined" sx={{ bgcolor: '#fff' }} onClick={() => setStep(undefined)}>
               Cancel
@@ -376,7 +457,7 @@ export const ActivationField = (props: Props) => {
               variant="contained"
               color="active"
               startIcon={<SensorsIcon />}
-              disabled={busy || !until}
+              disabled={busy || (mode === 'named' && several ? pickedDates.length === 0 : !until)}
               onClick={onActivate}
             >
               Activate
@@ -396,12 +477,14 @@ export const ActivationField = (props: Props) => {
           </Box>
           <Box>
             <Typography variant="h5">
-              {doneFrom && doneFrom > Date.now() / 1000
+              {doneDates
+                ? `${doneDates} date${doneDates > 1 ? 's' : ''} set, first ${formatStart(doneFrom!)}`
+                : doneFrom && doneFrom > Date.now() / 1000
                 ? `Starts ${formatStart(doneFrom)}, until ${formatUntil(doneUntil)}`
                 : `Active until ${formatUntil(doneUntil)}`}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {doneFrom && doneFrom > Date.now() / 1000 ? 'On the map when it starts' : 'On the map within a minute'}
+              {doneDates ? 'Each date is on the map when it starts' : doneFrom && doneFrom > Date.now() / 1000 ? 'On the map when it starts' : 'On the map within a minute'}
               {mode === 'named' ? ', with your name' : ', anonymously'}.
             </Typography>
           </Box>
@@ -417,7 +500,7 @@ export const ActivationField = (props: Props) => {
           variant="contained"
           onClick={() => {
             setStep(undefined);
-            props.onChanged();
+            changed(mode === 'named');
           }}
         >
           Done
@@ -431,6 +514,7 @@ export const ActivationField = (props: Props) => {
       <>
         <SignInDialog />
         {dialog}
+        {datesField}
         <Stack spacing={0.5}>
           <Button variant="contained" color="active" fullWidth startIcon={<SensorsIcon />} onClick={onActivateClicked}>
             Activate
@@ -446,6 +530,7 @@ export const ActivationField = (props: Props) => {
   const scheduled = activation.from > Date.now() / 1000;
 
   return (
+    <>
     <Section active>
       <Box>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
@@ -461,10 +546,10 @@ export const ActivationField = (props: Props) => {
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
           Activated {formatActivatedAgo(activation.activatedAt)}
           {activation.activatedBy ? ` by ${activation.activatedBy}` : ''}
-          {code ? ' · you have the manage link' : ''}
+          {code ? ' · you have the manage link' : activationAuth ? ' · you activated it' : ''}
         </Typography>
       </Box>
-      {code && step === 'extend' && (
+      {activationAuth && step === 'extend' && (
         <>
           <Typography variant="subtitle1">Extend until?</Typography>
           <UntilChips
@@ -500,11 +585,11 @@ export const ActivationField = (props: Props) => {
           </Stack>
         </>
       )}
-      {code && step === 'confirmDeactivate' && (
+      {activationAuth && step === 'confirmDeactivate' && (
         <>
-          <Typography variant="subtitle1">Deactivate?</Typography>
+          <Typography variant="subtitle1">{fromDates ? 'Deactivate for this date?' : 'Deactivate?'}</Typography>
           <Typography variant="body2" color="text.secondary">
-            The manage link stops working.
+            {fromDates ? 'Your other dates stay.' : code ? 'The manage link stops working.' : 'It is gone from the map.'}
           </Typography>
           <Stack direction="row" spacing={1}>
             <Button fullWidth variant="outlined" sx={{ bgcolor: '#fff' }} onClick={() => setStep(undefined)}>
@@ -516,7 +601,7 @@ export const ActivationField = (props: Props) => {
           </Stack>
         </>
       )}
-      {code && !step && (
+      {activationAuth && !step && (
         <>
           {nudgeToExtend(activation.from, activation.until) && (
             <Typography variant="body2" sx={{ color: ui.activeInk, fontWeight: 500 }}>
@@ -531,11 +616,30 @@ export const ActivationField = (props: Props) => {
               Deactivate
             </Button>
           </Stack>
-          <Button size="small" startIcon={<ShareIcon />} sx={{ alignSelf: 'flex-start' }} onClick={onShare}>
-            Share manage link
-          </Button>
+          {ownOnce && !fromDates && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  checked={ownOnce.remind}
+                  onChange={(e) => run(async () => {
+                    await setRemind(props.target, 'once', e.target.checked);
+                    refetchMine();
+                  })}
+                />
+              }
+              label={<Typography variant="body2">Email me before it ends</Typography>}
+            />
+          )}
+          {manageLink && (
+            <Button size="small" startIcon={<ShareIcon />} sx={{ alignSelf: 'flex-start' }} onClick={onShare}>
+              Share manage link
+            </Button>
+          )}
         </>
       )}
     </Section>
+    {datesField}
+    </>
   );
 };

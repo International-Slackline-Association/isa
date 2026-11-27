@@ -31,26 +31,34 @@ const forgetManageCode = (target: ActivationTarget) => {
   writeLinks(rest);
 };
 
-export const manageCodeFor = (target: ActivationTarget, activation?: { activatedAt: number }) => {
+// A set of dates and the activations it starts share one activatedAt, so either keeps the link alive.
+export const manageLinkFor = (target: ActivationTarget, ...current: ({ activatedAt: number } | undefined)[]) => {
   const link = readLinks()[storageKeyOf(target)];
   if (!link) return undefined;
-  if (!activation || (link.activatedAt !== undefined && link.activatedAt !== activation.activatedAt)) {
+  const alive = current.filter((c): c is { activatedAt: number } => Boolean(c));
+  if (alive.length === 0 || (link.activatedAt !== undefined && !alive.some((c) => c.activatedAt === link.activatedAt))) {
     forgetManageCode(target);
     return undefined;
   }
-  // A shared link is bound to the activation it was opened on.
-  if (link.activatedAt === undefined) storeLink(target, { ...link, activatedAt: activation.activatedAt });
-  return link.code;
+  // A link shared before it carried its activatedAt is bound to the activation it was opened on.
+  if (link.activatedAt === undefined) {
+    storeLink(target, { ...link, activatedAt: alive[0].activatedAt });
+    return { code: link.code, activatedAt: alive[0].activatedAt };
+  }
+  return { code: link.code, activatedAt: link.activatedAt };
 };
 
 // After '#', so the code never reaches a server or its logs.
-export const manageLinkOf = (target: ActivationTarget, code: string) =>
-  `${window.location.origin}/${target.type}/${target.id}#manage=${code}`;
+// The activatedAt it manages travels with it: a line can hold someone else's activation and a set of dates at once.
+export const manageLinkOf = (target: ActivationTarget, link: { code: string; activatedAt: number }) =>
+  `${window.location.origin}/${target.type}/${target.id}#manage=${link.code}&at=${link.activatedAt}`;
 
 export const consumeManageLinkFromUrl = (target: ActivationTarget) => {
-  const code = new URLSearchParams(window.location.hash.slice(1)).get('manage');
+  const params = new URLSearchParams(window.location.hash.slice(1));
+  const code = params.get('manage');
   if (!code) return;
-  storeLink(target, { code });
+  const at = Number(params.get('at'));
+  storeLink(target, { code, activatedAt: Number.isInteger(at) && at > 0 ? at : undefined });
   history.replaceState(history.state, '', window.location.pathname + window.location.search);
 };
 
@@ -59,12 +67,15 @@ const sha256Hex = async (text: string) =>
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 
-// Only the named activation sends the login; every other call must not carry who is signed in.
-const send = async (method: string, target: ActivationTarget, body: unknown, opts: { named?: boolean }) => {
+type Opts = { named?: boolean; dates?: boolean };
+
+// Only the named routes send the login; every other call must not carry who is signed in.
+const send = async (method: string, target: ActivationTarget, body: unknown, opts: Opts) => {
   const token = opts.named ? await fetchAuthSession().then((s) => s.tokens?.idToken?.toString()) : undefined;
   if (opts.named && !token) throw new Error('Sign in to activate with your name');
+  const path = `${opts.named ? '/named' : ''}${opts.dates ? '/dates' : ''}`;
   const request = () =>
-    fetch(`${apiBaseUrl}/${target.type}/${encodeURIComponent(target.id)}/activation${opts.named ? '/named' : ''}`, {
+    fetch(`${apiBaseUrl}/${target.type}/${encodeURIComponent(target.id)}/activation${path}`, {
       method,
       credentials: 'include',
       headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
@@ -81,7 +92,7 @@ const send = async (method: string, target: ActivationTarget, body: unknown, opt
   return data;
 };
 
-const call = (method: string, target: ActivationTarget, body: unknown, opts: { named?: boolean } = {}) => {
+const call = (method: string, target: ActivationTarget, body: unknown, opts: Opts = {}) => {
   const result = send(method, target, body, opts);
   reloadMapDataAfterWrite('features', result);
   return result;
@@ -109,9 +120,9 @@ export const activateAnonymously = async (target: ActivationTarget, until: numbe
   }
 };
 
-export const activateWithName = async (target: ActivationTarget, until: number, from?: number) => {
+export const activateWithName = async (target: ActivationTarget, until: number, from: number | undefined, remind: boolean) => {
   const code = toBase64Url(crypto.getRandomValues(new Uint8Array(16)));
-  const result = (await call('POST', target, { from, until, linkHash: await sha256Hex(code) }, { named: true })) as {
+  const result = (await call('POST', target, { from, until, remind, linkHash: await sha256Hex(code) }, { named: true })) as {
     from: number;
     until: number;
     activatedAt: number;
@@ -120,10 +131,34 @@ export const activateWithName = async (target: ActivationTarget, until: number, 
   return result;
 };
 
-export const extendActivation = (target: ActivationTarget, code: string, until: number) =>
-  call('PUT', target, { until, code }) as Promise<{ until: number }>;
+export type ActivationDate = { from: number; until: number };
 
-export const deactivate = async (target: ActivationTarget, code: string) => {
-  await call('DELETE', target, { code });
-  forgetManageCode(target);
+export const activateDatesWithName = async (target: ActivationTarget, dates: ActivationDate[], remind: boolean) => {
+  const code = toBase64Url(crypto.getRandomValues(new Uint8Array(16)));
+  const result = (await call('POST', target, { dates, remind, linkHash: await sha256Hex(code) }, { named: true, dates: true })) as {
+    dates: ActivationDate[];
+    activatedAt: number;
+  };
+  storeLink(target, { code, activatedAt: result.activatedAt });
+  return result;
 };
+
+export type ManageAuth = { code: string } | 'owner';
+
+export const extendActivation = (target: ActivationTarget, auth: ManageAuth, until: number) =>
+  auth === 'owner' ? call('PUT', target, { until }, { named: true }) : call('PUT', target, { until, code: auth.code });
+
+export const deactivate = (target: ActivationTarget, auth: ManageAuth) =>
+  auth === 'owner' ? call('DELETE', target, {}, { named: true }) : call('DELETE', target, { code: auth.code });
+
+export const changeDates = (target: ActivationTarget, auth: ManageAuth, dates: ActivationDate[]) =>
+  auth === 'owner'
+    ? call('PUT', target, { dates }, { named: true, dates: true })
+    : call('PUT', target, { dates, code: auth.code }, { dates: true });
+
+export const stopDates = async (target: ActivationTarget, auth: ManageAuth) => {
+  await (auth === 'owner' ? call('DELETE', target, {}, { named: true, dates: true }) : call('DELETE', target, { code: auth.code }, { dates: true }));
+};
+
+export const setRemind = (target: ActivationTarget, kind: 'once' | 'dates', remind: boolean) =>
+  call('PUT', target, { remind }, { named: true, dates: kind === 'dates' });

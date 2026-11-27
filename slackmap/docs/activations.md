@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: "Activations"
-description: "Line and spot activations (a line or a spot's area rigged) and anonymous activation: why they exist, the vocabulary, the anonymity promise, blind-signed passes, manage links, activating with a name, what activation routes may log, existing lines and spots only, spots and the lines inside them, third parties and the mediator role, reminders."
+description: "Line and spot activations (a line or a spot's area rigged) and anonymous activation: why they exist, the vocabulary, the anonymity promise, blind-signed passes, manage links, activating with a name, managing as the signed-in owner, several dates for regular meetups, reminder emails, what activation routes may log, existing lines and spots only, spots and the lines inside them, third parties and the mediator role."
 ---
 
 # Activations
@@ -18,11 +18,15 @@ ISA must be technically unable to know who activated a line anonymously: "we can
 - The anonymous activation routes never read the login, and their log lines carry nothing that could match them to the same browser's signed-in calls. Everything else keeps its logs as they are: analytics and debugging are not given up for this.
 - An anonymous activation is in the history of its line or spot and the activity feeds too, only as "the line was activated" or "the spot was activated": no person, and its time only to the hour.
 - Ownership is a manage link, not an account. Sharing it is how someone moves to another device or hands the activation to their crew, one mechanism for both.
-- The reminder before expiry is a banner on the card. ISA sends nothing.
+- For an anonymous activation, the reminder before expiry is a banner on the card. ISA sends nothing.
 
 ## With a name
 
-People who do not want anonymity can activate with their name instead. The name is only a label: such an activation is managed by the same manage link, so there is one way to manage every activation.
+People who do not want anonymity can activate with their name instead. Anonymous and named are different paths. A named activation still gets a manage link, as the way people hand editing rights to others; managing it as the signed-in member who activated it is a bonus for an owner who lost the link. Because the owner is known, ISA can email them before it ends.
+
+## Several dates
+
+Groups meet on a line regularly, weekly, every two weeks or on no pattern at all, so a named activation can hold several dates rather than a repeat rule. It is named only, so the owner can be emailed before the last date.
 
 ## What an activation is
 

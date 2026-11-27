@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import EventRepeatIcon from '@mui/icons-material/EventRepeat';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -18,6 +19,7 @@ import {
 } from '@mui/material';
 
 import { accountApi } from 'app/api/account-api';
+import { MyActivationsDialog } from 'app/components/LineActivation/MyActivationsDialog';
 import { appActions } from 'app/slices/app';
 import { selectIsUserSignedIn } from 'app/slices/app/selectors';
 import { AuthState } from 'app/slices/app/types';
@@ -35,6 +37,7 @@ export const Profile = () => {
 
   const dispatch = useDispatch();
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const [activationsOpen, setActivationsOpen] = useState(false);
 
   const name: string = userInfo?.name ?? '';
   const surname: string = userInfo?.surname || '';
@@ -83,6 +86,17 @@ export const Profile = () => {
             </ListItemIcon>
             Your ISA profile
           </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setMenuAnchor(null);
+              setActivationsOpen(true);
+            }}
+          >
+            <ListItemIcon>
+              <EventRepeatIcon fontSize="small" />
+            </ListItemIcon>
+            My activations
+          </MenuItem>
           <MenuItem onClick={signOutClicked}>
             <ListItemIcon>
               <LogoutIcon fontSize="small" />
@@ -91,6 +105,7 @@ export const Profile = () => {
           </MenuItem>
         </Menu>
       </ThemeProvider>
+      <MyActivationsDialog open={activationsOpen} onClose={() => setActivationsOpen(false)} />
     </Stack>
   );
 };

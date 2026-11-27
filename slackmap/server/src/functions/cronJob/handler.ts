@@ -7,10 +7,106 @@ import {
   refreshSpotGeoJsonFiles,
 } from '../../core/features/geojson';
 import { db } from '../../core/db';
+import { startDueDate } from '../../core/features/activation';
+import { ActivatableFeatureType } from '../../core/db/entities/activation';
+import { webUrl } from '../../core/domain';
+import { getUserDetails } from '../../core/features/isaUser';
+import { sendActivationReminderEmail } from '../../core/utils/email/sendActivationReminder';
 import { addActivatedChangelog } from '../../core/features/mapFeature/changelog';
 import { logger } from '../../core/logger';
 
 logger.setLambdaName('cronJob');
+
+const day = 24 * 3600;
+const featureOf = (featureType: ActivatableFeatureType, featureId: string) =>
+  featureType === 'line' ? db.getLineDetails(featureId) : db.getSpotDetails(featureId);
+
+const errorData = (error: unknown) => ({ message: (error as Error).message, stack: (error as Error).stack });
+
+const startActivationDates = async () => {
+  const now = Math.floor(Date.now() / 1000);
+  const all = [...(await db.getAllActivationDates('line')), ...(await db.getAllActivationDates('spot'))];
+  const counts: Record<string, number> = { sets: all.length, failed: 0 };
+  for (const record of all) {
+    const { featureType, featureId } = record;
+    try {
+      const outcome = await startDueDate(record, now);
+      counts[outcome] = (counts[outcome] ?? 0) + 1;
+      if (outcome === 'busy' || outcome === 'featureGone') logger.info(`activation date not started: ${outcome}`, { featureType, featureId });
+    } catch (error) {
+      counts.failed++;
+      logger.error('activation date start failed', { featureType, featureId, ...errorData(error) });
+    }
+  }
+  logger.info('activation dates checked', counts);
+};
+
+const sendActivationReminders = async () => {
+  const now = Math.floor(Date.now() / 1000);
+  const [activations, datesRecords] = await Promise.all([
+    Promise.all([db.getAllActivations('line'), db.getAllActivations('spot')]).then((all) => all.flat()),
+    Promise.all([db.getAllActivationDates('line'), db.getAllActivationDates('spot')]).then((all) => all.flat()),
+  ]);
+  // About a day before the end, from 30 to 12 hours ahead: an end at 23:59 is reminded the evening before, not at night,
+  // and an activation never gets it right after it was made.
+  const ending = activations.filter(
+    (a) =>
+      a.activatedBy &&
+      a.remind &&
+      !a.remindedAt &&
+      a.until - now <= 30 * 3600 &&
+      a.until - now > 12 * 3600 &&
+      now - a.activatedAt >= 6 * 3600,
+  );
+  // Only a set that ran down: one made with its last date already within the week needs no nudge.
+  const runningOut = datesRecords.filter((d) => {
+    const lastUntil = d.dates[d.dates.length - 1]?.until;
+    return d.remind && lastUntil > now && lastUntil - now < 7 * day && lastUntil - d.activatedAt > 7 * day && d.remindedForUntil !== lastUntil;
+  });
+  const counts = { due: ending.length + runningOut.length, sent: 0, skipped: 0, failed: 0 };
+
+  const remind = async (
+    kind: 'ending' | 'datesRunningOut',
+    item: { featureType: ActivatableFeatureType; featureId: string; userId: string },
+    markSent: () => Promise<void>,
+  ) => {
+    const { featureType, featureId, userId } = item;
+    try {
+      const [user, feature] = await Promise.all([getUserDetails(userId, { includeEmail: true }), featureOf(featureType, featureId)]);
+      if (!user?.email || !feature) {
+        // Marked anyway: a member without an email, or a deleted feature, would be tried every hour.
+        await markSent();
+        counts.skipped++;
+        logger.warn('activation reminder skipped', { featureType, featureId, kind, userId, hasUser: Boolean(user), hasEmail: Boolean(user?.email), hasFeature: Boolean(feature) });
+        return;
+      }
+      await sendActivationReminderEmail({
+        kind,
+        to: { name: user.fullname, email: user.email },
+        featureName: feature.name || `this ${featureType}`,
+        featureUrl: `${webUrl}/${featureType}/${featureId}`,
+      });
+      await markSent();
+      counts.sent++;
+      logger.info('activation reminder done', { featureType, featureId, kind, userId });
+    } catch (error) {
+      counts.failed++;
+      logger.error('activation reminder failed', { featureType, featureId, kind, userId, ...errorData(error) });
+    }
+  };
+
+  for (const a of ending) {
+    await remind('ending', { featureType: a.featureType, featureId: a.featureId, userId: a.activatedBy! }, () =>
+      db.markActivationReminded(a.featureType, a.featureId, a.until, now),
+    );
+  }
+  for (const d of runningOut) {
+    await remind('datesRunningOut', { featureType: d.featureType, featureId: d.featureId, userId: d.activatedBy }, () =>
+      db.markDatesReminded(d.featureType, d.featureId, d.dates[d.dates.length - 1].until),
+    );
+  }
+  logger.info('activation reminders checked', counts);
+};
 
 // The hourly run: an activation scheduled for later reaches the map files when it starts, since no
 // write happens then. A two-hour window covers a run that was late or missed.
@@ -33,7 +129,19 @@ const refreshStartedActivations = async () => {
 
 const cronJobHandler = async (event?: { job?: string }) => {
   try {
-    if (event?.job === 'activationStarts') return await refreshStartedActivations();
+    if (event?.job === 'activationStarts') {
+      const steps = { startActivationDates, refreshStartedActivations, sendActivationReminders };
+      for (const [name, step] of Object.entries(steps)) {
+        const start = Date.now();
+        try {
+          await step();
+          logger.info('hourly step done', { step: name, ms: Date.now() - start });
+        } catch (error) {
+          logger.error('hourly step failed', { step: name, ms: Date.now() - start, ...errorData(error) });
+        }
+      }
+      return;
+    }
     await runGenericCronJob();
   } catch (err) {
     if (err instanceof Error) {

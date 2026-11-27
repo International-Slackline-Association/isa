@@ -11,7 +11,7 @@ The world slackline map at `slackmap.com`: slackliners document their lines, spo
 ## Read when
 
 - Before any change: [the vision](/slackmap/README.md): simplicity is the first principle
-- Changing the table or the buckets, or setting up a new stage: [operating](operating.md)
+- Running it locally, changing the table or the buckets, or setting up a new stage: [operating](operating.md)
 - Working on or with test.slackmap.com: [the test stage](test-stage.md): it differs from prod on purpose
 - What is set up by hand and what other apps rely on: [manual operations](manual-operations.md)
 - Querying or adding to the table: [table design](table-design.md)

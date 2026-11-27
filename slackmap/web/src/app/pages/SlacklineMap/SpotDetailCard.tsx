@@ -90,6 +90,7 @@ export const SpotDetailCard = (props: Props) => {
             target={{ type: 'spot', id: props.spotId }}
             featureName={spotDetails.name || 'this spot'}
             activation={spotDetails.activation}
+            activationDates={spotDetails.activationDates}
             onChanged={refetch}
           />
           <FeatureDetailRestrictionField level={spotDetails.restrictionLevel} restrictionInfo={spotDetails.restrictionInfo} />

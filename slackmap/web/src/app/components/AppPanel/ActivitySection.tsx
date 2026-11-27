@@ -90,7 +90,7 @@ export const LatestChangesSection = (props: { onNavigate?: () => void }) => {
       <SectionTitle title="Latest changes" />
       {changelogs?.items.map((changelog) => (
         <PanelRow
-          key={changelog.date}
+          key={`${changelog.featureType}:${changelog.featureId}:${changelog.actionType}:${changelog.date}`}
           icon={<ChangelogActionIcon type={changelog.actionType} />}
           title={<span>{ReactHtmlParser(changelog.htmlText)}</span>}
           subtitle={formatDistanceToNowStrict(new Date(changelog.date), { addSuffix: true })}

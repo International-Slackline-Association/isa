@@ -14,7 +14,7 @@ import {
 } from '../../../../core/features/mapFeature/editors';
 import { updateFeatureImagesInS3 } from '../../../../core/features/mapFeature/imageUpload';
 import { assignFromSourceToTarget } from '../../../../core/utils';
-import { publicActivationOf } from '../../../../core/features/activation';
+import { publicActivationDatesOf, publicActivationOf } from '../../../../core/features/activation';
 import { logger } from '../../../../core/logger';
 import { FeatureCollection } from 'geojson';
 import { nanoid } from 'nanoid';
@@ -32,9 +32,10 @@ export const getLineDetails = async (req: Request) => {
   if (!line) {
     throw new Error(`NotFound: Line ${req.params.id} not found`);
   }
-  const [editPermission, activation] = await Promise.all([
+  const [editPermission, activation, activationDates] = await Promise.all([
     validateMapFeatureEditor(line.lineId, 'line', req.user?.isaId),
     publicActivationOf('line', line.lineId),
+    publicActivationDatesOf('line', line.lineId),
   ]);
 
   return getLineDetailsResponse(
@@ -44,6 +45,7 @@ export const getLineDetails = async (req: Request) => {
       canEdit: Boolean(editPermission),
     },
     activation,
+    activationDates,
   );
 };
 

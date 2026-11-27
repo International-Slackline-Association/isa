@@ -1,6 +1,6 @@
 import { db } from '../../../../core/db';
 import { DDBSpotDetailTypes } from '../../../../core/db/entities/spot/details/types';
-import { publicActivationOf } from '../../../../core/features/activation';
+import { publicActivationDatesOf, publicActivationOf } from '../../../../core/features/activation';
 import { processSpotGeoJson } from '../../../../core/features/geojson';
 import { getCountryCodeOfGeoJson } from '../../../../core/features/geojson/utils';
 import {
@@ -31,9 +31,10 @@ export const getSpotDetails = async (req: Request) => {
   if (!spot) {
     throw new Error('NotFound: Spot not found');
   }
-  const [editPermission, activation] = await Promise.all([
+  const [editPermission, activation, activationDates] = await Promise.all([
     validateMapFeatureEditor(spot.spotId, 'spot', req.user?.isaId),
     publicActivationOf('spot', spot.spotId),
+    publicActivationDatesOf('spot', spot.spotId),
   ]);
 
   return getSpotDetailsResponse(
@@ -43,6 +44,7 @@ export const getSpotDetails = async (req: Request) => {
       canEdit: Boolean(editPermission),
     },
     activation,
+    activationDates,
   );
 };
 

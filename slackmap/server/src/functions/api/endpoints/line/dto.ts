@@ -1,5 +1,5 @@
 import { DDBLineDetailTypes } from '../../../../core/db/entities/line/details/types';
-import { PublicActivation } from '../../../../core/features/activation';
+import { PublicActivation, PublicActivationDates } from '../../../../core/features/activation';
 import { FeatureCollection } from 'geojson';
 
 export const getLineDetailsResponse = (
@@ -9,6 +9,7 @@ export const getLineDetailsResponse = (
     canEdit: boolean;
   },
   activation?: PublicActivation,
+  activationDates?: PublicActivationDates,
 ) => {
   return {
     id: item.lineId,
@@ -33,5 +34,6 @@ export const getLineDetailsResponse = (
     images: item.images,
     editorPermissions,
     activation,
+    activationDates,
   };
 };
