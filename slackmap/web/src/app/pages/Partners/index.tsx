@@ -1,5 +1,7 @@
 import {
+  Alert,
   Box,
+  Button,
   Divider,
   Link,
   Paper,
@@ -13,6 +15,7 @@ import {
 } from '@mui/material';
 
 const contact = 'slackmap@slacklineinternational.org';
+const requestForm = 'https://data.slacklineinternational.org/access/slackmap.com-api-request/';
 
 const Section = (props: { id?: string; title: string; children: React.ReactNode }) => (
   <Box component="section" id={props.id} sx={{ marginTop: 3 }}>
@@ -108,34 +111,60 @@ export const PartnersPage = () => (
   <Box sx={{ height: '100vh', overflowY: 'auto', width: '100%' }}>
     <Box sx={{ maxWidth: 720, margin: '0 auto', padding: { xs: '24px 16px 88px', lg: '32px 24px' } }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Partner access to SlackMap data
+        Access to SlackMap API data
       </Typography>
 
       <P>
         Are you building an app, a federation or club map, a local guide or a research project, or does
-        your organisation need to know where slacklines are? SlackMap's data is available to partners.
+        your organisation need to know where slacklines are? SlackMap's data is available through an
+        API.
       </P>
+      <Alert severity="info" sx={{ marginBottom: 1.5 }}>
+        Only ISA members and ISA partners can request API access. Becoming one is the first step.
+      </Alert>
       <P>
-        This page has two parts: <Link href="#partnership">how partnership works</Link>, for everyone,
+        This page has two parts: <Link href="#api-access">how API access works</Link>, for everyone,
         and the <Link href="#technical">technical guide</Link>, for the developer who connects your
         application.
       </P>
 
-      <Part id="partnership" title="Part 1: How partnership works" />
+      <Part id="api-access" title="Part 1: How API access works" />
 
-      <Section title="How to become a partner">
+      <Section id="who" title="Who can request access">
+        <P>Only organisations that are part of ISA:</P>
+        <ul>
+          <Item>
+            <b>ISA members:</b> non-profit federations, associations and clubs.{' '}
+            <Link href="https://www.slacklineinternational.org/join-isa/">Become an ISA member</Link>.
+          </Item>
+          <Item>
+            <b>ISA partners:</b> commercial entities.{' '}
+            <Link href="https://www.slacklineinternational.org/partners/">Become an ISA partner</Link>.
+          </Item>
+        </ul>
+        <P>If your organisation is neither yet, join first. Then send your request.</P>
+      </Section>
+
+      <Section title="How to get access">
         <ol>
           <Item>
-            <b>Write to us.</b> Tell us about your project at{' '}
-            <Link href={`mailto:${contact}`}>{contact}</Link>. What to include is listed below.
+            <b>Be an ISA member or ISA partner.</b> This is required; see{' '}
+            <Link href="#who">who can request access</Link>.
+          </Item>
+          <Item>
+            <b>Fill out the request form.</b> It asks for the points listed below.
+            <Box sx={{ marginY: 1 }}>
+              <Button variant="contained" href={requestForm} target="_blank" rel="noopener">
+                Open the request form
+              </Button>
+            </Box>
           </Item>
           <Item>
             <b>We review your request.</b> ISA looks at every request case by case and may come back
             with questions.
           </Item>
           <Item>
-            <b>We agree in writing.</b> Access is granted under a written agreement that says what you
-            may do with the data.
+            <b>Access can be granted.</b>
           </Item>
           <Item>
             <b>You receive credentials.</b> A client ID and a client secret for your application.
@@ -144,13 +173,16 @@ export const PartnersPage = () => (
             <b>Your developer connects your application</b>, following the{' '}
             <Link href="#technical">technical guide</Link>.
           </Item>
+          <Item>
+            <b>We monitor your data use</b> after your application is connected, for changes.
+          </Item>
         </ol>
       </Section>
 
-      <Section id="request" title="What to write in your request">
+      <Section id="request" title="What the request form asks">
         <ul>
-          <Item>Who you are: your organisation and a contact person.</Item>
-          <Item>What you are building, and who will use it.</Item>
+          <Item>Who you are: your organisation, a contact person and a backup contact.</Item>
+          <Item>What you are building with the SlackMap data, and who will use it.</Item>
           <Item>Why you need the data: the purpose it serves.</Item>
           <Item>
             Which data you need: all lines, spots and guides, or only the lines rigged right now, and
@@ -164,18 +196,18 @@ export const PartnersPage = () => (
       <Section title="What you get">
         <P>
           The same data the map on slackmap.com shows: every line, spot and access guide, and a
-          separate list of the lines and spots that are rigged right now.
+          separate list of the lines and spots that are rigged right now (the activity feature).
         </P>
       </Section>
 
-      <Section id="rules" title="Rules for partners">
+      <Section id="rules" title="Rules for API usage">
         <ul>
           <Item>
             <b>Fetch only as often as you need.</b> The list of rigged lines about once an hour, and
             everything else a few times a day at most. That is enough to stay up to date.
           </Item>
           <Item>
-            <b>Lines, spots and guides only.</b> The community groups are not part of partner access.
+            <b>Lines, spots and guides only.</b> The community groups are not part of API access.
           </Item>
           <Item>
             <b>Name your application</b> in every request, so we can tell your requests apart.
@@ -190,8 +222,8 @@ export const PartnersPage = () => (
 
       <Section id="ending-access" title="We can restrict or end your access">
         <P>
-          Partner access is not an entitlement. We can restrict the access of an application that does
-          not keep to the rules above. We also reserve the right to end a partner's access at any time.
+          API access is not an entitlement. We can restrict the access of an application that does
+          not keep to the rules above. We also reserve the right to end access at any time.
         </P>
       </Section>
 
@@ -209,7 +241,7 @@ export const PartnersPage = () => (
         </P>
         <Rows head={['File', 'Contents']} rows={files} />
         <P>
-          Partner access covers these files only. The community groups are not part of it.
+          API access covers these files only. The community groups are not part of it.
         </P>
         <P>
           The files of lines, spots and guides use short field names:

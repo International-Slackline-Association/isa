@@ -232,7 +232,7 @@ const MobileSheet = (props: { activeCount: number }) => {
   const swipeStartY = useRef(0);
   const tab = tabOfPath(location.pathname);
 
-  const barShown = isLandingPath(location.pathname) || location.pathname === '/terms' || location.pathname === '/partner-integration';
+  const barShown = isLandingPath(location.pathname) || location.pathname === '/terms' || location.pathname === '/api-access';
 
   useEffect(() => setOpen(false), [location.pathname]);
 

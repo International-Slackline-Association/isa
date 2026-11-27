@@ -114,7 +114,7 @@ export function App() {
                   </>
                 )}
                 <Route path="/terms" element={<TermsPage />} />
-                <Route path="/partner-integration" element={<PartnersPage />} />
+                <Route path="/api-access" element={<PartnersPage />} />
                 <Route path="*" element={<SlacklineMapPage />} />
               </Routes>
               </SignInReturn>
